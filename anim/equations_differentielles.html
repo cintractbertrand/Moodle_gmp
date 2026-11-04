@@ -1,0 +1,553 @@
+<!doctype html>
+<html lang="fr">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>html{color-scheme:light}body{margin:0;font:14px/1.5 system-ui,-apple-system,"Segoe UI",sans-serif}[hidden]{display:none!important}img{max-width:100%}</style>
+<title>Équations différentielles en animations</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<script>window.MathJax={loader:{load:[]},tex:{inlineMath:[["\\(","\\)"]],displayMath:[["\\[","\\]"]],processEscapes:false},svg:{fontCache:"global"},options:{enableMenu:false,enableAssistiveMml:false},startup:{typeset:false,ready:function(){MathJax.startup.defaultReady();window.__mjr=1;(window.__mjq||[]).forEach(function(f){f()});}}};</script>
+<script async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-svg.min.js"></script>
+
+<style>
+/* Layout: une scène = un passage du cours (titre, réglages, commentaire du prof, tableau animé) */
+:root{--bg:#f6f7f9;--card:#fff;--fg:#1d2433;--mut:#5b6577;--line:#d9dee7;--accent:#1f5fbf;--hl:#ffe08a;--hl2:#bfe3d0;--bad:#b3261e;
+--mono:ui-monospace,"SF Mono",Menlo,Consolas,monospace;--sans:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#10141c;--card:#171d29;--fg:#e6eaf2;--mut:#9aa5b8;--line:#2b3446;--accent:#6aa3ff;--hl:#6b5a14;--hl2:#1f5a43;--bad:#ff8a80;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#10141c;--card:#171d29;--fg:#e6eaf2;--mut:#9aa5b8;--line:#2b3446;--accent:#6aa3ff;--hl:#6b5a14;--hl2:#1f5a43;--bad:#ff8a80;color-scheme:dark}
+body{background:var(--bg);color:var(--fg);font-family:var(--sans);font-size:16px;line-height:1.5;padding-block:20px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+main{max-width:780px;margin:0 auto;display:flex;flex-direction:column;gap:22px}
+h1{font-size:1.4rem;margin:0}h2{font-size:1.1rem;margin:0 0 2px}p{margin:0;color:var(--mut)}
+nav{display:flex;flex-wrap:wrap;gap:6px 12px;font-size:.9rem}nav a{color:var(--accent)}
+section{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:16px;display:flex;flex-direction:column;gap:12px;min-width:0}
+.row{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+label{font-size:.9rem;color:var(--mut)}
+input[type=text],select{font:inherit;font-family:var(--mono);padding:6px 8px;border:1px solid var(--line);border-radius:6px;background:var(--bg);color:var(--fg);min-width:0;max-width:100%}
+input[type=text]{width:14em}
+button{font:inherit;padding:6px 12px;border:1px solid var(--line);border-radius:6px;background:var(--bg);color:var(--fg);cursor:pointer}
+button.p{background:var(--accent);color:var(--bg);border-color:var(--accent)}
+button:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+button:disabled{opacity:.45;cursor:default}
+.bubble{border-left:4px solid var(--accent);background:var(--bg);padding:10px 12px;border-radius:0 8px 8px 0;min-height:3.2em;line-height:1.7}
+mark{background:var(--hl);color:inherit;border-radius:3px;padding:0 3px}
+.stage{overflow-x:auto;font-family:var(--mono)}
+.board{display:flex;align-items:flex-start}
+.board table{border-collapse:collapse}.board td{min-width:3.4em;height:2.2em;text-align:center;padding:0 4px;box-sizing:border-box;white-space:nowrap}
+.board .left{padding-right:10px}.board .right{border-left:2px solid var(--fg);padding-left:6px}
+.board td.rule{border-top:2px solid var(--fg)}
+.board td.lab{min-width:1.4em;padding:0 2px}
+.hl{background:var(--hl);border-radius:4px;font-weight:700}.hk{background:var(--hl2);border-radius:4px}
+.hq{outline:2px solid var(--accent);border-radius:4px;font-weight:700}
+.tab td,.tab th{border:1px solid var(--line);padding:4px 10px;text-align:center;font-weight:400}
+.lines{display:flex;flex-direction:column;gap:6px;font-family:var(--mono)}
+.lines div{padding:2px 6px;border-radius:4px;white-space:nowrap}
+.lines .new{background:var(--hl2)}
+.res{border:2px solid var(--accent);border-radius:8px;padding:8px 10px;font-family:var(--mono);overflow-x:auto}
+.ok{color:var(--accent)}.err{color:var(--bad)}
+svg{max-width:100%;height:auto;display:block;font-family:var(--sans)}
+svg text{fill:var(--fg);font-size:11px}
+svg .ax{stroke:var(--mut);stroke-width:1;fill:none}svg .gr{stroke:var(--line);stroke-width:1;fill:none}
+svg .cv{stroke:var(--accent);stroke-width:2;fill:none}svg .dsh{stroke:var(--mut);stroke-dasharray:4 3;fill:none}
+svg .cv2{stroke:var(--bad);stroke-width:2;fill:none}svg .cv3{stroke:var(--mut);stroke-width:1.5;stroke-dasharray:4 3;fill:none}svg .fillp{fill:var(--accent);opacity:.28;stroke:none}svg .fillm{fill:var(--bad);opacity:.28;stroke:none}svg .rect{fill:var(--accent);opacity:.3;stroke:var(--accent);stroke-width:1}svg .rectU{fill:var(--bad);opacity:.15;stroke:var(--bad);stroke-width:1}h2 .cd{display:inline-block;background:var(--accent);color:var(--bg);border-radius:6px;padding:0 8px;margin-right:6px;font-size:.95em}.rt{white-space:nowrap}.rt .ov{border-top:1.5px solid currentColor;padding:0 1px;margin-left:1px}svg .tg{stroke:var(--accent);stroke-width:2;fill:none}svg .vec{stroke:var(--accent);stroke-width:2}svg .pt{fill:var(--bad)}svg .pk{fill:var(--accent)}svg .pe{fill:none;stroke:var(--accent);stroke-width:1.5}
+.fq{display:inline-flex;flex-direction:column;vertical-align:middle;text-align:center;margin:0 2px;line-height:1.25;font-size:.95em}.fq .nu{border-bottom:1.5px solid currentColor;padding:0 3px}.fq .de{padding:0 3px}br.sp{display:block;content:"";margin-top:.55em}.bubble{line-height:1.95;padding:14px 16px}.bubble mjx-container[display="true"]{margin:.55em 0 !important}.lines{gap:10px}.lines div{padding:6px 10px;white-space:normal}.lines,.res,.stage{font-family:inherit}.res{padding:12px 14px;font-size:1.05em}mjx-container[jax="SVG"] svg{overflow:visible}section h2 mjx-container,nav mjx-container{font-size:100%}/*ovf*/mjx-container svg{display:inline!important}mjx-assistive-mml{display:none!important}mjx-assistive-mml{position:absolute!important;width:1px!important;height:1px!important;overflow:hidden!important;clip:rect(0 0 0 0)!important;left:0!important;top:0!important}mjx-container{position:relative}mjx-container{max-width:100%;overflow-x:auto;overflow-y:hidden}mjx-container[display=true]{margin:.5em 0!important}.bubble,.lines,.res,.stage,#board,#say{max-width:100%;overflow-x:auto}.ref{overflow-x:auto;max-width:100%}</style>
+<main>
+<h1>Équations différentielles : les animations du cours</h1>
+<p>Chaque animation reprend un passage du cours. Appuie sur Lecture, ou avance à ton rythme avec Suivant.</p>
+<nav id="nav"></nav>
+<div id="scenes" style="display:contents"></div>
+</main>
+<script>
+/* =================== calcul exact =================== */
+function gcd(a,b){a=Math.abs(a);b=Math.abs(b);while(b){[a,b]=[b,a%b]}return a}
+function F(n,d=1){if(d<0){n=-n;d=-d}const g=gcd(n,d)||1;return{n:n/g,d:d/g}}
+const add=(x,y)=>F(x.n*y.d+y.n*x.d,x.d*y.d),sub=(x,y)=>F(x.n*y.d-y.n*x.d,x.d*y.d),mul=(x,y)=>F(x.n*y.n,x.d*y.d),dv=(x,y)=>F(x.n*y.d,x.d*y.n);
+const isz=x=>x.n===0, fs=x=>x.d===1?String(x.n):x.n+"/"+x.d, fnum=x=>x.n/x.d;
+const sup=n=>String(n).split("").map(c=>"⁰¹²³⁴⁵⁶⁷⁸⁹"[+c]).join("");
+const sub_=n=>String(n).split("").map(c=>"₀₁₂₃₄₅₆₇₈₉"[+c]).join("");
+/* un polynôme = objet {puissance: Fraction} sans coefficient nul */
+function clean(m){const r={};for(const k in m)if(!isz(m[k]))r[k]=m[k];return r}
+function fromDesc(a){const m={};a.forEach((c,i)=>{m[a.length-1-i]=typeof c==="number"?F(c):c});return clean(m)}
+function fromAsc(a){const m={};a.forEach((c,i)=>{m[i]=typeof c==="number"?F(c):c});return clean(m)}
+const pows=m=>Object.keys(m).map(Number).sort((a,b)=>a-b);
+const deg=m=>{const p=pows(m);return p.length?p[p.length-1]:-1};
+const low=m=>{const p=pows(m);return p.length?p[0]:-1};
+const empty=m=>pows(m).length===0;
+function padd(a,b){const r={...a};for(const k in b)r[k]=r[k]?add(r[k],b[k]):b[k];return clean(r)}
+function pscale(a,c){const r={};for(const k in a)r[k]=mul(a[k],c);return clean(r)}
+function pshift(a,s){const r={};for(const k in a)r[+k+s]=a[k];return r}
+const psub=(a,b)=>padd(a,pscale(b,F(-1)));
+function pmul(a,b){let r={};for(const i in a)for(const j in b){const p=+i+ +j;r[p]=r[p]?add(r[p],mul(a[i],b[j])):mul(a[i],b[j])}return clean(r)}
+function pderiv(a){const r={};for(const k in a)if(+k>0)r[k-1]=mul(a[k],F(+k));return clean(r)}
+function peval(a,x){let s=F(0);for(const k in a){let t=F(1);for(let i=0;i<+k;i++)t=mul(t,x);s=add(s,mul(a[k],t))}return s}
+function pevalF(a,x){let s=0;for(const k in a)s+=fnum(a[k])*Math.pow(x,+k);return s}
+const peq=(a,b)=>empty(psub(a,b));
+let VAR="x";
+function term(c,p,first){if(isz(c))return"";const neg=c.n<0,ab=F(Math.abs(c.n),c.d);
+ let b=(p>0&&ab.n===1&&ab.d===1)?"":(ab.d===1||p===0?fs(ab):"("+fs(ab)+")");
+ b+=p>0?(p===1?VAR:VAR+sup(p)):"";
+ return first?(neg?"−"+b:b):(neg?"− ":"+ ")+b}
+function pstr(m,asc){const p=pows(m);if(!p.length)return"0";if(!asc)p.reverse();let o="";p.forEach((k,i)=>{const t=term(m[k],k,i===0);o+=(i&&t.startsWith("")?" ":"")+t});return o}
+const one=(c,p)=>term(c,p,true);
+function parseList(s){return s.split(/[,;\s]+/).filter(Boolean).map(t=>{const m=t.match(/^(-?\d+)(?:\/(\d+))?$/);if(!m||(m[2]&&+m[2]===0))throw 0;return F(+m[1],m[2]?+m[2]:1)})}
+
+/* =================== division (décroissante ou croissante) =================== */
+function divModel(A,B,asc,order){
+ const its=[];let R={...A};const dB=deg(B);
+ if(!asc){while(!empty(R)&&deg(R)>=dB){const lp=deg(R),qp=lp-dB,c=dv(R[lp],B[dB]);const prod=pscale(pshift(B,qp),c);const Rn=psub(R,prod);its.push({lp,qp,c,prod,Rold:R,Rn});R=Rn}}
+ else{for(let s=0;s<=order;s++){const c=R[s]?dv(R[s],B[0]):F(0);const prod=pscale(pshift(B,s),c);const Rn=psub(R,prod);its.push({lp:s,qp:s,c,prod,Rold:R,Rn});R=Rn}}
+ const Q={};its.forEach(it=>{if(!isz(it.c))Q[it.qp]=it.c});
+ const dA=deg(A);
+ let colsL,colsR;
+ if(!asc){const wp=Math.max(dB,dA-dB,0);colsL=range(dA,0,-1);colsR=range(wp,0,-1)}
+ else{const mp=Math.max(dA,order+dB);colsL=range(0,mp,1);colsR=range(0,Math.max(dB,order),1)}
+ return{A,B,asc,order,its,Q,R,dA,dB,colsL,colsR,N:4*its.length+1};
+}
+function range(a,b,s){const r=[];for(let i=a;s>0?i<=b:i>=b;i+=s)r.push(i);return r}
+function divCheck(D){return peq(padd(pmul(D.B,D.Q),D.R),D.A)}
+function divSay(D,t){
+ const {A,B,asc,its,order,dB}=D;
+ if(t===0)return asc?`On pose la DSPC à l'ordre <b>${order}</b> : on range A et B <b>suivant les puissances croissantes</b>. On veut A = B×Q + ${VAR}<sup>${order+1}</sup>×R avec deg Q ≤ ${order}.`
+  :`On pose la division : <b>A = ${pstr(A)}</b> à gauche, <b>B = ${pstr(B)}</b> à droite. On veut A = B×Q + R avec deg R &lt; deg B = ${dB}.`+(D.dA<dB?" Ici deg A &lt; deg B : la division est déjà finie.":"");
+ if(t===D.N){
+  if(asc){const Rp={};for(const k in D.R)Rp[k-order-1]=D.R[k];return `On s'arrête à l'ordre ${order}. <b>Q = ${pstr(D.Q,true)}</b> et le reste est <b>${pstr(D.R,true)} = ${VAR}${sup(order+1)}×(${pstr(Rp,true)})</b>.`}
+  return D.R&&!empty(D.R)?`Le reste <b>${pstr(D.R)}</b> a pour degré ${deg(D.R)}, strictement inférieur à ${dB} : on s'arrête. <b>Q = ${pstr(D.Q)}</b> et <b>R = ${pstr(D.R)}</b>.`
+   :`Le reste est nul : on s'arrête. <b>Q = ${pstr(D.Q)}</b> et <b>R = 0</b>, donc B divise A.`}
+ const i=Math.floor((t-1)/4),ph=(t-1)%4,it=its[i];
+ const src=i?"le reste":"A";
+ const lr=one(it.Rold[it.lp]||F(0),it.lp),lb=asc?one(B[0],0):one(B[dB],dB),q=one(it.c,it.qp),zero=isz(it.c);
+ const lead=asc?"de plus bas degré":"de plus haut degré";
+ if(ph===0)return `<b>Étape ${i+1}.</b> On regarde seulement les termes ${lead} : <mark>${lr||"0"}</mark> dans ${src} et <mark>${lb}</mark> dans B.`;
+ if(ph===1)return zero?`Le terme de degré ${it.lp} du reste est nul : le terme du quotient est <mark>0</mark>.`:`Par quoi faut-il multiplier ${lb} pour obtenir ${lr} ? ${lr} ÷ ${lb} = <mark>${q}</mark>. On l'écrit au quotient, sous B.`;
+ if(ph===2)return zero?`0 × B = 0 : il n'y a rien à écrire.`:`On multiplie <b>tout</b> B par ${q} et on écrit le résultat sous ${src}, en alignant les puissances de X : ${q}·B = ${pstr(it.prod,asc)}.`;
+ const Rn=it.Rn;return zero?`Rien à soustraire, on passe au terme suivant.`:`On soustrait la parenthèse, c'est-à-dire qu'on change tous ses signes : le terme de degré ${it.lp} disparaît. Il reste <mark>${empty(Rn)?"0":pstr(Rn,asc)}</mark>.`;
+}
+function divBoard(D,t){
+ const {A,B,asc,its,N,colsL,colsR,dB}=D;
+ const cur=t>0&&t<N?{i:Math.floor((t-1)/4),ph:(t-1)%4}:null;
+ const reached=(i,ph)=>t>=4*i+ph+1;
+ const row=(m,cols,cls,lab,rule)=>{let seen=false;return `<tr><td class="lab">${lab||""}</td>`+cols.map(p=>{const v=m[p];const tt=v?term(v,p,!seen):"";if(tt)seen=true;return `<td class="${(cls&&cls(p))||""} ${rule?"rule":""}">${tt}</td>`}).join("")+`<td class="lab">${lab?")":""}</td></tr>`};
+ let L=row(A,colsL,p=>cur&&cur.i===0&&cur.ph<=1&&its[0]&&p===its[0].lp?"hl":"","");
+ its.forEach((it,i)=>{const isCur=cur&&cur.i===i;
+  if(reached(i,2)&&!isz(it.c))L+=row(it.prod,colsL,()=>isCur&&cur.ph===2?"hk":"","− (");
+  if(reached(i,3)&&!isz(it.c)){const nx=its[i+1];L+=row(it.Rn,colsL,p=>isCur&&cur.ph===3?"hk":(cur&&cur.i===i+1&&cur.ph<=1&&nx&&p===nx.lp?"hl":""),"",true)}
+ });
+ const leadB=asc?0:dB;
+ let seenB=false,seenQ=false;
+ const RB=`<tr>`+colsR.map(p=>{const c=B[p];const tt=c?term(c,p,!seenB):"";if(tt)seenB=true;return `<td class="${cur&&cur.ph<=1&&p===leadB?"hl":""}">${tt}</td>`}).join("")+`</tr>`;
+ const RQ=`<tr>`+colsR.map(p=>{let v=null,h="";its.forEach((it,i)=>{if(it.qp===p&&reached(i,1)){v=it.c;if(cur&&cur.i===i&&cur.ph===1)h="hq"}});const tt=v&&!isz(v)?term(v,p,!seenQ):"";if(tt)seenQ=true;return `<td class="rule ${h}">${tt}</td>`}).join("")+`</tr>`;
+ let out=`<div class="board"><div class="left"><table>${L}</table></div><div class="right"><table>${RB+RQ}</table></div></div>`;
+ if(t===N)out+=`<div class="res">A = B·Q + ${D.asc?"reste":"R"}<br>(${pstr(B,asc)})·(${pstr(D.Q,asc)}) + (${empty(D.R)?"0":pstr(D.R,asc)})<br><span class="${divCheck(D)?"ok":"err"}">Vérification : B·Q + R = A ${divCheck(D)?"✓":"✗"}</span></div>`;
+ return out;
+}
+function divSteps(D,extra){const s=[];for(let t=0;t<=D.N;t++)s.push({say:divSay(D,t),board:divBoard(D,t)});return s}
+
+/* =================== dessins =================== */
+function niceTicks(a,b){const span=b-a;let st=Math.pow(10,Math.floor(Math.log10(span/4)));if(span/st>8)st*=2;if(span/st>8)st*=2.5;const r=[];for(let v=Math.ceil(a/st)*st;v<=b+1e-9;v+=st)r.push(Math.round(v/st)*st);return r}
+function graphSvg(o){const W=380,H=240,pl=30,pr=14,pt=14,pb=24;const {f,xmin,xmax}=o;let {ymin,ymax}=o;
+ if(ymin===undefined){let lo=1e9,hi=-1e9;for(let i=0;i<=200;i++){const y=f(xmin+(xmax-xmin)*i/200);lo=Math.min(lo,y);hi=Math.max(hi,y)}const pad=(hi-lo)*0.12||1;ymin=Math.min(lo,0)-pad;ymax=Math.max(hi,0)+pad}
+ const X=x=>pl+(x-xmin)/(xmax-xmin)*(W-pl-pr),Y=y=>pt+(ymax-y)/(ymax-ymin)*(H-pt-pb);
+ let s=`<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="${o.label||"graphe"}">`;
+ niceTicks(xmin,xmax).forEach(v=>{s+=`<line class="gr" x1="${X(v)}" y1="${pt}" x2="${X(v)}" y2="${H-pb}"/><text x="${X(v)}" y="${H-pb+13}" text-anchor="middle">${+v.toFixed(2)}</text>`});
+ niceTicks(ymin,ymax).forEach(v=>{s+=`<line class="gr" x1="${pl}" y1="${Y(v)}" x2="${W-pr}" y2="${Y(v)}"/><text x="${pl-4}" y="${Y(v)+4}" text-anchor="end">${+v.toFixed(2)}</text>`});
+ if(ymin<0&&ymax>0)s+=`<line class="ax" x1="${pl}" y1="${Y(0)}" x2="${W-pr}" y2="${Y(0)}"/>`;
+ if(xmin<0&&xmax>0)s+=`<line class="ax" x1="${X(0)}" y1="${pt}" x2="${X(0)}" y2="${H-pb}"/>`;
+ let d="",pen=false;for(let i=0;i<=240;i++){const x=xmin+(xmax-xmin)*i/240,y=f(x);if(y<ymin||y>ymax){pen=false;continue}d+=(pen?"L":"M")+X(x).toFixed(1)+" "+Y(y).toFixed(1)+" ";pen=true}
+ s+=`<path class="cv" d="${d}"/>`;
+ (o.marks||[]).forEach(m=>{if(m.drop)s+=`<line class="dsh" x1="${X(m.x)}" y1="${Y(m.y)}" x2="${X(m.x)}" y2="${Y(0)}"/>`;
+  s+=`<circle class="${m.ok?"pk":"pt"}" cx="${X(m.x)}" cy="${Y(m.y)}" r="5"/>`;if(m.label)s+=`<text x="${X(m.x)+7}" y="${Y(m.y)-7}">${m.label}</text>`});
+ return s+"</svg>"}
+function planeSvg(o){const S=300,R=o.R,pad=18,C=S/2;const X=x=>C+x/R*(C-pad),Y=y=>C-y/R*(C-pad);
+ let s=`<svg viewBox="0 0 ${S} ${S}" style="max-width:320px" role="img" aria-label="plan complexe">`;
+ for(let v=-Math.floor(R);v<=Math.floor(R);v++){if(!v)continue;s+=`<line class="gr" x1="${X(v)}" y1="${pad/2}" x2="${X(v)}" y2="${S-pad/2}"/><line class="gr" x1="${pad/2}" y1="${Y(v)}" x2="${S-pad/2}" y2="${Y(v)}"/><text x="${X(v)}" y="${C+12}" text-anchor="middle">${String(v).replace("-","−")}</text><text x="${C-4}" y="${Y(v)+4}" text-anchor="end">${v===1?"i":v===-1?"−i":String(v).replace("-","−")+"i"}</text>`}
+ s+=`<line class="ax" x1="${pad/2}" y1="${C}" x2="${S-pad/2}" y2="${C}"/><line class="ax" x1="${C}" y1="${pad/2}" x2="${C}" y2="${S-pad/2}"/>`;
+ if(o.circle)s+=`<circle class="pe" cx="${C}" cy="${C}" r="${(o.circleR||1)/R*(C-pad)}" style="stroke-dasharray:3 3"/>`;
+ if(o.poly){s+=`<polyline class="vec" fill="none" points="${o.poly.map(p=>X(p[0]).toFixed(1)+","+Y(p[1]).toFixed(1)).join(" ")}${o.closed?" "+X(o.poly[0][0]).toFixed(1)+","+Y(o.poly[0][1]).toFixed(1):""}"/>`}
+ (o.links||[]).forEach(l=>{s+=`<line class="dsh" x1="${X(l[0])}" y1="${Y(l[1])}" x2="${X(l[2])}" y2="${Y(l[3])}"/>`});
+ (o.vecs||[]).forEach(l=>{s+=`<line class="vec" x1="${X(0)}" y1="${Y(0)}" x2="${X(l[0])}" y2="${Y(l[1])}"/>`});
+ if(o.arc){const r=o.arc.r/R*(C-pad),th=o.arc.th,x2=C+r*Math.cos(th),y2=C-r*Math.sin(th);s+=`<path class="vec" fill="none" d="M ${C+r} ${C} A ${r} ${r} 0 ${Math.abs(th)>Math.PI?1:0} ${th>0?0:1} ${x2.toFixed(1)} ${y2.toFixed(1)}"/><text x="${C+r+4}" y="${C-4}">θ</text>`}
+ (o.pts||[]).forEach(p=>{s+=`<circle class="${p.hl?"pt":"pk"}" cx="${X(p.re)}" cy="${Y(p.im)}" r="5.5"/>`;if(p.m>1)s+=`<circle class="pe" cx="${X(p.re)}" cy="${Y(p.im)}" r="9"/>`;
+  s+=`<text x="${X(p.re)+9}" y="${Y(p.im)-8}">${p.label}${p.m>1?" (×"+p.m+")":""}</text>`});
+ return s+"</svg>"}
+const lines=(arr,k)=>`<div class="lines">`+arr.map((l,i)=>`<div class="${i===k?"new":""}">${l}</div>`).join("")+`</div>`;
+const stdP=F;
+
+/* =================== scènes : nombres complexes =================== */
+const SC=[];
+/* complexes rationnels exacts */
+const Zc=(re,im=0)=>({re:typeof re==="number"?F(re):re,im:typeof im==="number"?F(im):im});
+const zadd=(a,b)=>({re:add(a.re,b.re),im:add(a.im,b.im)}),zsub=(a,b)=>({re:sub(a.re,b.re),im:sub(a.im,b.im)});
+const zmul=(a,b)=>({re:sub(mul(a.re,b.re),mul(a.im,b.im)),im:add(mul(a.re,b.im),mul(a.im,b.re))});
+const zconj=a=>({re:a.re,im:mul(a.im,F(-1))});
+const zn2=a=>add(mul(a.re,a.re),mul(a.im,a.im));
+const zdiv=(a,b)=>{const d=zn2(b),n=zmul(a,zconj(b));return{re:dv(n.re,d),im:dv(n.im,d)}};
+const zeq=(a,b)=>isz(sub(a.re,b.re))&&isz(sub(a.im,b.im));
+const fr=x=>fs(x);
+function imS(y){const ab=F(Math.abs(y.n),y.d);if(ab.d===1)return ab.n===1?"i":ab.n+"i";return (ab.n===1?"i":ab.n+"i")+"/"+ab.d}
+function zstr(z){const a=!isz(z.re),b=!isz(z.im);if(!a&&!b)return"0";if(!b)return fr(z.re);if(!a)return (z.im.n<0?"−":"")+imS(z.im);return fr(z.re)+(z.im.n<0?" − ":" + ")+imS(z.im)}
+function zs(z){const s=zstr(z);return (a=>a)(s)}
+const zp=z=>{const s=zstr(z);return (!isz(z.re)&&!isz(z.im))||z.re.d!==1?"("+s+")":(z.re.n<0||(isz(z.re)&&z.im.n<0)?"("+s+")":s)};
+const ipow=(z,n)=>{let r=Zc(1);for(let i=0;i<n;i++)r=zmul(r,z);return r};
+const piS=q=>{if(q.n===0)return"0";const neg=q.n<0,n=Math.abs(q.n);return (neg?"−":"")+(n===1?"":n)+"π"+(q.d===1?"":"/"+q.d)};
+const C_=(n,k)=>{let r=1;for(let i=1;i<=k;i++)r=r*(n-k+i)/i;return Math.round(r)};
+const cpl=(o)=>`<div class="stage">${planeSvg(o)}</div>`;
+const NL=s=>s.replace(/-(?=\d)/g,"−");
+
+/* graphe à échelles libres */
+function g2(o){const W=o.W||360,H=o.H||o.W||320,pl=34,pr=14,pt=12,pb=26;const {xmin,xmax,ymin,ymax}=o;
+ const X=x=>pl+(x-xmin)/(xmax-xmin)*(W-pl-pr),Y=y=>pt+(ymax-y)/(ymax-ymin)*(H-pt-pb);
+ let s=`<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="${o.label||"graphe"}">`;
+ const tx=o.tx||niceTicks(xmin,xmax).map(v=>({v,l:String(+v.toFixed(2)).replace("-","−")})),ty=o.ty||niceTicks(ymin,ymax).map(v=>({v,l:String(+v.toFixed(2)).replace("-","−")}));
+ tx.forEach(t=>{s+=`<line class="gr" x1="${X(t.v)}" y1="${pt}" x2="${X(t.v)}" y2="${H-pb}"/><text x="${X(t.v)}" y="${H-pb+14}" text-anchor="middle">${t.l}</text>`});
+ ty.forEach(t=>{s+=`<line class="gr" x1="${pl}" y1="${Y(t.v)}" x2="${W-pr}" y2="${Y(t.v)}"/><text x="${pl-4}" y="${Y(t.v)+4}" text-anchor="end">${t.l}</text>`});
+ if(ymin<0&&ymax>0)s+=`<line class="ax" x1="${pl}" y1="${Y(0)}" x2="${W-pr}" y2="${Y(0)}"/>`;
+ if(xmin<0&&xmax>0)s+=`<line class="ax" x1="${X(0)}" y1="${pt}" x2="${X(0)}" y2="${H-pb}"/>`;
+ (o.fills||[]).forEach(fl=>{const n=80;let d=`M ${X(fl.a)} ${Y(0)} `;for(let i=0;i<=n;i++){const x=fl.a+(fl.b-fl.a)*i/n;d+=`L ${X(x).toFixed(1)} ${Y(Math.max(ymin,Math.min(ymax,fl.f(x)))).toFixed(1)} `}d+=`L ${X(fl.b)} ${Y(0)} Z`;s+=`<path class="${fl.cls||"fillp"}" d="${d}"/>`});
+ (o.rects||[]).forEach(r=>{const y0=Y(0),y1=Y(r.y);s+=`<rect class="${r.cls||"rect"}" x="${X(r.x0).toFixed(1)}" y="${Math.min(y0,y1).toFixed(1)}" width="${(X(r.x1)-X(r.x0)).toFixed(1)}" height="${Math.abs(y0-y1).toFixed(1)}"/>`});
+ (o.lines||[]).forEach(l=>{s+=`<line class="${l.cls||"dsh"}" x1="${X(l.p[0])}" y1="${Y(l.p[1])}" x2="${X(l.q[0])}" y2="${Y(l.q[1])}"/>`;if(l.l)s+=`<text x="${X(l.q[0])-4}" y="${Y(l.q[1])-5}" text-anchor="end">${l.l}</text>`});
+ (o.curves||[]).forEach(c=>{const a=Math.max(c.dom?c.dom[0]:xmin,xmin),b=Math.min(c.dom?c.dom[1]:xmax,xmax);let d="",pen=false;const N=300;
+  for(let i=0;i<=N;i++){const x=a+(b-a)*i/N,y=c.f(x);if(!isFinite(y)||y<ymin-1e-9||y>ymax+1e-9){pen=false;continue}d+=(pen?"L":"M")+X(x).toFixed(1)+" "+Y(y).toFixed(1)+" ";pen=true}
+  s+=`<path class="${c.cls||"cv"}" d="${d}"/>`});
+ (o.pts||[]).forEach(p=>{s+=`<circle class="${p.cls||"pt"}" cx="${X(p.x)}" cy="${Y(p.y)}" r="5"/>`;if(p.l)s+=`<text x="${X(p.x)+7}" y="${Y(p.y)-7}">${p.l}</text>`});
+ return `<div class="stage">${s}</svg></div>`}
+const PIT=(lo,hi,step)=>{const r=[];for(let k=Math.ceil(lo/step-1e-9);k*step<=hi+1e-9;k++){const v=k*step;const n=Math.round(v/(Math.PI/2));const l=n===0?"0":(n%2===0?(n/2===1?"π":n/2===-1?"-π":n/2+"π"):(n===1?"":n===-1?"−":n)+"π/2");r.push({v,l:l.replace(/^-/,"−")})}return r};
+const tang=(x,y,m,len)=>{const n=Math.hypot(1,m),dx=len/n,dy=len*m/n;return{p:[x-dx,y-dy],q:[x+dx,y+dy],cls:"tg"}};
+const PI=Math.PI;
+/* =================== scènes : équations différentielles =================== */
+const fmt=n=>{let s=(Math.abs(n)<1e-3&&n!==0)?n.toExponential(3):(+n.toPrecision(6))+"";s=s.replace(/e([+-]?)(\d+)/,(m,g,d)=>"×10"+(g==="-"?"⁻":"")+sup(+d));return s.replace(".",",").replace("-","−")};
+const d1=(f,x)=>(f(x+1e-5)-f(x-1e-5))/2e-5;
+const d2=(f,x)=>{const h=1e-3;return (f(x+h)-2*f(x)+f(x-h))/(h*h)};
+const GW={W:340,H:250};
+const sm=(c,s,first)=>{/* terme c·s */const n=Math.abs(c.n),d=c.d;const b=(n===1&&s?"":n)+s+(d>1?"/"+d:"");return first?(c.n<0?"−":"")+b:(c.n<0?" − ":" + ")+b};
+const polyS=(m,v="x")=>{const p=pows(m).reverse();if(!p.length)return"0";return p.map((k,i)=>sm(m[k],k===0?"":k===1?v:v+sup(k),i===0)).join("").replace(/^(−?)(\d+(?:\/\d+)?)$/,"$1$2")};
+const opS=(A,B,C,y2,y1,y0)=>[[A,y2],[B,y1],[C,y0]].filter(x=>x[0]!==0).map(([c,s],i)=>{const ab=Math.abs(c),co=ab===1&&s?"":ab;return (i===0?(c<0?"−":""):(c<0?" − ":" + "))+co+s}).join("");
+const addP=(h,pl)=>pl.startsWith("−")?`${h} − ${pl.slice(1)}`:`${h} + ${pl}`;
+const xe=g=>g===0?"0":g===1?"x":g===-1?"−x":`${g}x`;
+const exR=r=>r===1?"eˣ":`e^(${xe(r)})`;
+const exS=m=>m===1?"eˣ":`e^(${m}x)`;
+const lett="abcdefg";
+/* résolution exacte : a f'' + b f' + c f = P avec f = Σ_{j=s}^{n+s} q_j x^j */
+function solveED(A,B,C,P,s){const n=deg(P);const js=range(s,n+s,1);const M=[];
+ for(let k=0;k<=n;k++){M.push(js.map(j=>{let c=F(0);if(k===j)c=add(c,F(C));if(k===j-1)c=add(c,F(B*j));if(k===j-2)c=add(c,F(A*j*(j-1)));return c}))}
+ /* triangulaire : on résout depuis le haut */
+ const q={};const eq=[];
+ for(let k=n;k>=0;k--){const row=M[k];eq.push({k,row,rhs:P[k]||F(0)})}
+ const jt=js.slice().reverse();/* du plus haut degré au plus bas */
+ const val={};
+ /* élimination de Gauss simple */
+ const N=js.length;const aug=M.map((r,k)=>r.concat([P[k]||F(0)]));
+ for(let col=0;col<N;col++){let piv=-1;for(let r=col;r<N;r++)if(!isz(aug[r][col])){piv=r;break}
+  if(piv<0)continue;[aug[col],aug[piv]]=[aug[piv],aug[col]];const pv=aug[col][col];aug[col]=aug[col].map(x=>dv(x,pv));
+  for(let r=0;r<N;r++)if(r!==col&&!isz(aug[r][col])){const f=aug[r][col];aug[r]=aug[r].map((x,i)=>sub(x,mul(f,aug[col][i])))}}
+ js.forEach((j,i)=>{q[j]=aug[i][N]});
+ return{js,M,q,n,F:clean(q),letters:js.slice().reverse().map((j,i)=>({j,l:lett[i]}))};}
+const eqStr=(S,k)=>{const terms=[];S.letters.slice().forEach(({j,l})=>{const c=S.M[k][S.js.indexOf(j)];if(!isz(c))terms.push({c,s:l})});return terms.length?terms.map((t,i)=>sm(t.c,t.s,i===0)).join(""):"0"};
+const fgen=(S,s,e="")=>{const t=S.letters.map(({j,l})=>l+(j===0?"":j===1?"x":"x"+sup(j)));return `(${t.join(" + ")})${e}`};
+/* 1. équation homogène du 1er ordre */
+const H1=[{t:"y′ − x y = 0",al:"−x",I:"ℝ",phi:(x)=>Math.exp(x*x/2),int:"∫ (−x) dx = −x²/2",expo:"exp(x²/2)",sol:"λ e^(x²/2)",xr:[-2.5,2.5],al_f:x=>-x,ph:"e^(x²/2)"},
+ {t:"y′ + y/x = 0 sur ]0 ; +∞[",al:"1/x",I:"]0 ; +∞[",phi:x=>1/x,int:"∫ dx/x = ln x (x > 0)",expo:"exp(−ln x)",sol:"λ/x",xr:[0.2,4],al_f:x=>1/x,ph:"1/x"},
+ {t:"y′ + 2y = 0",al:"2",I:"ℝ",phi:x=>Math.exp(-2*x),int:"∫ 2 dx = 2x",expo:"exp(−2x)",sol:"λ e^(−2x)",xr:[-1,2],al_f:x=>2,ph:"e^(−2x)"}];
+SC.push({id:"h1",title:"Équation homogène du 1er ordre : y′ + α(x)y = 0",ref:"Cours : solutions λ·exp(−∫α), unicité avec y(x₀) = y₀, exemple y′ − xy = 0.",
+ params:[{id:"c",label:"Équation",type:"select",options:H1.map((e,i)=>[String(i),e.t])}],
+ build(v){const e=H1[+v.c];const lam=[-2,-1,1,2].map(l=>({f:x=>l*e.phi(x),cls:"cv3"}));const B={xmin:e.xr[0],xmax:e.xr[1],ymin:-6,ymax:6,...GW};
+  const lam0=2/e.phi(1);const x0=1.5;const chk=lam0*(d1(e.phi,x0)+e.al_f(x0)*e.phi(x0));
+  return[
+  {say:`On cherche <b>toutes</b> les solutions de ${e.t} (ici α(x) = ${e.al}). Le théorème dit : les solutions sont φ(x) = λ·exp(−∫α(x)dx), λ ∈ ℝ.`,board:lines([`(E′) y′ + α(x) y = 0 , α(x) = ${e.al}`,`φ(x) = λ exp(−∫ α(x) dx)`],1)},
+  {say:`On calcule une primitive de α : <b>${e.int}</b>. Donc exp(−∫α) = <b>${e.expo}</b> = ${e.ph}.`,board:lines([e.int,`exp(−∫α) = ${e.expo} = ${e.ph}`],1)},
+  {say:`Les solutions sont donc <b>φ(x) = ${e.sol}, λ ∈ ℝ</b> : une infinité de solutions, une courbe par valeur de λ (ici λ = −2, −1, 0, 1, 2).`,board:g2({...B,curves:lam.concat([{f:()=>0,cls:"cv3"}])})+lines([`φ(x) = ${e.sol} , λ ∈ ℝ`],0)},
+  {say:`Si on <b>impose une condition</b> y(1) = 2, une seule courbe convient : on écrit φ(1) = λ·(${e.ph} en x = 1) = 2, d'où λ = 2/${fmt(e.phi(1))} = <b>${fmt(lam0)}</b>.`,board:g2({...B,curves:lam.concat([{f:x=>lam0*e.phi(x),cls:"cv2"}]),pts:[{x:1,y:2,cls:"pt"}]})},
+  {say:`<b>Vérification :</b> avec φ = ${fmt(lam0)}·(${e.ph}), on calcule φ′(1,5) + α(1,5)φ(1,5) ≈ ${fmt(chk)}, qui est nul à la précision du calcul ✓.`,board:`<div class="res">φ′ + αφ = 0 ✓<br>unique solution avec y(1) = 2</div>`}]}});
+/* 2. structure : solution particulière + homogène */
+const ED1=[{t:"y′ + y/x = 2 sur ]0 ; +∞[",f0:x=>x,f0t:"x",hom:x=>1/x,homt:"1/x",al:x=>1/x,be:x=>2,bet:"2",xr:[0.2,4],yr:[-3,8],
+  f0chk:"x′ + x/x = 1 + 1 = 2 ✓",hs:"y′ + y/x = 0 ⇒ φ(x) = λ/x"},
+ {t:"(1 − x²)y′ + xy = 1 sur ]−1 ; 1[",f0:x=>x,f0t:"x",hom:x=>Math.sqrt(1-x*x),homt:"√(1 − x²)",al:x=>x/(1-x*x),be:x=>1/(1-x*x),bet:"1/(1 − x²)",xr:[-1,1],yr:[-2,2],
+  f0chk:"(1 − x²)·1 + x·x = 1 − x² + x² = 1 ✓",hs:"y′ + x/(1 − x²)·y = 0 ⇒ φ(x) = λ exp(−∫ x/(1−x²) dx) = λ exp(½ ln(1 − x²)) = λ√(1 − x²)"}];
+SC.push({id:"ed1",title:"Solutions de (E) = solutions de (E′) + une solution particulière",ref:"Cours : théorème f = φ + f₀ ; exemples y′ + y/x = 2 et (1 − x²)y′ + xy = 1.",
+ params:[{id:"c",label:"Équation",type:"select",options:ED1.map((e,i)=>[String(i),e.t])}],
+ build(v){const e=ED1[+v.c];const B={xmin:e.xr[0],xmax:e.xr[1],ymin:e.yr[0],ymax:e.yr[1],...GW};
+  const fam=[-2,-1,1,2].map(l=>({f:x=>e.f0(x)+l*e.hom(x),cls:"cv3"}));const x1=v.c==="0"?1.7:0.4;
+  const lam=0.8;const f=x=>e.f0(x)+lam*e.hom(x);const chk=v.c==="0"?d1(f,x1)+f(x1)/x1:(1-x1*x1)*d1(f,x1)+x1*f(x1);
+  return[
+  {say:`On veut toutes les solutions de (E) : ${e.t}. Une solution est parfois évidente : ici <b>f₀(x) = ${e.f0t}</b>. Vérification : ${e.f0chk}.`,board:g2({...B,curves:[{f:e.f0,cls:"cv"}]})},
+  {say:`Mais il y en a d'autres ! Théorème : f est solution de (E) ⇔ <b>f = f₀ + φ</b>, où φ décrit les solutions de l'équation homogène (E′). On résout donc (E′) : ${e.hs}.`,board:lines(["f solution de (E) ⇔ f = f₀ + φ","φ solution de (E′) : y′ + α(x)y = 0",e.hs],2)},
+  {say:`Preuve du sens direct : si f et f₀ sont solutions de (E), la différence f − f₀ vérifie (f − f₀)′ + α(f − f₀) = β − β = 0 : c'est une solution de (E′).`,board:lines(["f′ + αf = β","f₀′ + αf₀ = β","(f − f₀)′ + α(f − f₀) = 0"],2)},
+  {say:`<b>Conclusion :</b> toutes les solutions sont f(x) = ${e.f0t} + λ·${e.homt}, λ ∈ ℝ. On obtient les courbes de f₀ translatées de λ·${e.homt} (pointillés : λ = −2, −1, 1, 2).`,board:g2({...B,curves:fam.concat([{f:e.f0,cls:"cv"}])})+lines([`f(x) = ${e.f0t} + λ·${e.homt}`],0)},
+  {say:`<b>Contrôle :</b> pour λ = 0,8, le membre de gauche de (E) en x = ${x1} vaut ${fmt(chk)} et ${v.c==="0"?"β(x) = 2":`β(x) = 1`} ✓.`,board:`<div class="res">f = ${e.f0t} + λ·${e.homt}</div>`}]}});
+/* 3. variation de la constante */
+SC.push({id:"lag",title:"Variation de la constante (Lagrange)",ref:"Cours : méthode de variation de la constante, exemple y′ − y/x = x cos x sur ]0 ; +∞[.",params:[],
+ build(){const f0=x=>x*Math.sin(x),hom=x=>x;const f=x=>0.7*x+x*Math.sin(x);const B={xmin:0.1,xmax:8,ymin:-8,ymax:8,...GW};const x1=2.3;
+  return[
+  {say:`(E) : y′ − y/x = x cos x sur ]0 ; +∞[. Pas de solution évidente. On utilise la <b>méthode de variation de la constante</b>. D'abord on résout l'équation homogène (E′) : y′ − y/x = 0.`,board:lines(["(E) y′ − y/x = x cos x","(E′) y′ − y/x = 0"],1)},
+  {say:`Ici α(x) = −1/x, donc ∫α = −ln x et φ(x) = λ exp(ln x) = <b>λx</b> (car x &gt; 0 donc |x| = x).`,board:lines(["φ(x) = λ exp(∫ dx/x) = λ e^(ln x) = λx"],0)},
+  {say:`On « fait varier la constante » : on cherche une solution particulière de la forme <b>f₀(x) = λ(x)·x</b>, avec λ une <b>fonction</b> à trouver.`,board:lines(["φ(x) = λx   (λ constante)","f₀(x) = λ(x)·x   (λ fonction)"],1)},
+  {say:`On dérive : f₀′ = λ′(x)·x + λ(x). On remplace dans (E) : f₀′ − f₀/x = λ′x + λ − λ(x)·x/x = <b>λ′(x)·x</b> (les termes en λ(x) se simplifient toujours).`,board:lines(["f₀′ = λ′x + λ","f₀′ − f₀/x = λ′x + λ − λ = λ′x"],1)},
+  {say:`L'équation devient λ′(x)·x = x cos x, donc <b>λ′(x) = cos x</b>. On primitive : <b>λ(x) = sin x</b> convient (une seule primitive suffit).`,board:lines(["λ′(x)·x = x cos x","λ′(x) = cos x","λ(x) = sin x"],2)},
+  {say:`Donc f₀(x) = x sin x est <b>une</b> solution particulière. Toutes les solutions sont <b>f(x) = λx + x sin x, λ ∈ ℝ</b>. Contrôle en x = ${x1} avec λ = 0,7 : f′ − f/x ≈ ${fmt(d1(f,x1)-f(x1)/x1)} et x cos x = ${fmt(x1*Math.cos(x1))} ✓.`,board:g2({...B,curves:[-2,-1,1,2].map(l=>({f:x=>l*x+x*Math.sin(x),cls:"cv3"})).concat([{f:f0,cls:"cv"}])})+`<div class="res">f(x) = λx + x sin x</div>`}]}});
+/* 4. 2e ordre homogène */
+const E2H=[{A:1,B:-3,C:2,t:"y″ − 3y′ + 2y = 0"},{A:1,B:2,C:1,t:"y″ + 2y′ + y = 0"},{A:1,B:2,C:5,t:"y″ + 2y′ + 5y = 0"},{A:1,B:0,C:1,t:"y″ + y = 0"},{A:1,B:-1,C:0,t:"y″ − y′ = 0"}];
+SC.push({id:"e2h",title:"2ᵉ ordre : équation caractéristique",ref:"Cours : ar² + br + c = 0 ; Δ > 0, Δ = 0, Δ < 0 ; solutions de (E′).",
+ params:[{id:"c",label:"Équation",type:"select",options:E2H.map((e,i)=>[String(i),e.t])}],
+ build(v){const e=E2H[+v.c],{A,B,C}=e;const D=B*B-4*A*C;let phi,sol,roots,form;const mk=(l,m)=>x=>0;let fam;
+  if(D>0){const r1=(-B+Math.sqrt(D))/(2*A),r2=(-B-Math.sqrt(D))/(2*A);phi=(l,m)=>x=>l*Math.exp(r1*x)+m*Math.exp(r2*x);roots=`deux racines réelles distinctes r₁ = ${r1} et r₂ = ${r2}`;form=r1===0?`φ(x) = λ + μ ${exR(r2)}`:r2===0?`φ(x) = λ ${exR(r1)} + μ`:`φ(x) = λ ${exR(r1)} + μ ${exR(r2)}`}
+  else if(D===0){const r=-B/(2*A);phi=(l,m)=>x=>Math.exp(r*x)*(l*x+m);roots=`une racine double r₀ = ${r}`;form=r===0?`φ(x) = λx + μ`:`φ(x) = e^(${xe(r)})(λx + μ)`}
+  else{const g=-B/(2*A),w=Math.sqrt(-D)/(2*A);phi=(l,m)=>x=>Math.exp(g*x)*(l*Math.cos(w*x)+m*Math.sin(w*x));roots=`deux racines complexes conjuguées γ ± iω avec γ = ${g}, ω = ${w}`;const wx=w===1?"x":`${w}x`;form=g===0?`φ(x) = λ cos(${wx}) + μ sin(${wx})`:`φ(x) = e^(${xe(g)})(λ cos(${wx}) + μ sin(${wx}))`}
+  const f=phi(1,0.5);const x0=0.5;const res=A*d2(f,x0)+B*d1(f,x0)+C*f(x0);
+  const B0={xmin:-2,xmax:3,ymin:-6,ymax:6,...GW};fam=[[1,0],[0,1],[1,1],[-1,0.5]].map(([l,m])=>({f:phi(l,m),cls:"cv3"}));
+  const epol=`${opS(A,B,C,"r²","r","")} = 0`;
+  return[
+  {say:`On résout (E′) : ${e.t}. On cherche des solutions de la forme e^(rx) : si y = e^(rx), alors y′ = r e^(rx) et y″ = r² e^(rx). En remplaçant, on obtient e^(rx)·(${opS(A,B,C,"r²","r","")}) = 0, d'où l'<b>équation caractéristique</b> : <b>${epol}</b>.`.replace(/\+ -/g,"− ").replace(/(\d)r²/,"$1r²"),board:lines([`y = e^(rx) ⇒ y′ = r e^(rx), y″ = r² e^(rx)`,`équation caractéristique : ${epol}`],1)},
+  {say:`Discriminant : Δ = b² − 4ac = (${B})² − 4×${A}×${C} = <b>${D}</b>. ${D>0?"Δ &gt; 0":D===0?"Δ = 0":"Δ &lt; 0"} : on a ${roots}.`.replace(/-/g,"−"),board:lines([`Δ = ${B}² − 4·${A}·${C} = ${D}`,roots],1)},
+  {say:`<b>Cas ${D>0?"Δ &gt; 0":D===0?"Δ = 0":"Δ &lt; 0"} :</b> les solutions de (E′) sont toutes de la forme <b>${form}</b>, avec (λ, μ) ∈ ℝ².`.replace(/-/g,"−"),board:lines([form,"(λ, μ) ∈ ℝ²"],0)},
+  {say:`Chaque couple (λ, μ) donne une courbe (λ, μ) = (1, 0), (0, 1), (1, 1), (−1, 0,5). Il faut <b>deux conditions</b> (par exemple y(0) et y′(0)) pour déterminer λ et μ.`.replace(/-/g,"−"),board:g2({...B0,curves:fam})},
+  {say:`<b>Contrôle :</b> pour (λ, μ) = (1 ; 0,5), en x = 0,5 : ${opS(A,B,C,"φ″","φ′","φ")} ≈ ${fmt(Math.abs(res)<1e-4?0:res)}, nul à la précision du calcul ✓.`,board:`<div class="res">${form}</div>`}]}});
+/* 5. second membre polynôme */
+const E2P=[{A:1,B:-3,C:2,P:{2:1,0:1},t:"y″ − 3y′ + 2y = x² + 1",s:0,why:"c = 2 ≠ 0 : f₀ = Q(x), deg Q = 2",hom:"λeˣ + μe²ˣ"},
+ {A:1,B:-1,C:0,P:{2:1,0:1},t:"y″ − y′ = x² + 1",s:1,why:"c = 0 et b = −1 ≠ 0 : f₀ = xQ(x), deg Q = 2",hom:"λ + μeˣ"},
+ {A:1,B:0,C:0,P:{2:1,0:1},t:"y″ = x² + 1",s:2,why:"b = c = 0 : f₀ = x²Q(x), deg Q = 2",hom:"λx + μ"}];
+SC.push({id:"e2p",title:"2ᵉ ordre : second membre polynôme",ref:"Cours : β = P(x) : f₀ = Q, xQ ou x²Q selon que c ≠ 0, c = 0 et b ≠ 0, ou b = c = 0 ; exemples y″ − 3y′ + 2y = x² + 1, y″ − y′ = x² + 1, y″ = x² + 1.",
+ params:[{id:"c",label:"Équation",type:"select",options:E2P.map((e,i)=>[String(i),e.t])}],
+ build(v){const e=E2P[+v.c];const P=fromAsc([e.P[0]||0,e.P[1]||0,e.P[2]||0]);const S=solveED(e.A,e.B,e.C,P,e.s);const f0=x=>pevalF(S.F,x);
+  const lt=S.letters.map(({j,l})=>`${l}x${j>1?sup(j):j===1?"":""}`.replace(/x$/,j===1?"x":"")).join(" + ").replace(/([a-g])x⁰/,"$1");
+  const fform=S.letters.map(({j,l})=>l+(j===0?"":j===1?"x":"x"+sup(j))).join(" + ");
+  const eqs=[];for(let k=S.n;k>=0;k--)eqs.push(`${eqStr(S,k)} = ${fs(P[k]||F(0))}`);
+  const vals=S.letters.map(({j,l})=>`${l} = ${fs(S.q[j])}`);
+  const res=e.A*d2(f0,0.7)+e.B*d1(f0,0.7)+e.C*f0(0.7);
+  return[
+  {say:`On résout (E) : ${e.t}. D'abord l'équation homogène : les solutions de (E′) sont φ(x) = <b>${e.hom}</b> (voir la scène précédente), (λ, μ) ∈ ℝ².`,board:lines([`(E) ${e.t}`,`solutions de (E′) : φ(x) = ${e.hom}`],1)},
+  {say:`Le second membre est un <b>polynôme de degré 2</b>. Règle : on cherche f₀ polynomial. Ici ${e.why}. On pose <b>f₀(x) = ${fform}</b>.`,board:lines([e.why,`f₀(x) = ${fform}`],1)},
+  {say:`On calcule f₀′ et f₀″ puis on remplace dans (E). En regroupant les puissances de x, on <b>identifie</b> avec x² + 1 (coefficients de x², de x et constant).`,board:lines(eqs,0)},
+  {say:`On résout le système en partant de la plus haute puissance : ${vals.join(" ; ")}.`,board:lines(eqs.concat(vals),eqs.length+vals.length-1)},
+  {say:`Donc <b>f₀(x) = ${polyS(S.F)}</b> convient. Contrôle en x = 0,7 : ${opS(e.A,e.B,e.C,"f₀″","f₀′","f₀")} ≈ ${fmt(res)} et x² + 1 = ${fmt(1.49)} ✓.`,board:`<div class="res">f₀(x) = ${polyS(S.F)}</div>`},
+  {say:`<b>Conclusion :</b> toutes les solutions de (E) sur ℝ sont <b>f(x) = ${addP(e.hom,polyS(S.F))}</b>, avec (λ, μ) ∈ ℝ².`,board:`<div class="res">f(x) = ${addP(e.hom,polyS(S.F))}</div>`}]}});
+/* 6. second membre P(x) e^{mx} */
+const E2E=[{A:1,B:-3,C:2,m:3,t:"y″ − 3y′ + 2y = (x + 1)e³ˣ",hom:"λeˣ + μe²ˣ",ec:"r² − 3r + 2 = (r − 1)(r − 2), racines 1 et 2",cas:"m = 3 n'est pas racine de l'équation caractéristique : f₀ = Q(x)e³ˣ",s:0},
+ {A:1,B:-3,C:2,m:1,t:"y″ − 3y′ + 2y = (x + 1)eˣ",hom:"λeˣ + μe²ˣ",ec:"r² − 3r + 2 = (r − 1)(r − 2), racines 1 et 2",cas:"m = 1 est racine simple : f₀ = xQ(x)eˣ",s:1},
+ {A:1,B:-2,C:1,m:1,t:"y″ − 2y′ + y = (x + 1)eˣ",hom:"(λx + μ)eˣ",ec:"r² − 2r + 1 = (r − 1)², racine double 1",cas:"m = 1 est racine double : f₀ = x²Q(x)eˣ",s:2}];
+SC.push({id:"e2e",title:"2ᵉ ordre : second membre P(x)e^(mx)",ref:"Cours : β = P(x)e^(mx) : f₀ = Q e^(mx), xQ e^(mx) ou x²Q e^(mx) selon que m est racine de l'équation caractéristique ; exemples (x + 1)e³ˣ, (x + 1)eˣ.",
+ params:[{id:"c",label:"Équation",type:"select",options:E2E.map((e,i)=>[String(i),e.t])}],
+ build(v){const e=E2E[+v.c];const P=fromAsc([1,1]);const b2=2*e.A*e.m+e.B,c2=e.A*e.m*e.m+e.B*e.m+e.C;const S=solveED(e.A,b2,c2,P,e.s);
+  const ex=exS(e.m);const f0=x=>Math.exp(e.m*x)*pevalF(S.F,x);
+  const fform=S.letters.map(({j,l})=>l+(j===0?"":j===1?"x":"x"+sup(j))).join(" + ");
+  const eqs=[];for(let k=S.n;k>=0;k--)eqs.push(`${eqStr(S,k)} = ${fs(P[k]||F(0))}`);
+  const vals=S.letters.map(({j,l})=>`${l} = ${fs(S.q[j])}`);const x0=0.4;const res=e.A*d2(f0,x0)+e.B*d1(f0,x0)+e.C*f0(x0);
+  const tr=(a,b,c)=>`${a===1?"":a}Q″ ${b<0?"−":"+"} ${Math.abs(b)===1?"":Math.abs(b)}Q′ ${c<0?"−":"+"} ${Math.abs(c)===1?"":Math.abs(c)}Q`.replace(/ \+ 0Q/,"").replace(/ [−+] 0Q′/,"");
+  return[
+  {say:`On résout (E) : ${e.t}. Équation caractéristique : ${e.ec}. Solutions de (E′) : <b>φ(x) = ${e.hom}</b>.`,board:lines([`(E) ${e.t}`,`ec : ${e.ec}`,`φ(x) = ${e.hom}`],2)},
+  {say:`Le second membre est P(x)e^(mx) avec P(x) = x + 1 et m = ${e.m}. <b>${e.cas}</b> (avec deg Q = deg P = 1, on décale d'un cran par racine).`,board:lines([`β(x) = (x + 1)·${ex}`,e.cas],1)},
+  {say:`Pour éviter de longs calculs, on pose f₀ = R(x)·e^(${e.m}x) avec R = ${e.s===0?"Q":e.s===1?"xQ":"x²Q"} = ${fform}. Alors f₀′ = (R′ + ${e.m}R)e^(${e.m}x) et f₀″ = (R″ + ${2*e.m}R′ + ${e.m*e.m}R)e^(${e.m}x).`.replace(/^/,""),board:lines([`f₀ = R·${ex}`,`f₀′ = (R′ + ${e.m}R)·${ex}`,`f₀″ = (R″ + ${2*e.m}R′ + ${e.m*e.m}R)·${ex}`],2)},
+  {say:`On remplace dans (E) et on simplifie par ${ex} : <b>${opS(e.A,b2,c2,"R″","R′","R")} = x + 1</b>. On est ramené à une équation sur un polynôme, qu'on traite par identification.`,board:lines([`${e.A}R″ + (2·${e.A}·${e.m} + (${e.B}))R′ + (${e.A}·${e.m}² + (${e.B})·${e.m} + ${e.C})R = x + 1`,`${opS(e.A,b2,c2,"R″","R′","R")} = x + 1`],1)},
+  {say:`En identifiant les coefficients (de la plus haute puissance à la plus basse) : ${eqs.join(" ; ")}. On trouve ${vals.join(" ; ")}.`,board:lines(eqs.concat(vals),eqs.length+vals.length-1)},
+  {say:`Donc <b>f₀(x) = (${polyS(S.F)})·${ex}</b> convient. Contrôle en x = ${fmt(x0)} : ${opS(e.A,e.B,e.C,"f₀″","f₀′","f₀")} ≈ ${fmt(res)} et β(${fmt(x0)}) = ${fmt(1.4*Math.exp(e.m*x0))} ✓. Toutes les solutions : <b>f(x) = ${e.hom} + (${polyS(S.F)})${ex}</b>.`,board:`<div class="res">f(x) = ${e.hom} + (${polyS(S.F)})${ex}</div>`}]}});
+/* 7. second membre trigonométrique */
+SC.push({id:"e2t",title:"2ᵉ ordre : second membre en cos et sin",ref:"Cours : β = P e^(ux) cos(vx) : f₀ = e^(ux)(Q₁cos + Q₂sin) ou x·… si u + iv est racine ; exemple y″ + y = ½cos 2x.",
+ params:[{id:"c",label:"Équation",type:"select",options:[["a","y″ + y = ½ cos(2x)"],["b","y″ + y = cos x"]]}],
+ build(v){
+  if(v.c==="a"){const f0=x=>-Math.cos(2*x)/6;const x0=0.8;const res=d2(f0,x0)+f0(x0);return[
+   {say:`On résout (E) : y″ + y = ½cos(2x). Équation caractéristique : r² + 1 = 0, racines complexes <b>i et −i</b> : solutions de (E′) : φ(x) = λ cos x + μ sin x.`,board:lines(["(E) y″ + y = ½cos(2x)","ec : r² + 1 = 0 ⇒ r = ±i","φ(x) = λ cos x + μ sin x"],2)},
+   {say:`Le second membre est de la forme P e^(ux)cos(vx) avec P = ½, u = 0 et v = 2. Le nombre u + iv = 2i <b>n'est pas racine</b> de l'équation caractéristique : on cherche f₀(x) = <b>a cos(2x) + b sin(2x)</b> (avec les deux : cos et sin).`,board:lines(["u + iv = 2i n'est pas racine (les racines sont ±i)","f₀(x) = a cos(2x) + b sin(2x)"],1)},
+   {say:`On dérive deux fois : f₀′ = −2a sin(2x) + 2b cos(2x) et f₀″ = −4a cos(2x) − 4b sin(2x). Donc f₀″ + f₀ = −3a cos(2x) − 3b sin(2x).`,board:lines(["f₀′ = −2a sin(2x) + 2b cos(2x)","f₀″ = −4a cos(2x) − 4b sin(2x)","f₀″ + f₀ = −3a cos(2x) − 3b sin(2x)"],2)},
+   {say:`On identifie avec ½cos(2x) + 0·sin(2x) : −3a = ½ et −3b = 0, donc <b>a = −1/6</b> et <b>b = 0</b>.`,board:lines(["−3a = 1/2 ⇒ a = −1/6","−3b = 0 ⇒ b = 0"],1)},
+   {say:`<b>f₀(x) = −(1/6)cos(2x)</b> convient (contrôle en x = ${x0} : f₀″ + f₀ ≈ ${fmt(res)} et ½cos(2x) = ${fmt(0.5*Math.cos(2*x0))} ✓). Toutes les solutions : <b>f(x) = λ cos x + μ sin x − (1/6)cos(2x)</b>, (λ, μ) ∈ ℝ².`,board:`<div class="res">f(x) = λ cos x + μ sin x − (1/6) cos(2x)</div>`}]}
+  const f0=x=>x*Math.sin(x)/2;const x0=0.8;const res=d2(f0,x0)+f0(x0);return[
+   {say:`Cas résonant : y″ + y = cos x. Mêmes solutions de (E′) : φ(x) = λ cos x + μ sin x, racines ±i.`,board:lines(["(E) y″ + y = cos x","ec : r² + 1 = 0 ⇒ r = ±i"],1)},
+   {say:`Ici β = cos x : u = 0, v = 1, donc u + iv = i <b>est racine</b> de l'équation caractéristique. Si on cherchait a cos x + b sin x, ce serait déjà solution de (E′) : on obtiendrait 0 ≠ cos x. On <b>multiplie par x</b> : f₀(x) = x(a cos x + b sin x).`,board:lines(["u + iv = i est racine de l'ec","f₀(x) = x(a cos x + b sin x)"],1)},
+   {say:`On dérive : f₀′ = a cos x + b sin x + x(−a sin x + b cos x), puis f₀″ = 2(−a sin x + b cos x) + x(−a cos x − b sin x). Alors <b>f₀″ + f₀ = 2b cos x − 2a sin x</b> (les termes en x se simplifient).`,board:lines(["f₀″ = −2a sin x + 2b cos x − x(a cos x + b sin x)","f₀″ + f₀ = 2b cos x − 2a sin x"],1)},
+   {say:`On identifie avec cos x : 2b = 1 et −2a = 0, donc <b>a = 0</b> et <b>b = 1/2</b>. Donc f₀(x) = (x/2) sin x. Contrôle en x = ${x0} : f₀″ + f₀ ≈ ${fmt(res)} et cos x = ${fmt(Math.cos(x0))} ✓.`,board:lines(["2b = 1 ⇒ b = 1/2","−2a = 0 ⇒ a = 0"],1)},
+   {say:`<b>Toutes les solutions :</b> f(x) = λ cos x + μ sin x + (x/2) sin x. L'amplitude croît avec x : c'est le phénomène de <b>résonance</b>.`,board:g2({xmin:0,xmax:12,ymin:-8,ymax:8,...GW,curves:[{f:f0,cls:"cv"},{f:x=>x/2,cls:"cv3"},{f:x=>-x/2,cls:"cv3"}]})+`<div class="res">f(x) = λ cos x + μ sin x + (x/2) sin x</div>`}]}});
+/* 8. superposition */
+SC.push({id:"sup",title:"Principe de superposition",ref:"Cours : β = β₁ + β₂ ; exemple y″ + 2y′ + y = x²(eˣ + e⁻ˣ).",params:[],
+ build(){const S1=solveED(1,4,4,fromAsc([0,0,1]),0),S2=solveED(1,0,0,fromAsc([0,0,1]),2);
+  const f1=x=>Math.exp(x)*pevalF(S1.F,x),f2=x=>Math.exp(-x)*pevalF(S2.F,x);const f=x=>f1(x)+f2(x);const x0=0.5;const res=d2(f,x0)+2*d1(f,x0)+f(x0);
+  return[
+  {say:`On résout (E) : y″ + 2y′ + y = x²(eˣ + e⁻ˣ). Équation caractéristique : r² + 2r + 1 = (r + 1)², <b>racine double −1</b> : solutions de (E′) : φ(x) = (λx + μ)e⁻ˣ.`,board:lines(["(E) y″ + 2y′ + y = x²(eˣ + e⁻ˣ)","ec : r² + 2r + 1 = (r + 1)² ⇒ r₀ = −1","φ(x) = (λx + μ)e⁻ˣ"],2)},
+  {say:`Le second membre n'est pas de la forme du cours, mais en développant on voit une <b>somme de deux termes</b> qui le sont : <b>x²(eˣ + e⁻ˣ) = x²eˣ + x²e⁻ˣ</b>. On sépare : (E₁) y″ + 2y′ + y = x²eˣ et (E₂) y″ + 2y′ + y = x²e⁻ˣ.`,board:lines(["β = x²(eˣ + e⁻ˣ) = x² eˣ + x² e⁻ˣ","(E₁) y″ + 2y′ + y = x² eˣ","(E₂) y″ + 2y′ + y = x² e⁻ˣ"],2)},
+  {say:`<b>Superposition :</b> si f₁ est solution particulière de (E₁) et f₂ de (E₂), alors <b>f₁ + f₂ est solution particulière de (E)</b> (l'équation est linéaire).`,board:lines(["L[f₁] = x²eˣ","L[f₂] = x²e⁻ˣ","L[f₁ + f₂] = x²eˣ + x²e⁻ˣ"],2)},
+  {say:`<b>(E₁) :</b> m = 1 n'est pas racine de l'ec : f₁ = (ax² + bx + c)eˣ. En posant f₁ = R eˣ, l'équation devient R″ + 4R′ + 4R = x² (car 2m + 2 = 4 et m² + 2m + 1 = 4). Identification : 4a = 1 ; 8a + 4b = 0 ; 2a + 4b + 4c = 0, soit a = 1/4, b = −1/2, c = 3/8.`,board:lines(["R″ + 4R′ + 4R = x²","4a = 1","8a + 4b = 0","2a + 4b + 4c = 0","a = 1/4 ; b = −1/2 ; c = 3/8"],4)},
+  {say:`<b>(E₂) :</b> m = −1 est racine <b>double</b> : f₂ = x²(ax² + bx + c)e⁻ˣ. Avec f₂ = R e⁻ˣ : R″ + 0·R′ + 0·R = x² (car 2m + 2 = 0 et m² + 2m + 1 = 0). Donc R″ = x² avec R = ax⁴ + bx³ + cx² : 12a = 1 ; 6b = 0 ; 2c = 0, soit a = 1/12, b = c = 0.`,board:lines(["R″ = x²   (R = ax⁴ + bx³ + cx²)","12a = 1 ; 6b = 0 ; 2c = 0","f₂(x) = (x⁴/12) e⁻ˣ"],2)},
+  {say:`<b>Conclusion :</b> f₀ = f₁ + f₂, donc les solutions de (E) sont <b>f(x) = (x⁴/12 + λx + μ)e⁻ˣ + (x²/4 − x/2 + 3/8)eˣ</b>, (λ, μ) ∈ ℝ². Contrôle en x = ${x0} avec λ = μ = 0 : f″ + 2f′ + f ≈ ${fmt(res)} et x²(eˣ + e⁻ˣ) = ${fmt(x0*x0*(Math.exp(x0)+Math.exp(-x0)))} ✓.`,board:`<div class="res">f(x) = (x⁴/12 + λx + μ)e⁻ˣ + (x²/4 − x/2 + 3/8)eˣ</div>`}]}});
+
+/* 9. résonance */
+SC.push({id:"res",title:"Résonance : pourquoi l'amplitude explose",ref:"Cours : y″ + ω²y = cos(Ωt), comparaison avec y″ + ω²y = 0 ; cas Ω = ω.",
+ params:[{id:"w",label:"Pulsation propre ω",type:"select",options:[["2","ω = 2"],["1","ω = 1"],["3","ω = 3"]]}],
+ build(v){const w=+v.w,Om=w/2,a=1/(w*w-Om*Om);const t0=3.7;
+  const xmax=w===1?30:w===2?20:14;const B={xmin:0,xmax,ymin:-xmax/(2*w)-1,ymax:xmax/(2*w)+1,...GW};
+  const fh=t=>Math.cos(w*t),fnr=t=>a*(Math.cos(Om*t)-Math.cos(w*t)),f0=t=>t*Math.sin(w*t)/(2*w);
+  const L=f=>d2(f,t0)+w*w*f(t0);const tO=Om===1?"t":String(Om).replace(".",",")+"t";const sw=String(w),sO=String(Om).replace(".",",");const O2={1:"1/4",2:"1",3:"9/4"}[w],dS={1:"3/4",2:"3",3:"27/4"}[w],aT={1:"4/3",2:"1/3",3:"4/27"}[w];
+  const aS=Number.isInteger(a)?String(a):(w===2?"1/3":w===1?"4/3":"4/(9)");
+  return[
+  {say:`<b>Le système sans force : y″ + ω²y = 0</b> (ressort, pendule, circuit LC). Équation caractéristique : r² + ${w*w} = 0, donc r = ±${w}i et <b>y(t) = A cos(${sw}t) + B sin(${sw}t)</b>. C'est une oscillation d'amplitude <b>constante</b> √(A² + B²) : le système oscille librement à sa <b>pulsation propre ω = ${sw}</b>.`,board:g2({...B,...GW,curves:[{f:fh,cls:"cv"},{f:()=>1,cls:"cv3"},{f:()=>-1,cls:"cv3"}]})+lines([`y″ + ${w*w}y = 0`,`y(t) = A cos(${sw}t) + B sin(${sw}t)`,"amplitude constante"],2)},
+  {say:`<b>Ajoutons une force extérieure</b> cos(Ωt) : y″ + ω²y = cos(Ωt), avec une pulsation Ω <b>différente</b> de ω, par exemple Ω = ${sO}. Alors iΩ n'est pas racine de l'équation caractéristique : on cherche f₀(t) = a cos(${tO}) + b sin(${tO}), sans multiplier par t.`,board:lines([`y″ + ${w*w}y = cos(${tO})`,`iΩ = ${sO}i n'est pas racine de r² + ${w*w} = 0`,`f₀(t) = a cos(${tO}) + b sin(${tO})`],2)},
+  {say:`On a f₀″ = −${O2==="1"?"":O2}f₀ pour cette forme, donc f₀″ + ${w*w}f₀ = ${dS}·(a cos(${tO}) + b sin(${tO})) car ${w*w} − ${O2} = ${dS}. On identifie avec cos(${tO}) : <b>a = ${aT}</b> et b = 0. L'amplitude <b>reste bornée</b> : le système suit la force sans que rien ne s'accumule.`,board:g2({...B,...GW,curves:[{f:fnr,cls:"cv"},{f:()=>2*a,cls:"cv3"},{f:()=>-2*a,cls:"cv3"}]})+lines([`(${w*w} − ${O2})(a cos(${tO}) + b sin(${tO})) = cos(${tO})`,`a = ${aT} ; b = 0`,"amplitude bornée"],1)},
+  {say:`<b>Plaçons maintenant la force à la pulsation propre :</b> y″ + ω²y = cos(${sw}t). Cette fois ${sw}i <b>est racine</b> de r² + ${w*w} = 0. Si on essayait a cos(${sw}t) + b sin(${sw}t), ce serait <b>déjà solution de l'équation homogène</b> : on trouverait 0 et jamais cos(${sw}t). Ce n'est pas un hasard : la force vient « pousser » exactement au rythme naturel du système.`,board:lines([`y″ + ${w*w}y = cos(${sw}t)`,`${sw}i est racine de r² + ${w*w} = 0`,`a cos(${sw}t) + b sin(${sw}t) ↦ 0 ≠ cos(${sw}t)`],2)},
+  {say:`On <b>multiplie par t</b> : f₀(t) = t(a cos(${sw}t) + b sin(${sw}t)). On dérive deux fois : f₀′ = (a cos(${tO}) + b sin(${tO})) + t(−${w}a sin + ${w}b cos), puis f₀″ = ${2*w}(−a sin + b cos) − ${w*w}t(a cos(${tO}) + b sin(${tO})). Donc <b>f₀″ + ${w*w}f₀ = ${2*w}(b cos(${sw}t) − a sin(${sw}t))</b> : les termes en t se simplifient.`,board:lines([`f₀ = t(a cos(${sw}t) + b sin(${sw}t))`,`f₀″ = ${2*w}(−a sin(${sw}t) + b cos(${sw}t)) − ${w*w}f₀`,`f₀″ + ${w*w}f₀ = ${2*w}(b cos(${sw}t) − a sin(${sw}t))`],2)},
+  {say:`On identifie avec cos(${sw}t) : ${2*w}b = 1 et −${2*w}a = 0, donc <b>a = 0</b> et <b>b = 1/${2*w}</b>. Solution particulière : <b>f₀(t) = (t/${2*w}) sin(${sw}t)</b>. Contrôle en t = ${t0} : f₀″ + ${w*w}f₀ ≈ ${fmt(L(f0))} et cos(${sw}t) = ${fmt(Math.cos(w*t0))} ✓.`,board:lines([`${2*w}b = 1 ⇒ b = 1/${2*w}`,`−${2*w}a = 0 ⇒ a = 0`,`f₀(t) = (t/${2*w}) sin(${sw}t)`],2)},
+  {say:`<b>Lecture du résultat.</b> L'amplitude de f₀ est <b>t/${2*w}</b> : elle croît linéairement avec le temps et tend vers +∞. Comparez avec le cas Ω ≠ ω, où l'amplitude restait bornée : ici la courbe est coincée entre les droites y = ±t/${2*w}, qui s'écartent sans limite.`,board:g2({...B,...GW,curves:[{f:f0,cls:"cv"},{f:t=>t/(2*w),cls:"cv3"},{f:t=>-t/(2*w),cls:"cv3"}]})+lines([`|f₀(t)| ≤ t/${2*w} → +∞`,"résonance : amplitude non bornée"],0)},
+  {say:`<b>Pourquoi l'amplitude explose-elle ?</b> Pour t grand, f₀′(t) ≈ (t/2) cos(${sw}t) : la <b>vitesse</b> est en phase avec la force cos(${sw}t). La puissance fournie est force × vitesse ≈ (t/2) cos²(${sw}t) ≥ 0 : <b>à chaque instant, la force pousse dans le sens du mouvement</b>, et l'énergie s'accumule. Si Ω ≠ ω, force et vitesse se décalent peu à peu : tantôt la force aide, tantôt elle freine, et l'énergie ne fait que s'échanger.`,board:lines(["Ω ≠ ω : force et mouvement se décalent → amplitude bornée","Ω = ω : force toujours en phase avec la vitesse → énergie qui s'accumule","f₀′(t) ≈ (t/2) cos(ωt) ; force × vitesse ≈ (t/2)cos²(ωt) ≥ 0"],2)},
+  {say:`<b>Toutes les solutions de y″ + ω²y = cos(${sw}t) :</b> f(t) = λ cos(${sw}t) + μ sin(${sw}t) + (t/${2*w}) sin(${sw}t), (λ, μ) ∈ ℝ². La partie λ cos + μ sin est l'oscillation libre, bornée ; c'est le terme <b>(t/${2*w}) sin(${sw}t)</b> qui provoque la résonance. Sur un vrai système, les frottements limitent l'amplitude, mais elle devient très grande (pont, verre qui se brise sous la voix).`,board:`<div class="res">f(t) = λ cos(${sw}t) + μ sin(${sw}t) + (t/${2*w}) sin(${sw}t)</div>`}]}});
+
+/*DOM*/
+/* ===== rendu LaTeX : conversion des notations unicode en TeX (MathJax) ===== */
+const TXE=(()=>{
+const SUP={"⁰":"0","¹":"1","²":"2","³":"3","⁴":"4","⁵":"5","⁶":"6","⁷":"7","⁸":"8","⁹":"9","⁺":"+","⁻":"-","⁽":"(","⁾":")","ⁿ":"n","ᵏ":"k","ˣ":"x","ᵃ":"a","ᵇ":"b","ᶜ":"c","ᵈ":"d","ᵉ":"e","ᶠ":"f","ᵍ":"g","ʰ":"h","ⁱ":"i","ʲ":"j","ˡ":"l","ᵐ":"m","ᵒ":"o","ᵖ":"p","ʳ":"r","ˢ":"s","ᵗ":"t","ᵘ":"u","ᵛ":"v","ʷ":"w","ʸ":"y","ᶻ":"z"};
+const SUB={"₀":"0","₁":"1","₂":"2","₃":"3","₄":"4","₅":"5","₆":"6","₇":"7","₈":"8","₉":"9","₊":"+","₋":"-","ₐ":"a","ₙ":"n","ₖ":"k","ₓ":"x","ₒ":"o","ᵢ":"i","ⱼ":"j","ₘ":"m","ₚ":"p","ₛ":"s","ₜ":"t","ₑ":"e","ₗ":"l","ₕ":"h"};
+const SYM={"−":"-","·":"\\cdot ","×":"\\times ","÷":"\\div ","≤":"\\leq ","≥":"\\geq ","≠":"\\neq ","≈":"\\approx ","∼":"\\sim ","±":"\\pm ","∞":"\\infty ","→":"\\to ","↦":"\\mapsto ","⇒":"\\Rightarrow ","⇔":"\\Leftrightarrow ","⇐":"\\Leftarrow ","∈":"\\in ","∉":"\\notin ","∀":"\\forall ","∃":"\\exists ","∪":"\\cup ","∩":"\\cap ","⊂":"\\subset ","∅":"\\varnothing ","∘":"\\circ ","…":"\\cdots ","∫":"\\int ","∑":"\\sum ","Σ":"\\sum ","ℝ":"\\mathbb{R}","ℂ":"\\mathbb{C}","ℕ":"\\mathbb{N}","ℤ":"\\mathbb{Z}","′":"'","″":"''","‴":"'''","π":"\\pi ","θ":"\\theta ","φ":"\\varphi ","ψ":"\\psi ","λ":"\\lambda ","μ":"\\mu ","ω":"\\omega ","γ":"\\gamma ","α":"\\alpha ","β":"\\beta ","δ":"\\delta ","Δ":"\\Delta ","ε":"\\varepsilon ","ρ":"\\rho ","σ":"\\sigma ","τ":"\\tau ","ξ":"\\xi ","ζ":"\\zeta ","η":"\\eta ","κ":"\\kappa ","ν":"\\nu ","Ω":"\\Omega ","Γ":"\\Gamma ","Φ":"\\Phi ","~":"\\sim ","<":"\\lt ",">":"\\gt ","{":"\\{ ","}":"\\} ","%":"\\% ","&":"\\& ","#":"\\# ","_":"\\_ ","≡":"\\equiv ","∥":"\\parallel ","⟂":"\\perp ","∠":"\\angle ","°":"^{\\circ}","∗":"*","ᵀ":"^{T}","↔":"\\leftrightarrow ","⟹":"\\Longrightarrow ","≃":"\\simeq ","⊥":"\\perp "};
+const FUNS={sin:"\\sin ",cos:"\\cos ",tan:"\\tan ",ln:"\\ln ",exp:"\\exp ",lim:"\\lim ",deg:"\\deg ",max:"\\max ",min:"\\min ",arg:"\\arg ",ch:"\\operatorname{ch}",sh:"\\operatorname{sh}",th:"\\operatorname{th}",arcsin:"\\arcsin ",arccos:"\\arccos ",arctan:"\\arctan ",Re:"\\operatorname{Re}",Im:"\\operatorname{Im}",mod:"\\bmod ",gcd:"\\gcd ",pgcd:"\\gcd ",sup:"\\sup ",inf:"\\inf ",ker:"\\ker ",det:"\\det "};
+const STOP=new Set("peu due qui que ont on si ici une il le la les des par sur ou se ce ci pas est de du en et un ne nu ta te tu me ma ni ce cet ait eu au aux ai an que par car ici une dire ex ent aie eue nue tue dut eut ete tant rien mais cas fait pied peut dont ou où".split(" "));
+const VL=/^[abcdefghikmnpqrtuxyzABCDEFGHIKMNPQRTUXYZ]{1,3}$/;
+const ISW=c=>/[A-Za-zÀ-ÿ]/.test(c);
+/* extraction des racines et fractions -> espaces réservés */
+function extract(s,st){
+ const CL=/[¯0-9A-Za-zπ′″²³⁴⁵⁶⁷⁸⁹⁰¹ᵏⁿ₀-₉ᵃ-ᶻε!\u0001\u0002\u0003]/;
+ const mb=(o,k,d0)=>{let d=0;if(d0>0){for(;k<o.length;k++){if(o[k]==="(")d++;else if(o[k]===")"){d--;if(d===0)return k}}}else{for(;k>=0;k--){if(o[k]===")")d++;else if(o[k]==="("){d--;if(d===0)return k}}}return -1};
+ const ph=(o)=>{st.push(o);return "\u0001"+(st.length-1)+"\u0002"};
+ /* racines */
+ let o=s.replace(/([0-9A-Za-z)⁰-⁹¹²³ⁿ])\s\/\s(?=[0-9A-Za-z(√−])/g,"$1/"),i=0;
+ while((i=o.indexOf("√",i))>=0){let j=i+1,body,end;
+  if(o[j]==="("){const m=mb(o,j,1);if(m>0){body=o.slice(j+1,m);end=m+1}}
+  if(body===undefined){const m=/^(?:\d+[⁰¹²³⁴⁵⁶⁷⁸⁹]*|[A-Za-zπ][⁰¹²³⁴⁵⁶⁷⁸⁹]*|\u0001\d+\u0002)/.exec(o.slice(j));if(m){body=m[0];end=j+m[0].length}}
+  if(body===undefined){i=j;continue}
+  const h=ph({t:"s",b:body});o=o.slice(0,i)+h+o.slice(end);i+=h.length}
+ /* fractions */
+ let pos=0;
+ while(true){const k=o.indexOf("/",pos);if(k<0)break;
+  if(k===0||k===o.length-1||o[k-1]===" "||o[k+1]===" "){pos=k+1;continue}
+  let ls,num;
+  let pp=k-1;while(pp>0&&/[⁰-⁹¹²³ⁿᵏ⁺⁻]/.test(o[pp]))pp--;
+  if(o[pp]===")"){const m=mb(o,pp,-1);if(m<0){pos=k+1;continue}let a=m;while(a>0&&/[A-Za-z′″⁰-⁹¹²³⁽⁾ε]/.test(o[a-1]))a--;if(a>0&&o[a-1]==="^"){a--;while(a>0&&/[A-Za-z]/.test(o[a-1]))a--}
+   num=(a===m&&pp===k-1)?o.slice(m+1,k-1):o.slice(a,k);ls=a}
+  else{let a=k;while(a>0&&CL.test(o[a-1]))a--;if(a===k){pos=k+1;continue}ls=a;num=o.slice(a,k);
+   if(ls>0&&(o[ls-1]==="−"||o[ls-1]==="-")&&(ls===1||" (=,;:".includes(o[ls-2]))){ls--;num=o.slice(ls,k)}}
+  let re,den;
+  if(o[k+1]==="("){const m=mb(o,k+1,1);if(m<0){pos=k+1;continue}re=m+1;den=o.slice(k+2,m);let r2=re;if(o[r2]==="^"){r2++;if(o[r2]==="("){const q=mb(o,r2,1);if(q>0)r2=q+1}else while(r2<o.length&&/[0-9A-Za-z]/.test(o[r2]))r2++}else while(r2<o.length&&/[⁰-⁹¹²³ⁿᵏ⁺⁻]/.test(o[r2]))r2++;if(r2>re){den="("+den+")"+o.slice(re,r2);re=r2}}
+  else{let b=k+1;if(o[b]==="−"||o[b]==="-")b++;if(o[b]==="|"){const q=o.indexOf("|",b+1);if(q>0)b=q+1}while(b<o.length&&CL.test(o[b]))b++;if(b===k+1||b===k+2&&(o[k+1]==="−"||o[k+1]==="-")){pos=k+1;continue}
+   if(o[b]==="("){const m=mb(o,b,1);if(m>0)b=m+1}re=b;den=o.slice(k+1,b)}
+  const h=ph({t:"f",n:num,d:den});o=o.slice(0,ls)+h+o.slice(re);pos=ls+h.length}
+ return o}
+/* conversion caractère par caractère */
+function conv(s,st,disp){
+ let o="",i=0;const n=s.length;
+ const grab=(map,i)=>{let r="";while(i<n&&map[s[i]]!==undefined){r+=map[s[i]];i++}return [r,i]};
+ while(i<n){const c=s[i];
+  if(c==="\u0001"){const m=/^\u0001(\d+)\u0002/.exec(s.slice(i));let e=st[+m[1]];i+=m[0].length;
+   if(e.t==="s"){o+="\\sqrt{"+conv(e.b,st,disp)+"}";continue}
+   let ed=e.d;{const mi=/^\u0001(\d+)\u0002$/.exec(e.n);if(mi&&st[+mi[1]].t==="f"){const inn=st[+mi[1]];const w=/[+−-]/.test(ed)&&!/^\(.*\)[^()]*$/.test(ed);e={t:"f",n:inn.n,d:inn.d+(w?"("+ed+")":ed)};ed=e.d}}
+   let nn=e.n,sg="";if(/^[−-][^−+-]*$/.test(nn)){sg="-";nn=nn.slice(1)}
+   o+=sg+(disp?"\\dfrac{":"\\frac{")+conv(nn,st,disp)+"}{"+conv(e.d,st,disp)+"}";continue}
+  if(SUP[c]!==undefined){const [r,j]=grab(SUP,i);o+="^{"+r+"}";i=j;continue}
+  if(SUB[c]!==undefined){const [r,j]=grab(SUB,i);o+="_{"+r+"}";i=j;continue}
+  if(c==="^"&&s[i+1]==="("){let d=0,k=i+1;for(;k<n;k++){if(s[k]==="(")d++;else if(s[k]===")"){d--;if(d===0)break}}
+   o+="^{"+conv(s.slice(i+2,k),st,disp)+"}";i=k+1;continue}
+  if(/[A-Za-z]/.test(c)){let j=i;while(j<n&&/[A-Za-z]/.test(s[j]))j++;const w=s.slice(i,j);
+   /* fonctions */
+   if(FUNS[w]){o+=FUNS[w];i=j;continue}
+   if(/^d[xtuyz]$/.test(w)){o+=(/[A-Za-z0-9})]$/.test(o)?"\\,":"")+"\\mathrm{d}"+w[1];i=j;continue}
+   /* mots collés : dx, dt, cos... à l'intérieur ? */
+   let r="";let p=0;while(p<w.length){let f=null;for(const k of Object.keys(FUNS).sort((a,b)=>b.length-a.length)){if(w.startsWith(k,p)&&k.length>=3){f=k;break}}if(f){r+=FUNS[f];p+=f.length}else{r+=w[p];p++}}
+   o+=r;i=j;continue}
+  if(c===","&&/\d/.test(s[i-1]||"")&&/\d/.test(s[i+1]||"")){o+="{,}";i++;continue}
+  if(c===" "){let k=i;while(s[k]===" ")k++;const pv=o[o.length-1]||"",nx=s[k]||"";if(/[A-Za-z0-9}]/.test(pv)&&/[A-Za-z0-9\u0001]/.test(nx))o+="\\,";i=k;continue}
+  if(c==="¯"){o=o.replace(/([A-Za-z]|\\[a-z]+ |\))$/,m=>"\\overline{"+m+"}");i++;continue}
+  if(SYM[c]!==undefined){o+=SYM[c];i++;continue}
+  o+=c;i++}
+ return o}
+const m2t=(raw,disp)=>{const st=[];const s=extract(raw,st);let t=conv(s,st,disp);return (disp&&/\\dfrac|\\int|\\sum|\\sqrt/.test(t)?"\\displaystyle ":"")+t};
+/* segmentation texte / maths */
+const IV=/[\[\]][0-9A-Za-zπ∞+−\-\s,.√/²·()]{1,36}?;[0-9A-Za-zπ∞+−\-\s,.√/²·()]{1,36}?[\[\]]|\((?![^;)]*[A-Za-zÀ-ÿ]{4})[0-9A-Za-zα-ωπ∞+−\-,.√/²]{1,16}\s;\s[0-9A-Za-zα-ωπ∞+−\-,.√/²]{1,16}\)/g;
+function node(text,disp,blk){
+ if(!node._iv&&new RegExp(IV.source).test(text.replace(/&lt;/g,"<"))){const IV2=new RegExp(IV.source,"g");node._iv=1;const t0=text.replace(/&lt;/g,"<").replace(/&gt;/g,">").replace(/&amp;/g,"&");let out="",last=0,m;
+  while((m=IV2.exec(t0))){out+=node(t0.slice(last,m.index),disp,blk);out+="\\("+m2t(m[0].replace(/\s*;\s*/g,"§;§"),false).replace(/§/g,"\\,")+"\\)";last=m.index+m[0].length}
+  out+=node(t0.slice(last),disp,blk);node._iv=0;return out}
+ text=text.replace(/([A-Za-z])\u0304/g,"$1¯").replace(/&lt;/g,"<").replace(/&gt;/g,">").replace(/&amp;/g,"&").replace(/&nbsp;/g," ");
+ const re=/([A-Za-zÀ-ÿ]+)|(\d+(?:,\d+)?)|(\s+)|([\s\S])/g;const T=[];let m;
+ while((m=re.exec(text))){if(m[1])T.push({k:"w",s:m[1]});else if(m[2])T.push({k:"n",s:m[2]});else if(m[3])T.push({k:"s",s:m[3]});else T.push({k:"o",s:m[4]})}
+ const STRONG=new Set("¯=≠≤≥<>+×÷∼≈±∈∉⇒⇔→↦∞∫∑Σ√π∀∃∪∩⊂∘≡^²³⁴⁵⁶⁷⁸⁹⁰¹ⁿᵏˣ₀₁₂₃₄₅₆₇₈₉⁺⁻ᵃᵇᵈᵉ".split("").concat(Object.keys(SUP),Object.keys(SUB)));
+ const GREEK=/[α-ωΑ-Ωℝℂℕℤ′″‴∅]/;
+ T.forEach((t,i)=>{t.m=null;
+  if(t.k==="w"){const w=t.s;
+   if(FUNS[w]||w==="dx")t.m=true;
+   else if(["dt","du","dy","dz"].includes(w)){const pv=T.slice(0,i).reverse().find(q=>q.k!=="s");t.m=!!pv&&(pv.k==="w"&&!STOP.has(pv.s)&&(VL.test(pv.s)||FUNS[pv.s])||pv.k==="n"||(pv.k==="o"&&/[)}\]'′∞∫+\-−=·×]/.test(pv.s)))}
+   else if(/[À-ÿ]/.test(w))t.m=false;
+   else if(w.length===1){t.m=(w==="a"||w==="A")?(((T[i+1]&&T[i+1].k==="s"&&T[i+2]&&T[i+2].k==="w"&&FUNS[T[i+2].s]))?true:"?"):true;if(i+1<T.length&&(T[i+1].s==="'"||T[i+1].s==="’")&&T[i+2]&&T[i+2].k==="w")t.m=false}
+   else t.m=(VL.test(w)&&!STOP.has(w.toLowerCase()))?true:false}
+  else if(t.k==="n")t.m=true;
+  else if(t.k==="s")t.m="s";
+  else{const c=t.s;if(STRONG.has(c)||GREEK.test(c))t.m=true;else if("(){}[]|/,;:.!?'’-−·…*«»“”\"".includes(c))t.m="?";else t.m=false}});
+ const near=(i,d)=>{let j=i+d;while(T[j]&&T[j].k==="s")j+=d;return T[j]};
+ for(let pass=0;pass<4;pass++)T.forEach((t,i)=>{if(t.m!=="?")return;const c=t.s,P=T[i-1],N=T[i+1],Pm=P&&P.m===true,Nm=N&&N.m===true;
+  const Ps=near(i,-1),Ns=near(i,1),Pms=Ps&&Ps.m===true,Nms=Ns&&Ns.m===true;
+  let r=null;
+  if(c==="a"||c==="A"){const OPS="=+−-×·/^≤≥<>≠≈(),;|";const op=x=>x&&((x.k==="o"&&OPS.includes(x.s))||x.k==="n");
+   const ww=(x,d)=>{let j=T.indexOf(x);return null};
+   const nw=Ns&&Ns.k==="w"?Ns.s:"",pw=Ps&&Ps.k==="w"?Ps.s:"";
+   const afterEt=(nw==="et"||nw==="ou")&&(()=>{let j=T.indexOf(Ns)+1;while(T[j]&&T[j].k==="s")j++;return T[j]&&T[j].k==="w"&&T[j].s.length===1})();
+   const beforeEt=(pw==="et"||pw==="ou")&&(()=>{let j=T.indexOf(Ps)-1;while(T[j]&&T[j].k==="s")j--;return T[j]&&T[j].k==="w"&&T[j].s.length===1})();
+   r=(op(Ps)||op(Ns)||afterEt||beforeEt)?true:null}
+  else if("([{".includes(c))r=Nm?true:null;
+  else if(")]}".includes(c))r=Pm?true:null;
+  else if(c==="|")r=(Nm||Pm)?true:null;
+  else if(c==="/"||c==="·"||c==="*")r=(Pms&&Nms)?true:null;
+  else if(c==="-"||c==="−")r=Nms&&(Pms||!Ps||/[=(,;:]/.test(Ps.s)||Ps.m===true)?true:null;
+  else if(c===","||c===";"||c===":")r=(Pm&&Nms)?true:null;
+  else if(c==="!")r=(Pm&&!(N&&N.k==="w"))?true:null;
+  else if(c==="'"||c==="’")r=(Pm&&!(N&&N.k==="w"))?true:null;
+  else if(c==="…")r=(Pms||Nms)?true:null;
+  else r=null;
+  if(r===true)t.m=true});
+ T.forEach(t=>{if(t.m==="?"||t.m===null)t.m=false});
+ let out="",i=0;
+ while(i<T.length){if(T[i].m===true){let j=i,last=i;while(j<T.length){if(T[j].m===true)last=j;else if(!(T[j].m==="s"&&T[j+1]&&(T[j+1].m===true)))break;j++}
+   const raw=T.slice(i,last+1).map(t=>t.s).join("");
+   if(/^\d+(?:,\d+)?$/.test(raw))out+=raw;else{const tex=m2t(raw,disp||(blk&&raw.length>=16&&/[=⇒⇔]/.test(raw)&&/[=]/.test(raw)&&!/^[^=]{0,3}=[^=]{0,5}$/.test(raw)));
+    if(blk&&raw.length>=16&&/[=⇒⇔]/.test(raw)&&!/^[^=]{0,3}=[^=]{0,5}$/.test(raw))out+="\\["+m2t(raw,true)+"\\]";else out+="\\("+tex+"\\)"}i=last+1}
+  else{out+=T[i].s;i++}}
+ return out.replace(/&/g,"&amp;").replace(/\\\(/g,"\\(").replace(/</g,"&lt;")}
+const html=(h,disp,say)=>h.split(/(<svg[\s\S]*?<\/svg>)/).map((p,i)=>{if(i%2)return p;let last="";return p.replace(/(<[^>]*>)|([^<]+)/g,(m,tag,txt)=>{if(tag){last=tag;return tag}
+  const ok=say&&!/^<(mark|b|i|sub|sup)\b/.test(last);let x=txt.replace(/-(?=\d)/g,"−");
+  if(ok)x=x.replace(/([.!?])\s+(?=[A-ZÉÈÀÂÎÔÛ])/g,"$1<br class=sp>");
+  return x.split("<br class=sp>").map(y=>node(y,disp,ok)).join("<br class=sp>")}).replace(/&amp;lt;/g,"&lt;")}).join("").replace(/\\\]([ \u00a0]?)([.,;])(?![0-9])/g,(m,sp,p)=>"\\,"+p+"\\]");
+return{node,html,m2t,tx1:s=>node(s,false)}})();
+
+
+const mjt=els=>{const f=()=>{MathJax.startup.promise=MathJax.startup.promise.then(()=>MathJax.typesetPromise(els)).then(()=>document.querySelectorAll("mjx-assistive-mml").forEach(e=>e.remove())).catch(()=>{})};if(window.__mjr)f();else(window.__mjq=window.__mjq||[]).push(f)};
+
+if(typeof document!=="undefined"){
+const host=document.getElementById("scenes"),nav=document.getElementById("nav");
+SC.forEach((sc,ix)=>{const CODE="E"+(ix+1);
+ const sec=document.createElement("section");sec.id="s-"+sc.id;
+ const ps=(sc.params||[]).map(p=>p.type==="select"?`<label for="${sc.id}_${p.id}">${p.label}</label><select id="${sc.id}_${p.id}">${p.options.map(o=>`<option value="${o[0]}"${(p.value||p.options[0][0])===o[0]?" selected":""}>${o[1]}</option>`).join("")}</select>`:`<label for="${sc.id}_${p.id}">${p.label}</label><input type="text" id="${sc.id}_${p.id}" value="${p.value}">`).join("");
+ sec.innerHTML=`<div><h2><span class="cd">${CODE}</span> ${TXE.tx1(sc.title)}</h2><p>${TXE.tx1(sc.ref)}</p></div>${ps?`<div class="row">${ps}${(sc.params||[]).some(p=>p.type==="text")?`<button id="${sc.id}_go">Poser</button>`:""}</div>`:""}
+ <div class="row"><button class="p" id="${sc.id}_play">Lecture</button><button id="${sc.id}_prev">◀ Précédent</button><button id="${sc.id}_next">Suivant ▶</button><label for="${sc.id}_sp">Lent</label><input type="range" id="${sc.id}_sp" min="800" max="4000" step="200" value="2600" style="direction:rtl;max-width:110px"><label for="${sc.id}_sp">Rapide</label></div>
+ <div class="bubble" id="${sc.id}_say" aria-live="polite"></div><div class="stage" id="${sc.id}_board"></div>`;
+ host.appendChild(sec);mjt([sec]);
+ const a=document.createElement("a");a.href="#s-"+sc.id;a.textContent=CODE+" · "+sc.title;nav.appendChild(a);
+ const $=s=>document.getElementById(sc.id+"_"+s);
+ let steps=[],t=0,timer=null,speed=2600;
+ const stop=()=>{if(timer){clearInterval(timer);timer=null}$("play").textContent="Lecture"};
+ 
+const mn=h=>TXE.html(h,true,false);
+
+ const draw=()=>{const s=steps[t];$("say").innerHTML=TXE.html(s.say,false,true);$("board").innerHTML=TXE.html(s.board,true,false);mjt([$("say"),$("board")]);$("prev").disabled=t===0;$("next").disabled=t===steps.length-1};
+ const vals=()=>{const v={};(sc.params||[]).forEach(p=>{v[p.id]=$(p.id).value});return v};
+ const rebuild=()=>{stop();steps=sc.build(vals());t=0;draw()};
+ $("next").onclick=()=>{stop();if(t<steps.length-1){t++;draw()}};
+ $("prev").onclick=()=>{stop();if(t>0){t--;draw()}};
+ const tick=()=>{if(t<steps.length-1){t++;draw()}else stop()};
+ $("play").onclick=()=>{if(timer){stop();return}if(t===steps.length-1){t=0;draw()}$("play").textContent="Pause";timer=setInterval(tick,speed)};
+ $("sp").oninput=e=>{speed=+e.target.value;if(timer){clearInterval(timer);timer=setInterval(tick,speed)}};
+ (sc.params||[]).forEach(p=>{if(p.type==="select")$(p.id).onchange=rebuild});
+ if($("go"))$("go").onclick=rebuild;
+ rebuild();
+});}
+</script>
+
+<script>
+/* mode intégré dans le site : ?s=<scène>&embed=1 n'affiche que cette scène et signale sa hauteur à la page parente */
+(function(){var q=new URLSearchParams(location.search),s=q.get("s");if(!s||q.get("embed")!=="1")return;
+var id=CSS.escape(s);var css="main>h1,main>p,nav,.cd{display:none!important}section{display:none!important}"
++"#s-"+id+",section#"+id+"{display:block!important}body,main{margin:0!important;padding:0!important;background:transparent!important}"
++"main{max-width:none!important}section{margin:0!important;border:0!important;box-shadow:none!important}";
+var st=document.createElement("style");st.textContent=css;document.head.appendChild(st);
+document.documentElement.classList.add("embed");
+function post(){parent.postMessage({anim:1,h:Math.ceil(document.documentElement.scrollHeight)},"*")}
+if(window.ResizeObserver)new ResizeObserver(post).observe(document.documentElement);
+window.addEventListener("load",post);setInterval(post,1500);
+})();
+</script>

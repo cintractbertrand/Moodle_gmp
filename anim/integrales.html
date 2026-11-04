@@ -1,0 +1,627 @@
+<!doctype html>
+<html lang="fr">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>html{color-scheme:light}body{margin:0;font:14px/1.5 system-ui,-apple-system,"Segoe UI",sans-serif}[hidden]{display:none!important}img{max-width:100%}</style>
+<title>Intégrales en animations</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<script>window.MathJax={loader:{load:[]},tex:{inlineMath:[["\\(","\\)"]],displayMath:[["\\[","\\]"]],processEscapes:false},svg:{fontCache:"global"},options:{enableMenu:false,enableAssistiveMml:false},startup:{typeset:false,ready:function(){MathJax.startup.defaultReady();window.__mjr=1;(window.__mjq||[]).forEach(function(f){f()});}}};</script>
+<script async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-svg.min.js"></script>
+
+<style>
+/* Layout: une scène = un passage du cours (titre, réglages, commentaire du prof, tableau animé) */
+:root{--bg:#f6f7f9;--card:#fff;--fg:#1d2433;--mut:#5b6577;--line:#d9dee7;--accent:#1f5fbf;--hl:#ffe08a;--hl2:#bfe3d0;--bad:#b3261e;
+--mono:ui-monospace,"SF Mono",Menlo,Consolas,monospace;--sans:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#10141c;--card:#171d29;--fg:#e6eaf2;--mut:#9aa5b8;--line:#2b3446;--accent:#6aa3ff;--hl:#6b5a14;--hl2:#1f5a43;--bad:#ff8a80;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#10141c;--card:#171d29;--fg:#e6eaf2;--mut:#9aa5b8;--line:#2b3446;--accent:#6aa3ff;--hl:#6b5a14;--hl2:#1f5a43;--bad:#ff8a80;color-scheme:dark}
+body{background:var(--bg);color:var(--fg);font-family:var(--sans);font-size:16px;line-height:1.5;padding-block:20px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+main{max-width:780px;margin:0 auto;display:flex;flex-direction:column;gap:22px}
+h1{font-size:1.4rem;margin:0}h2{font-size:1.1rem;margin:0 0 2px}p{margin:0;color:var(--mut)}
+nav{display:flex;flex-wrap:wrap;gap:6px 12px;font-size:.9rem}nav a{color:var(--accent)}
+section{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:16px;display:flex;flex-direction:column;gap:12px;min-width:0}
+.row{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+label{font-size:.9rem;color:var(--mut)}
+input[type=text],select{font:inherit;font-family:var(--mono);padding:6px 8px;border:1px solid var(--line);border-radius:6px;background:var(--bg);color:var(--fg);min-width:0;max-width:100%}
+input[type=text]{width:14em}
+button{font:inherit;padding:6px 12px;border:1px solid var(--line);border-radius:6px;background:var(--bg);color:var(--fg);cursor:pointer}
+button.p{background:var(--accent);color:var(--bg);border-color:var(--accent)}
+button:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+button:disabled{opacity:.45;cursor:default}
+.bubble{border-left:4px solid var(--accent);background:var(--bg);padding:10px 12px;border-radius:0 8px 8px 0;min-height:3.2em;line-height:1.7}
+mark{background:var(--hl);color:inherit;border-radius:3px;padding:0 3px}
+.stage{overflow-x:auto;font-family:var(--mono)}
+.board{display:flex;align-items:flex-start}
+.board table{border-collapse:collapse}.board td{min-width:3.4em;height:2.2em;text-align:center;padding:0 4px;box-sizing:border-box;white-space:nowrap}
+.board .left{padding-right:10px}.board .right{border-left:2px solid var(--fg);padding-left:6px}
+.board td.rule{border-top:2px solid var(--fg)}
+.board td.lab{min-width:1.4em;padding:0 2px}
+.hl{background:var(--hl);border-radius:4px;font-weight:700}.hk{background:var(--hl2);border-radius:4px}
+.hq{outline:2px solid var(--accent);border-radius:4px;font-weight:700}
+.tab td,.tab th{border:1px solid var(--line);padding:4px 10px;text-align:center;font-weight:400}
+.lines{display:flex;flex-direction:column;gap:6px;font-family:var(--mono)}
+.lines div{padding:2px 6px;border-radius:4px;white-space:nowrap}
+.lines .new{background:var(--hl2)}
+.res{border:2px solid var(--accent);border-radius:8px;padding:8px 10px;font-family:var(--mono);overflow-x:auto}
+.ok{color:var(--accent)}.err{color:var(--bad)}
+svg{max-width:100%;height:auto;display:block;font-family:var(--sans)}
+svg text{fill:var(--fg);font-size:11px}
+svg .ax{stroke:var(--mut);stroke-width:1;fill:none}svg .gr{stroke:var(--line);stroke-width:1;fill:none}
+svg .cv{stroke:var(--accent);stroke-width:2;fill:none}svg .dsh{stroke:var(--mut);stroke-dasharray:4 3;fill:none}
+svg .cv2{stroke:var(--bad);stroke-width:2;fill:none}svg .cv3{stroke:var(--mut);stroke-width:1.5;stroke-dasharray:4 3;fill:none}svg .fillp{fill:var(--accent);opacity:.28;stroke:none}svg .fillm{fill:var(--bad);opacity:.28;stroke:none}svg .rect{fill:var(--accent);opacity:.3;stroke:var(--accent);stroke-width:1}svg .rectU{fill:var(--bad);opacity:.15;stroke:var(--bad);stroke-width:1}h2 .cd{display:inline-block;background:var(--accent);color:var(--bg);border-radius:6px;padding:0 8px;margin-right:6px;font-size:.95em}.rt{white-space:nowrap}.rt .ov{border-top:1.5px solid currentColor;padding:0 1px;margin-left:1px}svg .tg{stroke:var(--accent);stroke-width:2;fill:none}svg .vec{stroke:var(--accent);stroke-width:2}svg .pt{fill:var(--bad)}svg .pk{fill:var(--accent)}svg .pe{fill:none;stroke:var(--accent);stroke-width:1.5}
+.fq{display:inline-flex;flex-direction:column;vertical-align:middle;text-align:center;margin:0 2px;line-height:1.25;font-size:.95em}.fq .nu{border-bottom:1.5px solid currentColor;padding:0 3px}.fq .de{padding:0 3px}br.sp{display:block;content:"";margin-top:.55em}.bubble{line-height:1.95;padding:14px 16px}.bubble mjx-container[display="true"]{margin:.55em 0 !important}.lines{gap:10px}.lines div{padding:6px 10px;white-space:normal}.lines,.res,.stage{font-family:inherit}.res{padding:12px 14px;font-size:1.05em}mjx-container[jax="SVG"] svg{overflow:visible}section h2 mjx-container,nav mjx-container{font-size:100%}/*ovf*/mjx-container svg{display:inline!important}mjx-assistive-mml{display:none!important}mjx-assistive-mml{position:absolute!important;width:1px!important;height:1px!important;overflow:hidden!important;clip:rect(0 0 0 0)!important;left:0!important;top:0!important}mjx-container{position:relative}mjx-container{max-width:100%;overflow-x:auto;overflow-y:hidden}mjx-container[display=true]{margin:.5em 0!important}.bubble,.lines,.res,.stage,#board,#say{max-width:100%;overflow-x:auto}.ref{overflow-x:auto;max-width:100%}</style>
+<main>
+<h1>Intégrales : les animations du cours</h1>
+<p>Chaque animation reprend un passage du cours. Appuie sur Lecture, ou avance à ton rythme avec Suivant.</p>
+<nav id="nav"></nav>
+<div id="scenes" style="display:contents"></div>
+</main>
+<script>
+/* =================== calcul exact =================== */
+function gcd(a,b){a=Math.abs(a);b=Math.abs(b);while(b){[a,b]=[b,a%b]}return a}
+function F(n,d=1){if(d<0){n=-n;d=-d}const g=gcd(n,d)||1;return{n:n/g,d:d/g}}
+const add=(x,y)=>F(x.n*y.d+y.n*x.d,x.d*y.d),sub=(x,y)=>F(x.n*y.d-y.n*x.d,x.d*y.d),mul=(x,y)=>F(x.n*y.n,x.d*y.d),dv=(x,y)=>F(x.n*y.d,x.d*y.n);
+const isz=x=>x.n===0, fs=x=>x.d===1?String(x.n):x.n+"/"+x.d, fnum=x=>x.n/x.d;
+const sup=n=>String(n).split("").map(c=>"⁰¹²³⁴⁵⁶⁷⁸⁹"[+c]).join("");
+const sub_=n=>String(n).split("").map(c=>"₀₁₂₃₄₅₆₇₈₉"[+c]).join("");
+/* un polynôme = objet {puissance: Fraction} sans coefficient nul */
+function clean(m){const r={};for(const k in m)if(!isz(m[k]))r[k]=m[k];return r}
+function fromDesc(a){const m={};a.forEach((c,i)=>{m[a.length-1-i]=typeof c==="number"?F(c):c});return clean(m)}
+function fromAsc(a){const m={};a.forEach((c,i)=>{m[i]=typeof c==="number"?F(c):c});return clean(m)}
+const pows=m=>Object.keys(m).map(Number).sort((a,b)=>a-b);
+const deg=m=>{const p=pows(m);return p.length?p[p.length-1]:-1};
+const low=m=>{const p=pows(m);return p.length?p[0]:-1};
+const empty=m=>pows(m).length===0;
+function padd(a,b){const r={...a};for(const k in b)r[k]=r[k]?add(r[k],b[k]):b[k];return clean(r)}
+function pscale(a,c){const r={};for(const k in a)r[k]=mul(a[k],c);return clean(r)}
+function pshift(a,s){const r={};for(const k in a)r[+k+s]=a[k];return r}
+const psub=(a,b)=>padd(a,pscale(b,F(-1)));
+function pmul(a,b){let r={};for(const i in a)for(const j in b){const p=+i+ +j;r[p]=r[p]?add(r[p],mul(a[i],b[j])):mul(a[i],b[j])}return clean(r)}
+function pderiv(a){const r={};for(const k in a)if(+k>0)r[k-1]=mul(a[k],F(+k));return clean(r)}
+function peval(a,x){let s=F(0);for(const k in a){let t=F(1);for(let i=0;i<+k;i++)t=mul(t,x);s=add(s,mul(a[k],t))}return s}
+function pevalF(a,x){let s=0;for(const k in a)s+=fnum(a[k])*Math.pow(x,+k);return s}
+const peq=(a,b)=>empty(psub(a,b));
+let VAR="x";
+function term(c,p,first){if(isz(c))return"";const neg=c.n<0,ab=F(Math.abs(c.n),c.d);
+ let b=(p>0&&ab.n===1&&ab.d===1)?"":(ab.d===1||p===0?fs(ab):"("+fs(ab)+")");
+ b+=p>0?(p===1?VAR:VAR+sup(p)):"";
+ return first?(neg?"−"+b:b):(neg?"− ":"+ ")+b}
+function pstr(m,asc){const p=pows(m);if(!p.length)return"0";if(!asc)p.reverse();let o="";p.forEach((k,i)=>{const t=term(m[k],k,i===0);o+=(i&&t.startsWith("")?" ":"")+t});return o}
+const one=(c,p)=>term(c,p,true);
+function parseList(s){return s.split(/[,;\s]+/).filter(Boolean).map(t=>{const m=t.match(/^(-?\d+)(?:\/(\d+))?$/);if(!m||(m[2]&&+m[2]===0))throw 0;return F(+m[1],m[2]?+m[2]:1)})}
+
+/* =================== division (décroissante ou croissante) =================== */
+function divModel(A,B,asc,order){
+ const its=[];let R={...A};const dB=deg(B);
+ if(!asc){while(!empty(R)&&deg(R)>=dB){const lp=deg(R),qp=lp-dB,c=dv(R[lp],B[dB]);const prod=pscale(pshift(B,qp),c);const Rn=psub(R,prod);its.push({lp,qp,c,prod,Rold:R,Rn});R=Rn}}
+ else{for(let s=0;s<=order;s++){const c=R[s]?dv(R[s],B[0]):F(0);const prod=pscale(pshift(B,s),c);const Rn=psub(R,prod);its.push({lp:s,qp:s,c,prod,Rold:R,Rn});R=Rn}}
+ const Q={};its.forEach(it=>{if(!isz(it.c))Q[it.qp]=it.c});
+ const dA=deg(A);
+ let colsL,colsR;
+ if(!asc){const wp=Math.max(dB,dA-dB,0);colsL=range(dA,0,-1);colsR=range(wp,0,-1)}
+ else{const mp=Math.max(dA,order+dB);colsL=range(0,mp,1);colsR=range(0,Math.max(dB,order),1)}
+ return{A,B,asc,order,its,Q,R,dA,dB,colsL,colsR,N:4*its.length+1};
+}
+function range(a,b,s){const r=[];for(let i=a;s>0?i<=b:i>=b;i+=s)r.push(i);return r}
+function divCheck(D){return peq(padd(pmul(D.B,D.Q),D.R),D.A)}
+function divSay(D,t){
+ const {A,B,asc,its,order,dB}=D;
+ if(t===0)return asc?`On pose la DSPC à l'ordre <b>${order}</b> : on range A et B <b>suivant les puissances croissantes</b>. On veut A = B×Q + ${VAR}<sup>${order+1}</sup>×R avec deg Q ≤ ${order}.`
+  :`On pose la division : <b>A = ${pstr(A)}</b> à gauche, <b>B = ${pstr(B)}</b> à droite. On veut A = B×Q + R avec deg R &lt; deg B = ${dB}.`+(D.dA<dB?" Ici deg A &lt; deg B : la division est déjà finie.":"");
+ if(t===D.N){
+  if(asc){const Rp={};for(const k in D.R)Rp[k-order-1]=D.R[k];return `On s'arrête à l'ordre ${order}. <b>Q = ${pstr(D.Q,true)}</b> et le reste est <b>${pstr(D.R,true)} = ${VAR}${sup(order+1)}×(${pstr(Rp,true)})</b>.`}
+  return D.R&&!empty(D.R)?`Le reste <b>${pstr(D.R)}</b> a pour degré ${deg(D.R)}, strictement inférieur à ${dB} : on s'arrête. <b>Q = ${pstr(D.Q)}</b> et <b>R = ${pstr(D.R)}</b>.`
+   :`Le reste est nul : on s'arrête. <b>Q = ${pstr(D.Q)}</b> et <b>R = 0</b>, donc B divise A.`}
+ const i=Math.floor((t-1)/4),ph=(t-1)%4,it=its[i];
+ const src=i?"le reste":"A";
+ const lr=one(it.Rold[it.lp]||F(0),it.lp),lb=asc?one(B[0],0):one(B[dB],dB),q=one(it.c,it.qp),zero=isz(it.c);
+ const lead=asc?"de plus bas degré":"de plus haut degré";
+ if(ph===0)return `<b>Étape ${i+1}.</b> On regarde seulement les termes ${lead} : <mark>${lr||"0"}</mark> dans ${src} et <mark>${lb}</mark> dans B.`;
+ if(ph===1)return zero?`Le terme de degré ${it.lp} du reste est nul : le terme du quotient est <mark>0</mark>.`:`Par quoi faut-il multiplier ${lb} pour obtenir ${lr} ? ${lr} ÷ ${lb} = <mark>${q}</mark>. On l'écrit au quotient, sous B.`;
+ if(ph===2)return zero?`0 × B = 0 : il n'y a rien à écrire.`:`On multiplie <b>tout</b> B par ${q} et on écrit le résultat sous ${src}, en alignant les puissances de X : ${q}·B = ${pstr(it.prod,asc)}.`;
+ const Rn=it.Rn;return zero?`Rien à soustraire, on passe au terme suivant.`:`On soustrait la parenthèse, c'est-à-dire qu'on change tous ses signes : le terme de degré ${it.lp} disparaît. Il reste <mark>${empty(Rn)?"0":pstr(Rn,asc)}</mark>.`;
+}
+function divBoard(D,t){
+ const {A,B,asc,its,N,colsL,colsR,dB}=D;
+ const cur=t>0&&t<N?{i:Math.floor((t-1)/4),ph:(t-1)%4}:null;
+ const reached=(i,ph)=>t>=4*i+ph+1;
+ const row=(m,cols,cls,lab,rule)=>{let seen=false;return `<tr><td class="lab">${lab||""}</td>`+cols.map(p=>{const v=m[p];const tt=v?term(v,p,!seen):"";if(tt)seen=true;return `<td class="${(cls&&cls(p))||""} ${rule?"rule":""}">${tt}</td>`}).join("")+`<td class="lab">${lab?")":""}</td></tr>`};
+ let L=row(A,colsL,p=>cur&&cur.i===0&&cur.ph<=1&&its[0]&&p===its[0].lp?"hl":"","");
+ its.forEach((it,i)=>{const isCur=cur&&cur.i===i;
+  if(reached(i,2)&&!isz(it.c))L+=row(it.prod,colsL,()=>isCur&&cur.ph===2?"hk":"","− (");
+  if(reached(i,3)&&!isz(it.c)){const nx=its[i+1];L+=row(it.Rn,colsL,p=>isCur&&cur.ph===3?"hk":(cur&&cur.i===i+1&&cur.ph<=1&&nx&&p===nx.lp?"hl":""),"",true)}
+ });
+ const leadB=asc?0:dB;
+ let seenB=false,seenQ=false;
+ const RB=`<tr>`+colsR.map(p=>{const c=B[p];const tt=c?term(c,p,!seenB):"";if(tt)seenB=true;return `<td class="${cur&&cur.ph<=1&&p===leadB?"hl":""}">${tt}</td>`}).join("")+`</tr>`;
+ const RQ=`<tr>`+colsR.map(p=>{let v=null,h="";its.forEach((it,i)=>{if(it.qp===p&&reached(i,1)){v=it.c;if(cur&&cur.i===i&&cur.ph===1)h="hq"}});const tt=v&&!isz(v)?term(v,p,!seenQ):"";if(tt)seenQ=true;return `<td class="rule ${h}">${tt}</td>`}).join("")+`</tr>`;
+ let out=`<div class="board"><div class="left"><table>${L}</table></div><div class="right"><table>${RB+RQ}</table></div></div>`;
+ if(t===N)out+=`<div class="res">A = B·Q + ${D.asc?"reste":"R"}<br>(${pstr(B,asc)})·(${pstr(D.Q,asc)}) + (${empty(D.R)?"0":pstr(D.R,asc)})<br><span class="${divCheck(D)?"ok":"err"}">Vérification : B·Q + R = A ${divCheck(D)?"✓":"✗"}</span></div>`;
+ return out;
+}
+function divSteps(D,extra){const s=[];for(let t=0;t<=D.N;t++)s.push({say:divSay(D,t),board:divBoard(D,t)});return s}
+
+/* =================== dessins =================== */
+function niceTicks(a,b){const span=b-a;let st=Math.pow(10,Math.floor(Math.log10(span/4)));if(span/st>8)st*=2;if(span/st>8)st*=2.5;const r=[];for(let v=Math.ceil(a/st)*st;v<=b+1e-9;v+=st)r.push(Math.round(v/st)*st);return r}
+function graphSvg(o){const W=380,H=240,pl=30,pr=14,pt=14,pb=24;const {f,xmin,xmax}=o;let {ymin,ymax}=o;
+ if(ymin===undefined){let lo=1e9,hi=-1e9;for(let i=0;i<=200;i++){const y=f(xmin+(xmax-xmin)*i/200);lo=Math.min(lo,y);hi=Math.max(hi,y)}const pad=(hi-lo)*0.12||1;ymin=Math.min(lo,0)-pad;ymax=Math.max(hi,0)+pad}
+ const X=x=>pl+(x-xmin)/(xmax-xmin)*(W-pl-pr),Y=y=>pt+(ymax-y)/(ymax-ymin)*(H-pt-pb);
+ let s=`<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="${o.label||"graphe"}">`;
+ niceTicks(xmin,xmax).forEach(v=>{s+=`<line class="gr" x1="${X(v)}" y1="${pt}" x2="${X(v)}" y2="${H-pb}"/><text x="${X(v)}" y="${H-pb+13}" text-anchor="middle">${+v.toFixed(2)}</text>`});
+ niceTicks(ymin,ymax).forEach(v=>{s+=`<line class="gr" x1="${pl}" y1="${Y(v)}" x2="${W-pr}" y2="${Y(v)}"/><text x="${pl-4}" y="${Y(v)+4}" text-anchor="end">${+v.toFixed(2)}</text>`});
+ if(ymin<0&&ymax>0)s+=`<line class="ax" x1="${pl}" y1="${Y(0)}" x2="${W-pr}" y2="${Y(0)}"/>`;
+ if(xmin<0&&xmax>0)s+=`<line class="ax" x1="${X(0)}" y1="${pt}" x2="${X(0)}" y2="${H-pb}"/>`;
+ let d="",pen=false;for(let i=0;i<=240;i++){const x=xmin+(xmax-xmin)*i/240,y=f(x);if(y<ymin||y>ymax){pen=false;continue}d+=(pen?"L":"M")+X(x).toFixed(1)+" "+Y(y).toFixed(1)+" ";pen=true}
+ s+=`<path class="cv" d="${d}"/>`;
+ (o.marks||[]).forEach(m=>{if(m.drop)s+=`<line class="dsh" x1="${X(m.x)}" y1="${Y(m.y)}" x2="${X(m.x)}" y2="${Y(0)}"/>`;
+  s+=`<circle class="${m.ok?"pk":"pt"}" cx="${X(m.x)}" cy="${Y(m.y)}" r="5"/>`;if(m.label)s+=`<text x="${X(m.x)+7}" y="${Y(m.y)-7}">${m.label}</text>`});
+ return s+"</svg>"}
+function planeSvg(o){const S=300,R=o.R,pad=18,C=S/2;const X=x=>C+x/R*(C-pad),Y=y=>C-y/R*(C-pad);
+ let s=`<svg viewBox="0 0 ${S} ${S}" style="max-width:320px" role="img" aria-label="plan complexe">`;
+ for(let v=-Math.floor(R);v<=Math.floor(R);v++){if(!v)continue;s+=`<line class="gr" x1="${X(v)}" y1="${pad/2}" x2="${X(v)}" y2="${S-pad/2}"/><line class="gr" x1="${pad/2}" y1="${Y(v)}" x2="${S-pad/2}" y2="${Y(v)}"/><text x="${X(v)}" y="${C+12}" text-anchor="middle">${String(v).replace("-","−")}</text><text x="${C-4}" y="${Y(v)+4}" text-anchor="end">${v===1?"i":v===-1?"−i":String(v).replace("-","−")+"i"}</text>`}
+ s+=`<line class="ax" x1="${pad/2}" y1="${C}" x2="${S-pad/2}" y2="${C}"/><line class="ax" x1="${C}" y1="${pad/2}" x2="${C}" y2="${S-pad/2}"/>`;
+ if(o.circle)s+=`<circle class="pe" cx="${C}" cy="${C}" r="${(o.circleR||1)/R*(C-pad)}" style="stroke-dasharray:3 3"/>`;
+ if(o.poly){s+=`<polyline class="vec" fill="none" points="${o.poly.map(p=>X(p[0]).toFixed(1)+","+Y(p[1]).toFixed(1)).join(" ")}${o.closed?" "+X(o.poly[0][0]).toFixed(1)+","+Y(o.poly[0][1]).toFixed(1):""}"/>`}
+ (o.links||[]).forEach(l=>{s+=`<line class="dsh" x1="${X(l[0])}" y1="${Y(l[1])}" x2="${X(l[2])}" y2="${Y(l[3])}"/>`});
+ (o.vecs||[]).forEach(l=>{s+=`<line class="vec" x1="${X(0)}" y1="${Y(0)}" x2="${X(l[0])}" y2="${Y(l[1])}"/>`});
+ if(o.arc){const r=o.arc.r/R*(C-pad),th=o.arc.th,x2=C+r*Math.cos(th),y2=C-r*Math.sin(th);s+=`<path class="vec" fill="none" d="M ${C+r} ${C} A ${r} ${r} 0 ${Math.abs(th)>Math.PI?1:0} ${th>0?0:1} ${x2.toFixed(1)} ${y2.toFixed(1)}"/><text x="${C+r+4}" y="${C-4}">θ</text>`}
+ (o.pts||[]).forEach(p=>{s+=`<circle class="${p.hl?"pt":"pk"}" cx="${X(p.re)}" cy="${Y(p.im)}" r="5.5"/>`;if(p.m>1)s+=`<circle class="pe" cx="${X(p.re)}" cy="${Y(p.im)}" r="9"/>`;
+  s+=`<text x="${X(p.re)+9}" y="${Y(p.im)-8}">${p.label}${p.m>1?" (×"+p.m+")":""}</text>`});
+ return s+"</svg>"}
+const lines=(arr,k)=>`<div class="lines">`+arr.map((l,i)=>`<div class="${i===k?"new":""}">${l}</div>`).join("")+`</div>`;
+const stdP=F;
+
+/* =================== scènes : nombres complexes =================== */
+const SC=[];
+/* complexes rationnels exacts */
+const Zc=(re,im=0)=>({re:typeof re==="number"?F(re):re,im:typeof im==="number"?F(im):im});
+const zadd=(a,b)=>({re:add(a.re,b.re),im:add(a.im,b.im)}),zsub=(a,b)=>({re:sub(a.re,b.re),im:sub(a.im,b.im)});
+const zmul=(a,b)=>({re:sub(mul(a.re,b.re),mul(a.im,b.im)),im:add(mul(a.re,b.im),mul(a.im,b.re))});
+const zconj=a=>({re:a.re,im:mul(a.im,F(-1))});
+const zn2=a=>add(mul(a.re,a.re),mul(a.im,a.im));
+const zdiv=(a,b)=>{const d=zn2(b),n=zmul(a,zconj(b));return{re:dv(n.re,d),im:dv(n.im,d)}};
+const zeq=(a,b)=>isz(sub(a.re,b.re))&&isz(sub(a.im,b.im));
+const fr=x=>fs(x);
+function imS(y){const ab=F(Math.abs(y.n),y.d);if(ab.d===1)return ab.n===1?"i":ab.n+"i";return (ab.n===1?"i":ab.n+"i")+"/"+ab.d}
+function zstr(z){const a=!isz(z.re),b=!isz(z.im);if(!a&&!b)return"0";if(!b)return fr(z.re);if(!a)return (z.im.n<0?"−":"")+imS(z.im);return fr(z.re)+(z.im.n<0?" − ":" + ")+imS(z.im)}
+function zs(z){const s=zstr(z);return (a=>a)(s)}
+const zp=z=>{const s=zstr(z);return (!isz(z.re)&&!isz(z.im))||z.re.d!==1?"("+s+")":(z.re.n<0||(isz(z.re)&&z.im.n<0)?"("+s+")":s)};
+const ipow=(z,n)=>{let r=Zc(1);for(let i=0;i<n;i++)r=zmul(r,z);return r};
+const piS=q=>{if(q.n===0)return"0";const neg=q.n<0,n=Math.abs(q.n);return (neg?"−":"")+(n===1?"":n)+"π"+(q.d===1?"":"/"+q.d)};
+const C_=(n,k)=>{let r=1;for(let i=1;i<=k;i++)r=r*(n-k+i)/i;return Math.round(r)};
+const cpl=(o)=>`<div class="stage">${planeSvg(o)}</div>`;
+const NL=s=>s.replace(/-(?=\d)/g,"−");
+
+/* graphe à échelles libres */
+function g2(o){const W=o.W||360,H=o.H||o.W||320,pl=34,pr=14,pt=12,pb=26;const {xmin,xmax,ymin,ymax}=o;
+ const X=x=>pl+(x-xmin)/(xmax-xmin)*(W-pl-pr),Y=y=>pt+(ymax-y)/(ymax-ymin)*(H-pt-pb);
+ let s=`<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="${o.label||"graphe"}">`;
+ const tx=o.tx||niceTicks(xmin,xmax).map(v=>({v,l:String(+v.toFixed(2)).replace("-","−")})),ty=o.ty||niceTicks(ymin,ymax).map(v=>({v,l:String(+v.toFixed(2)).replace("-","−")}));
+ tx.forEach(t=>{s+=`<line class="gr" x1="${X(t.v)}" y1="${pt}" x2="${X(t.v)}" y2="${H-pb}"/><text x="${X(t.v)}" y="${H-pb+14}" text-anchor="middle">${t.l}</text>`});
+ ty.forEach(t=>{s+=`<line class="gr" x1="${pl}" y1="${Y(t.v)}" x2="${W-pr}" y2="${Y(t.v)}"/><text x="${pl-4}" y="${Y(t.v)+4}" text-anchor="end">${t.l}</text>`});
+ if(ymin<0&&ymax>0)s+=`<line class="ax" x1="${pl}" y1="${Y(0)}" x2="${W-pr}" y2="${Y(0)}"/>`;
+ if(xmin<0&&xmax>0)s+=`<line class="ax" x1="${X(0)}" y1="${pt}" x2="${X(0)}" y2="${H-pb}"/>`;
+ (o.fills||[]).forEach(fl=>{const n=80;let d=`M ${X(fl.a)} ${Y(0)} `;for(let i=0;i<=n;i++){const x=fl.a+(fl.b-fl.a)*i/n;d+=`L ${X(x).toFixed(1)} ${Y(Math.max(ymin,Math.min(ymax,fl.f(x)))).toFixed(1)} `}d+=`L ${X(fl.b)} ${Y(0)} Z`;s+=`<path class="${fl.cls||"fillp"}" d="${d}"/>`});
+ (o.rects||[]).forEach(r=>{const y0=Y(0),y1=Y(r.y);s+=`<rect class="${r.cls||"rect"}" x="${X(r.x0).toFixed(1)}" y="${Math.min(y0,y1).toFixed(1)}" width="${(X(r.x1)-X(r.x0)).toFixed(1)}" height="${Math.abs(y0-y1).toFixed(1)}"/>`});
+ (o.lines||[]).forEach(l=>{s+=`<line class="${l.cls||"dsh"}" x1="${X(l.p[0])}" y1="${Y(l.p[1])}" x2="${X(l.q[0])}" y2="${Y(l.q[1])}"/>`;if(l.l)s+=`<text x="${X(l.q[0])-4}" y="${Y(l.q[1])-5}" text-anchor="end">${l.l}</text>`});
+ (o.curves||[]).forEach(c=>{const a=Math.max(c.dom?c.dom[0]:xmin,xmin),b=Math.min(c.dom?c.dom[1]:xmax,xmax);let d="",pen=false;const N=300;
+  for(let i=0;i<=N;i++){const x=a+(b-a)*i/N,y=c.f(x);if(!isFinite(y)||y<ymin-1e-9||y>ymax+1e-9){pen=false;continue}d+=(pen?"L":"M")+X(x).toFixed(1)+" "+Y(y).toFixed(1)+" ";pen=true}
+  s+=`<path class="${c.cls||"cv"}" d="${d}"/>`});
+ (o.pts||[]).forEach(p=>{s+=`<circle class="${p.cls||"pt"}" cx="${X(p.x)}" cy="${Y(p.y)}" r="5"/>`;if(p.l)s+=`<text x="${X(p.x)+7}" y="${Y(p.y)-7}">${p.l}</text>`});
+ return `<div class="stage">${s}</svg></div>`}
+const PIT=(lo,hi,step)=>{const r=[];for(let k=Math.ceil(lo/step-1e-9);k*step<=hi+1e-9;k++){const v=k*step;const n=Math.round(v/(Math.PI/2));const l=n===0?"0":(n%2===0?(n/2===1?"π":n/2===-1?"-π":n/2+"π"):(n===1?"":n===-1?"−":n)+"π/2");r.push({v,l:l.replace(/^-/,"−")})}return r};
+const tang=(x,y,m,len)=>{const n=Math.hypot(1,m),dx=len/n,dy=len*m/n;return{p:[x-dx,y-dy],q:[x+dx,y+dy],cls:"tg"}};
+const PI=Math.PI;
+/* =================== scènes : intégrales =================== */
+const fmt=n=>{let s=(Math.abs(n)<1e-3&&n!==0)?n.toExponential(3):(+n.toPrecision(6))+"";s=s.replace(/e([+-]?)(\d+)/,(m,g,d)=>"×10"+(g==="-"?"⁻":"")+sup(+d));return s.replace(".",",").replace("-","−")};
+const quad=(f,a,b,n=2000)=>{const h=(b-a)/n;let s=f(a)+f(b);for(let i=1;i<n;i++)s+=f(a+i*h)*(i%2?4:2);return s*h/3};
+const sint=m=>{const r={};for(const k in m)r[+k+1]=dv(m[k],F(+k+1));return clean(r)};
+const nd=(F,x)=>(F(x+1e-5)-F(x-1e-5))/2e-5;
+const mm=(a,b)=>(+a.toFixed(6))===(+b.toFixed(6));
+const ctl=(F,f,x)=>`Contrôle en x = ${fmt(x)} : F′(x) ≈ ${fmt(nd(F,x))} et f(x) = ${fmt(f(x))} ✓.`;
+const GW={W:340,H:250};
+const tt=(c,s)=>{const n=Math.abs(c.n),d=c.d;return `${n===1&&s?"":n}${s}${d>1?"/"+d:""}`};
+const sg=c=>c.n<0?"−":"";
+const sumS=(arr)=>arr.map((a,i)=>i===0?(sg(a.c)+tt(a.c,a.s)):(a.c.n<0?" − ":" + ")+tt(a.c,a.s)).join("");
+/* 1. aire et sommes de Riemann */
+SC.push({id:"aire",title:"L'intégrale comme aire : sommes de rectangles",ref:"Cours : définition de l'intégrale d'une fonction continue (aire algébrique sous la courbe).",
+ params:[{id:"n",label:"Nombre de rectangles n",type:"select",options:[["2","2"],["4","4"],["8","8"],["16","16"]]}],
+ build(v){const n=+v.n,f=x=>x*x;const rs=(lo)=>{const r=[];for(let k=0;k<n;k++)r.push({x0:k/n,x1:(k+1)/n,y:lo?f(k/n):f((k+1)/n),cls:lo?"rect":"rectU"});return r};
+  const base={xmin:-0.1,xmax:1.1,ymin:-0.1,ymax:1.15,...GW,curves:[{f,cls:"cv"}]};
+  const lo=F((n-1)*(2*n-1),6*n*n),up=F((n+1)*(2*n+1),6*n*n);
+  const rows=[2,4,8,16,100].map(m=>`n = ${m} : ${fmt((m-1)*(2*m-1)/(6*m*m))} ≤ aire ≤ ${fmt((m+1)*(2*m+1)/(6*m*m))}`);
+  return[
+  {say:`Pour une fonction continue et positive, <b>∫₀¹ f(x) dx est l'aire sous la courbe</b> entre x = 0 et x = 1. Prenons f(x) = x².`,board:g2({...base,fills:[{f,a:0,b:1}]})},
+  {say:`On découpe [0 ; 1] en <b>n = ${n}</b> intervalles de largeur 1/${n}. Rectangles <b>sous</b> la courbe (hauteur = valeur à gauche de chaque intervalle) : leur aire totale est <b>inférieure</b> à l'aire cherchée.`,board:g2({...base,rects:rs(true)})},
+  {say:`Rectangles <b>au-dessus</b> de la courbe (hauteur = valeur à droite) : leur aire totale est <b>supérieure</b> à l'aire cherchée.`,board:g2({...base,rects:rs(false).concat(rs(true))})},
+  {say:`On calcule exactement. Somme par défaut = (1/n)·Σ (k/n)² pour k = 0…n−1 = <b>(n−1)(2n−1)/(6n²) = ${fs(lo)}</b>. Somme par excès = (n+1)(2n+1)/(6n²) = <b>${fs(up)}</b>. Donc ${fs(lo)} ≤ aire ≤ ${fs(up)}.`,board:lines([`n = ${n}`,`par défaut : (n−1)(2n−1)/(6n²) = ${fs(lo)} ≈ ${fmt(fnum(lo))}`,`par excès : (n+1)(2n+1)/(6n²) = ${fs(up)} ≈ ${fmt(fnum(up))}`],2)},
+  {say:`Quand n augmente, l'encadrement se resserre. Pour n → +∞, les deux bornes tendent vers 2n²/(6n²) = <b>1/3</b>.`,board:lines(rows,4)},
+  {say:`<b>Conclusion :</b> ∫₀¹ x² dx = 1/3. On retrouvera ce résultat avec une primitive : F(x) = x³/3, donc F(1) − F(0) = 1/3 − 0 = 1/3 ✓.`,board:`<div class="res">∫₀¹ x² dx = 1/3<br>= [x³/3]₀¹ = 1/3 − 0</div>`}]}});
+/* 2. propriétés */
+SC.push({id:"prop",title:"Propriétés de l'intégrale",ref:"Cours : linéarité, Chasles, |∫f| ≤ ∫|f|.",
+ params:[{id:"c",label:"Propriété",type:"select",options:[["ch","Relation de Chasles"],["li","Linéarité"],["ab","|∫f| ≤ ∫|f|"]]}],
+ build(v){
+  if(v.c==="ch"){const f=x=>x*x;const B={xmin:-0.2,xmax:2.2,ymin:-0.3,ymax:4.5,...GW,curves:[{f,cls:"cv"}]};return[
+   {say:`<b>Chasles :</b> ∫ₐᵇ f = ∫ₐᶜ f + ∫꜀ᵇ f. Avec f(x) = x² sur [0 ; 2], on coupe en c = 1.`,board:g2({...B,fills:[{f,a:0,b:1,cls:"fillp"},{f,a:1,b:2,cls:"fillm"}]})},
+   {say:`Première aire (en bleu) : ∫₀¹ x² dx = [x³/3]₀¹ = <b>1/3</b>. Seconde (en rouge) : ∫₁² x² dx = [x³/3]₁² = 8/3 − 1/3 = <b>7/3</b>.`,board:lines(["∫₀¹ x² dx = 1/3","∫₁² x² dx = 8/3 − 1/3 = 7/3"],1)},
+   {say:`Somme : 1/3 + 7/3 = 8/3, et directement ∫₀² x² dx = [x³/3]₀² = <b>8/3</b> ✓ : couper l'intervalle ne change pas l'aire totale.`,board:`<div class="res">1/3 + 7/3 = 8/3 = ∫₀² x² dx</div>`}]}
+  if(v.c==="li"){const f=x=>x*x,g=x=>x;const B={xmin:-0.1,xmax:1.1,ymin:-0.1,ymax:1.2,...GW,curves:[{f,cls:"cv"},{f:g,cls:"cv2"}]};return[
+   {say:`<b>Linéarité :</b> ∫(αf + βg) = α∫f + β∫g. On prend f(x) = x² (bleu), g(x) = x (rouge) sur [0 ; 1], avec α = 3 et β = 2.`,board:g2({...B,fills:[{f,a:0,b:1,cls:"fillp"},{f:g,a:0,b:1,cls:"fillm"}]})},
+   {say:`On calcule chaque intégrale : ∫₀¹ x² dx = 1/3 et ∫₀¹ x dx = [x²/2]₀¹ = 1/2.`,board:lines(["∫₀¹ x² dx = 1/3","∫₀¹ x dx = 1/2"],1)},
+   {say:`Donc ∫₀¹ (3x² + 2x) dx = 3 × 1/3 + 2 × 1/2 = <b>2</b>. Vérification directe : une primitive de 3x² + 2x est x³ + x², et [x³ + x²]₀¹ = 2 ✓.`,board:`<div class="res">3 × 1/3 + 2 × 1/2 = 2<br>[x³ + x²]₀¹ = 2</div>`}]}
+  const f=Math.sin;const B={xmin:-0.2,xmax:6.5,ymin:-1.3,ymax:1.3,...GW,tx:PIT(0,2*PI,PI/2),curves:[{f,cls:"cv"}]};return[
+   {say:`<b>Inégalité triangulaire :</b> |∫f| ≤ ∫|f|. Prenons f = sin sur [0 ; 2π]. La partie au-dessus de l'axe compte positivement (bleu), celle en dessous négativement (rouge).`,board:g2({...B,fills:[{f,a:0,b:PI,cls:"fillp"},{f,a:PI,b:2*PI,cls:"fillm"}]})},
+   {say:`∫₀²π sin x dx = [−cos x]₀²π = −1 − (−1) = <b>0</b> : les deux aires se compensent. Donc |∫f| = 0.`,board:lines(["∫₀²π sin x dx = [−cos x]₀²π","= −cos 2π + cos 0 = −1 + 1 = 0"],1)},
+   {say:`Avec la valeur absolue, les aires s'additionnent : ∫₀²π |sin x| dx = 2∫₀π sin x dx = 2 × 2 = <b>4</b>. On a bien 0 ≤ 4 : <b>|∫f| ≤ ∫|f|</b>.`,board:`<div class="res">|∫ sin| = 0 ≤ ∫|sin| = 4</div>`}]}});
+/* 3. primitives */
+SC.push({id:"prim",title:"Primitives et constante",ref:"Cours : primitive, F + c, unicité avec F(x₀) = y₀, ∫ₐᵇ f = F(b) − F(a).",
+ params:[{id:"c",label:"Condition F(x₀) = y₀",type:"select",options:[["0","F(π/2) = 3"],["1","F(0) = 0"],["2","F(π) = −1"]]}],
+ build(v){const cd=[{x0:PI/2,t:"π/2",y0:3},{x0:0,t:"0",y0:0},{x0:PI,t:"π",y0:-1}][+v.c];const C=cd.y0-Math.sin(cd.x0);const f=Math.cos;
+  const fam=[-1,0,1,2].map(c=>({f:x=>Math.sin(x)+c,cls:"cv3"}));
+  const B={xmin:-0.2,xmax:6.4,ymin:-2.5,ymax:4,...GW,tx:PIT(0,2*PI,PI/2)};
+  return[
+  {say:`Une <b>primitive</b> de f sur I est une fonction F dérivable avec F′ = f. Pour f(x) = cos x : (sin x)′ = cos x, donc <b>F(x) = sin x</b> est une primitive.`,board:g2({...B,curves:[{f:Math.sin,cls:"cv"}]})},
+  {say:`Mais sin x + 1, sin x − 1, sin x + 2… sont aussi des primitives, car la dérivée d'une constante est nulle. <b>F primitive ⇔ F + c primitive</b> : on obtient toute une famille de courbes translatées verticalement.`,board:g2({...B,curves:[...fam,{f:Math.sin,cls:"cv"}]})},
+  {say:`Pour choisir <b>une seule</b> primitive, on impose une condition : F(${cd.t}) = ${cd.y0}. On écrit F(x) = sin x + C, donc sin(${cd.t}) + C = ${cd.y0}, soit <b>C = ${cd.y0} − ${fmt(Math.sin(cd.x0))} = ${fmt(C)}</b>.`,board:lines([`F(x) = sin x + C`,`F(${cd.t}) = sin(${cd.t}) + C = ${cd.y0}`,`C = ${cd.y0} − (${fmt(Math.sin(cd.x0))}) = ${fmt(C)}`],2)},
+  {say:`La primitive cherchée est <b>F(x) = sin x + ${fmt(C)}</b> (courbe rouge) : c'est la seule qui passe par le point (${cd.t} ; ${cd.y0}).`,board:g2({...B,curves:[...fam,{f:x=>Math.sin(x)+C,cls:"cv2"}],pts:[{x:cd.x0,y:cd.y0,cls:"pt"}]})},
+  {say:`<b>Calcul d'intégrale :</b> ∫ₐᵇ f = F(b) − F(a) <b>ne dépend pas de la constante</b>, car elle disparaît dans la différence. Par exemple ∫₀^(π/2) cos x dx = (sin(π/2) + C) − (sin 0 + C) = 1 − 0 = <b>1</b>.`,board:g2({...B,curves:[{f,cls:"cv"}],fills:[{f,a:0,b:PI/2,cls:"fillp"}]})+`<div class="res">[F(x)]₀^(π/2) = (1 + C) − (0 + C) = 1</div>`}]}});
+/* 4. IPP */
+SC.push({id:"ipp",title:"Intégration par parties",ref:"Cours : IPP, exemples ∫₀^(π/2) t sin t dt, ∫ ln x dx, ∫ x² eˣ dx.",
+ params:[{id:"c",label:"Exemple",type:"select",options:[["a","∫₀^(π/2) t sin t dt"],["b","∫ ln x dx"],["c","∫ x² eˣ dx"]]}],
+ build(v){const R=[{say:`<b>Formule d'IPP :</b> ∫ u v′ = [u v] − ∫ u′ v. On choisit u comme la partie qui <b>se simplifie en dérivant</b>, et v′ comme la partie dont on connaît une primitive.`,board:lines(["∫ₐᵇ u(x) v′(x) dx = [u(x) v(x)]ₐᵇ − ∫ₐᵇ u′(x) v(x) dx"],0)}];
+  if(v.c==="a"){const f=t=>t*Math.sin(t);return R.concat([
+   {say:`Calculons I = ∫₀^(π/2) t sin t dt. On pose <b>u(t) = t</b> (sa dérivée vaut 1 : plus simple) et <b>v′(t) = sin t</b>.`,board:g2({xmin:-0.2,xmax:1.8,ymin:-0.2,ymax:1.4,...GW,curves:[{f,cls:"cv"}],fills:[{f,a:0,b:PI/2}]})+lines(["u(t) = t ; v′(t) = sin t"],0)},
+   {say:`On dérive u et on primitive v′ : <b>u′(t) = 1</b> et <b>v(t) = −cos t</b>.`,board:lines(["u(t) = t ; u′(t) = 1","v′(t) = sin t ; v(t) = −cos t"],1)},
+   {say:`On applique la formule : I = [−t cos t]₀^(π/2) + ∫₀^(π/2) cos t dt. Le crochet vaut −(π/2)·cos(π/2) − 0 = <b>0</b>.`,board:lines(["I = [−t cos t]₀^(π/2) + ∫₀^(π/2) cos t dt","[−t cos t]₀^(π/2) = 0 − 0 = 0"],1)},
+   {say:`Il reste ∫₀^(π/2) cos t dt = [sin t]₀^(π/2) = 1. Donc <b>I = 1</b>. Contrôle numérique de l'intégrale : ${fmt(quad(f,0,PI/2))} ✓.`,board:`<div class="res">I = 0 + [sin t]₀^(π/2) = 1</div>`}])}
+  if(v.c==="b"){const f=Math.log,Fx=x=>x*Math.log(x)-x;return R.concat([
+   {say:`Primitive de ln x. Astuce : on écrit ln x = ln x × 1. On pose <b>u(x) = ln x</b> et <b>v′(x) = 1</b>.`,board:lines(["ln x = ln x × 1","u(x) = ln x ; v′(x) = 1"],1)},
+   {say:`Alors <b>u′(x) = 1/x</b> et <b>v(x) = x</b>.`,board:lines(["u′(x) = 1/x ; v(x) = x"],0)},
+   {say:`IPP : F(x) = x ln x − ∫ x · (1/x) dx = x ln x − ∫ 1 dx = <b>x ln x − x + C</b>. ${ctl(Fx,f,2)}`,board:`<div class="res">∫ ln x dx = x ln x − x + C</div>`}])}
+  const f=x=>x*x*Math.exp(x),Fx=x=>Math.exp(x)*(x*x-2*x+2);return R.concat([
+   {say:`Calculons F(x) = ∫ x² eˣ dx. On veut <b>faire baisser le degré du polynôme</b> : on pose <b>u(x) = x²</b> et <b>v′(x) = eˣ</b>, donc u′(x) = 2x et v(x) = eˣ.`,board:lines(["u = x² ; v′ = eˣ","u′ = 2x ; v = eˣ"],0)},
+   {say:`Première IPP : <b>F(x) = x² eˣ − ∫ 2x eˣ dx</b>. Le degré est passé de 2 à 1.`,board:lines(["F(x) = x² eˣ − ∫ 2x eˣ dx"],0)},
+   {say:`Deuxième IPP sur ∫ 2x eˣ dx : u(x) = x, v′(x) = eˣ, donc u′ = 1 et v = eˣ. On trouve ∫ 2x eˣ dx = 2(x eˣ − ∫ eˣ dx) = 2x eˣ − 2eˣ.`,board:lines(["F(x) = x² eˣ − ∫ 2x eˣ dx","∫ 2x eˣ dx = 2(x eˣ − ∫ eˣ dx) = 2x eˣ − 2eˣ"],1)},
+   {say:`Donc F(x) = x² eˣ − 2x eˣ + 2eˣ = <b>eˣ(x² − 2x + 2) + C</b>. ${ctl(Fx,f,0.7)}`,board:`<div class="res">∫ x² eˣ dx = eˣ(x² − 2x + 2) + C</div>`}])}});
+/* 5. exp x polynôme par identification */
+const EXPP=[{a:2,P:{3:4,1:-2,0:1},t:"e²ˣ(4x³ − 2x + 1)"},{a:1,P:{2:1},t:"eˣ x²"},{a:-1,P:{2:1,0:1},t:"e⁻ˣ(x² + 1)"}];
+SC.push({id:"exq",title:"∫ e^(αx) P(x) dx par identification",ref:"Cours : méthode 2 (calcul direct) : primitive de la forme e^(αx)Q(x), exemple ∫ e^(2x)(4x³ − 2x + 1) dx.",
+ params:[{id:"c",label:"Intégrale",type:"select",options:EXPP.map((e,i)=>[String(i),e.t])}],
+ build(v){const e=EXPP[+v.c],al=e.a;const P=fromAsc(Array.from({length:Math.max(...Object.keys(e.P).map(Number))+1},(_,k)=>e.P[k]||0));const n=deg(P);
+  const L="abcde".slice(0,n+1).split("");const letter=k=>L[n-k];/* coefficient de x^k */
+  const Qs=L.map((l,i)=>`${l}x${sup(n-i)}`.replace(/x⁰$/,"").replace(/x¹$/,"x")).join(" + ").replace(/x\^1/,"x");
+  const Qdisp=`${L.slice(0,-1).map((l,i)=>l+"x"+(n-i>1?sup(n-i):"")).concat([L[n]]).join(" + ")}`;
+  const q={};for(let k=n;k>=0;k--){const pk=P[k]||F(0);const nxt=k<n?q[k+1]:F(0);q[k]=dv(sub(pk,mul(F(k+1),nxt)),F(al))}
+  const cA=al===1?"":al===-1?"−":String(al);
+  const coef=k=>{const s1=`${cA}${letter(k)}`;const s2=k<n?`${k+1===1?"":(k+1)}${letter(k+1)}`:"";return k<n?`${s1} + ${s2}`:s1};
+  const pcs=k=>fs(P[k]||F(0));
+  const Q=clean(q);const FQ=x=>Math.exp(al*x)*pevalF(Q,x);const fx=x=>Math.exp(al*x)*pevalF(P,x);
+  const eqs=[];for(let k=n;k>=0;k--)eqs.push(`${coef(k)} = ${pcs(k)}`);
+  const sol=[];const st=[
+  {say:`On veut une primitive de f(x) = ${e.t}. Au lieu d'enchaîner des IPP, on la <b>cherche directement</b> sous la forme <b>F(x) = e<sup>${al===1?"":al}x</sup>·Q(x) + C</b>, avec Q de même degré que P, ici ${n}.`,board:lines([`f(x) = ${e.t}`,`F(x) = e^(${al}x)·(${Qdisp}) + C`],1)},
+  {say:`On dérive F avec la formule du produit (uv)′ = u′v + uv′, où u = e<sup>${al}x</sup> et v = Q(x) : <b>F′(x) = e<sup>${al}x</sup>(${al}·Q(x) + Q′(x))</b>. L'exponentielle se met en facteur.`,board:lines([`F = e^(${al}x)·Q`,`F′ = ${al}·e^(${al}x)·Q + e^(${al}x)·Q′`,`F′ = e^(${al}x)(${al}·Q + Q′)`],2)},
+  {say:`Calculons séparément les deux morceaux. On a Q(x) = ${Qdisp}, donc ${al}·Q(x) = ${L.map((l,i)=>{const k=n-i;return `${cA}${l}${k>1?"x"+sup(k):k===1?"x":""}`}).join(" + ")}. Et on dérive Q terme à terme : Q′(x) = ${L.slice(0,-1).map((l,i)=>{const k=n-i;return `${k>1?k:""}${l}${k>2?"x"+sup(k-1):k===2?"x":""}`}).join(" + ")||"0"}.`,board:lines([`${al}·Q = ${L.map((l,i)=>{const k=n-i;return `${cA}${l}${k>1?"x"+sup(k):k===1?"x":""}`}).join(" + ")}`,`Q′ = ${L.slice(0,-1).map((l,i)=>{const k=n-i;return `${k>1?k:""}${l}${k>2?"x"+sup(k-1):k===2?"x":""}`}).join(" + ")||"0"}`],1)},
+  {say:`On additionne ${al}·Q et Q′, puis on <b>regroupe les termes de même puissance de x</b> : le coefficient de x^k reçoit ${al}·(coefficient de x^k dans Q) et (k+1)·(coefficient de x^(k+1) dans Q).`,board:lines([`F′(x) = e^(${al}x)(${al}·Q + Q′)`,`= e^(${al}x)(${L.map((l,i)=>{const k=n-i;return `[${coef(k)}]${k>1?"x"+sup(k):k===1?"x":""}`}).join(" + ")})`],1)},
+  {say:`F′ doit être égale à f : on <b>identifie</b> les coefficients de chaque puissance de x avec ceux de P. On obtient un système (triangulaire).`,board:lines(eqs,0)}];
+  const vals=[];
+  for(let k=n;k>=0;k--){const l=letter(k);const nxt=k<n?q[k+1]:null;const rhs=k<n?`(${pcs(k)} − ${k+1}·(${fs(nxt)})) / ${al}`:`${pcs(k)} / ${al}`;
+   vals.push(`${l} = ${fs(q[k])}`);
+   st.push({say:`On résout en partant du haut : ${l} = ${rhs} = <mark>${fs(q[k])}</mark>.`,board:lines(eqs.concat(vals),eqs.length+vals.length-1)})}
+  st.push({say:`Donc Q(x) = ${pstr(Q)} et la primitive est <b>F(x) = e<sup>${al}x</sup>(${pstr(Q)}) + C</b>. ${ctl(FQ,fx,0.3)}`,board:`<div class="res">F(x) = e^(${al}x)(${pstr(Q)}) + C</div>`});
+  return st}});
+/* 6. exp x cos par identification */
+const EXC=[{al:F(1,2),a:2},{al:F(1),a:1},{al:F(2),a:3}];
+SC.push({id:"exc",title:"∫ e^(αx) cos(ax) dx",ref:"Cours : calcul direct avec A et B, exemple ∫ e^(x/2) cos(2x) dx.",
+ params:[{id:"c",label:"(α ; a)",type:"select",options:EXC.map((e,i)=>[String(i),`α = ${fs(e.al)}, a = ${e.a}`])}],
+ build(v){const e=EXC[+v.c],al=e.al,a=F(e.a);const den=add(mul(al,al),mul(a,a));const A=dv(al,den),B=dv(a,den);
+  const sA=fs(al),sa=String(e.a);const FF=x=>Math.exp(fnum(al)*x)*(fnum(A)*Math.cos(e.a*x)+fnum(B)*Math.sin(e.a*x)),f=x=>Math.exp(fnum(al)*x)*Math.cos(e.a*x);
+  const ea=`e^(${sA}x)`;
+  return[
+  {say:`On cherche F(x) = ∫ ${ea} cos(${sa}x) dx. La dérivée d'un produit exponentielle × (cos, sin) reste de la même famille : on cherche donc <b>F(x) = ${ea}(A cos(${sa}x) + B sin(${sa}x)) + C</b>.`,board:lines([`F(x) = ${ea}(A cos(${sa}x) + B sin(${sa}x)) + C`],0)},
+  {say:`On dérive : F′(x) = ${sA}·${ea}(A cos + B sin) + ${ea}(−${sa}A sin + ${sa}B cos) = <b>${ea}[(${sA}A + ${sa}B) cos(${sa}x) + (${sA}B − ${sa}A) sin(${sa}x)]</b>.`,board:lines([`F′ = ${ea}[(${sA}A + ${sa}B)cos(${sa}x) + (${sA}B − ${sa}A)sin(${sa}x)]`],0)},
+  {say:`F′ doit valoir ${ea} cos(${sa}x) : on identifie les coefficients de cos et de sin.`,board:lines([`${sA}A + ${sa}B = 1`,`−${sa}A + ${sA}B = 0`],1)},
+  {say:`De la 2ᵉ équation : B = ${sa}A/${sA} = ${fs(dv(a,al))}·A. On remplace dans la 1ʳᵉ : (${sA} + ${sa}·${fs(dv(a,al))})A = ${fs(add(al,mul(a,dv(a,al))))}A = 1, donc <b>A = ${fs(A)}</b> puis <b>B = ${fs(B)}</b>.`,board:lines([`B = ${fs(dv(a,al))}·A`,`A = ${fs(A)}`,`B = ${fs(B)}`],2)},
+  {say:`<b>F(x) = ${ea}(${fs(A)} cos(${sa}x) + ${fs(B)} sin(${sa}x)) + C</b>. ${ctl(FF,f,0.4)}`,board:`<div class="res">F(x) = ${ea}(${fs(A)} cos(${sa}x) + ${fs(B)} sin(${sa}x)) + C</div>`}]}});
+/* 7. changement de variable */
+SC.push({id:"chv",title:"Changement de variable",ref:"Cours : ∫₀¹ √(1 − x²) dx avec x = sin t, et ∫ cos√x/√x dx avec u = √x ; changement des bornes.",
+ params:[{id:"c",label:"Exemple",type:"select",options:[["a","∫₀¹ √(1 − x²) dx"],["b","∫ cos(√x)/√x dx"]]}],
+ build(v){
+  if(v.c==="a"){const f=x=>Math.sqrt(1-x*x);return[
+   {say:`On veut I = ∫₀¹ √(1 − x²) dx : c'est l'aire d'<b>un quart de disque</b> de rayon 1 (la courbe est le cercle x² + y² = 1). On calcule par changement de variable.`,board:g2({xmin:-0.1,xmax:1.2,ymin:-0.1,ymax:1.2,...GW,curves:[{f,cls:"cv"}],fills:[{f,a:0,b:1}]})},
+   {say:`On pose <b>x = sin t</b>. Alors <b>dx = cos t dt</b>. <b>Les bornes changent</b> : x = 0 ⇔ t = 0 ; x = 1 ⇔ t = π/2.`,board:lines(["x = sin t ⇒ dx = cos t dt","x = 0 → t = 0","x = 1 → t = π/2"],0)},
+   {say:`On remplace : I = ∫₀^(π/2) √(1 − sin²t) cos t dt. Pour t ∈ [0 ; π/2], cos t ≥ 0 donc √(1 − sin²t) = cos t. Ainsi <b>I = ∫₀^(π/2) cos² t dt</b>.`,board:lines(["I = ∫₀^(π/2) √(1 − sin²t) · cos t dt","√(1 − sin²t) = |cos t| = cos t","I = ∫₀^(π/2) cos²t dt"],2)},
+   {say:`On linéarise : cos² t = (1 + cos 2t)/2. Donc I = [t/2 + sin(2t)/4]₀^(π/2) = (π/4 + 0) − 0 = <b>π/4</b>.`,board:lines(["cos²t = (1 + cos 2t)/2","I = [t/2 + sin(2t)/4]₀^(π/2)","I = π/4 + 0 − 0 = π/4"],2)},
+   {say:`<b>Contrôle :</b> l'aire d'un quart de disque de rayon 1 est π/4 ≈ ${fmt(PI/4)}, et le calcul numérique de l'intégrale donne ${fmt(quad(f,0,1))} ✓.`,board:`<div class="res">I = π/4</div>`}]}
+  const f=x=>Math.cos(Math.sqrt(x))/Math.sqrt(x),Fx=x=>2*Math.sin(Math.sqrt(x));return[
+   {say:`On veut F(x) = ∫ cos(√x)/√x dx, pour x &gt; 0. La présence de √x suggère de poser <b>u = √x</b>.`,board:lines(["F(x) = ∫ cos(√x)/√x dx","u = √x"],1)},
+   {say:`Alors x = u², donc <b>dx = 2u du</b>. (Il n'y a pas de bornes : on cherche une primitive.)`,board:lines(["u = √x ⇔ x = u²","dx = 2u du"],1)},
+   {say:`On remplace : cos(√x)/√x dx = cos u / u × 2u du = <b>2 cos u du</b>. Le facteur u se simplifie.`,board:lines(["F = ∫ (cos u / u) × 2u du","F = ∫ 2 cos u du"],1)},
+   {say:`On intègre : F = 2 sin u + C, puis on <b>revient à x</b> : u = √x. <b>F(x) = 2 sin(√x) + C</b>. ${ctl(Fx,f,2)}`,board:`<div class="res">F(x) = 2 sin(√x) + C</div>`}]}});
+/* 8. parité */
+const PAR=[{t:"x³",f:x=>x**3,a:2,lab:"2",half:F(4),im:true,hs:"∫₀² x³ dx = [x⁴/4]₀² = 4"},{t:"x²",f:x=>x*x,a:2,lab:"2",half:F(8,3),im:false,hs:"∫₀² x² dx = [x³/3]₀² = 8/3"},
+ {t:"sin x",f:Math.sin,a:PI,lab:"π",half:F(2),im:true,hs:"∫₀^π sin x dx = [−cos x]₀^π = 2"},{t:"cos x",f:Math.cos,a:PI/2,lab:"π/2",half:F(1),im:false,hs:"∫₀^(π/2) cos x dx = [sin x]₀^(π/2) = 1"}];
+SC.push({id:"par",title:"Parité et intégrale sur [−a ; a]",ref:"Cours : f impaire ⇒ ∫₋ₐᵃ f = 0 ; f paire ⇒ ∫₋ₐᵃ f = 2∫₀ᵃ f.",
+ params:[{id:"c",label:"Fonction",type:"select",options:PAR.map((e,i)=>[String(i),e.t])}],
+ build(v){const e=PAR[+v.c],a=e.a,f=e.f;const B={xmin:-a*1.2,xmax:a*1.2,ymin:-Math.max(1.2,Math.abs(f(a)))*1.25,ymax:Math.max(1.2,Math.abs(f(a)))*1.25,...GW,curves:[{f,cls:"cv"}]};
+  const sg=x=>f(x)>=0?"fillp":"fillm";
+
+  const fills=[{f,a:-a,b:0,cls:sg(-a/2)},{f,a:0,b:a,cls:sg(a/2)}];
+  return[
+  {say:`Soit f(x) = ${e.t} sur l'intervalle symétrique [−${e.lab} ; ${e.lab}]. On regarde les deux demi-aires : à gauche de 0 et à droite de 0.`,board:g2({...B,fills})},
+  {say:e.im?`f est <b>impaire</b> : f(−x) = −f(x) (par exemple f(−1) = ${fmt(f(-1))} et f(1) = ${fmt(f(1))}). La courbe est symétrique par rapport à l'origine : les aires à gauche et à droite sont <b>opposées</b>.`:`f est <b>paire</b> : f(−x) = f(x) (par exemple f(−1) = ${fmt(f(-1))} = f(1)). La courbe est symétrique par rapport à l'axe des ordonnées : les deux aires sont <b>égales</b>.`,board:g2({...B,fills,pts:[{x:-1,y:f(-1),cls:"pk"},{x:1,y:f(1),cls:"pt"}]})},
+  {say:`On calcule l'aire de droite : ${e.hs}, soit <b>${fs(e.half)}</b>.`,board:lines([e.hs],0)},
+  {say:e.im?`Par symétrie, ∫ de −${e.lab} à 0 vaut −${fs(e.half)}. Donc ∫₋${e.lab}^${e.lab} f = −${fs(e.half)} + ${fs(e.half)} = <b>0</b>.`:`Par symétrie, ∫ de −${e.lab} à 0 vaut aussi ${fs(e.half)}. Donc ∫₋${e.lab}^${e.lab} f = 2 × ${fs(e.half)} = <b>${fs(mul(F(2),e.half))}</b>.`,board:`<div class="res">${e.im?`f impaire : ∫₋ₐᵃ f = 0`:`f paire : ∫₋ₐᵃ f = 2∫₀ᵃ f = ${fs(mul(F(2),e.half))}`}</div>`},
+  {say:`<b>Contrôle numérique :</b> ∫ de −${e.lab} à ${e.lab} de ${e.t} ≈ ${fmt(quad(f,-a,a))} ✓. <b>À retenir :</b> repérer la parité évite des calculs.`,board:`<div class="res">${fmt(quad(f,-a,a))}</div>`}]}});
+/* 9. décomposition en éléments simples et intégration */
+const DSE=[{N:{1:1,0:1},r:[0,1,-2],t:"(x + 1)/(x(x − 1)(x + 2))"},{N:{2:1},r:[1,-1],t:"x²/(x² − 1)"},{N:{1:3,0:5},r:[1,-3],t:"(3x + 5)/((x − 1)(x + 3))"}];
+SC.push({id:"dse",title:"Intégrer une fraction rationnelle (pôles simples)",ref:"Cours : ∫ P/Q : partie entière, parties polaires ∫ a/(x − x₀) = a ln|x − x₀|, exemple ∫ (x+1)/(x(x²+x−2)) dx.",
+ params:[{id:"c",label:"Fraction",type:"select",options:DSE.map((e,i)=>[String(i),e.t])}],
+ build(v){const e=DSE[+v.c];const Nn=fromAsc(Array.from({length:Math.max(...Object.keys(e.N).map(Number))+1},(_,k)=>e.N[k]||0));
+  let Dp={0:F(1)};e.r.forEach(r=>{Dp=pmul(Dp,clean({0:F(-r),1:F(1)}))});
+  const m=e.r.length;const fx=x=>pevalF(Nn,x)/pevalF(Dp,x);
+  const Ddisp=e.r.map(r=>r===0?"x":`(x ${r<0?"+":"−"} ${Math.abs(r)})`).join("");
+  const st=[{say:`On veut F(x) = ∫ ${e.t} dx. On factorise le dénominateur : Q(x) = ${pstr(Dp)} = ${Ddisp}. Il a <b>${m} pôles simples</b> : ${e.r.map(r=>"x = "+r).join(", ")}.`.replace(/-/g,"−"),board:lines([`f(x) = ${e.t}`,`Q(x) = ${pstr(Dp)} = ${Ddisp}`],1)}];
+  let R=Nn,E={};
+  if(deg(Nn)>=m){const D=divModel(Nn,Dp,false);E=D.Q;R=D.R;
+   st.push({say:`Le degré du numérateur (${deg(Nn)}) est ≥ celui du dénominateur (${m}) : on commence par la <b>division euclidienne</b> pour séparer la <b>partie entière</b>.`,board:lines([`deg(P) = ${deg(Nn)} ≥ deg(Q) = ${m}`],0)});
+   divSteps(D).forEach(s=>st.push(s));
+   st.push({say:`On obtient P = Q × (${pstr(E)}) + (${pstr(R)}) : f(x) = <b>${pstr(E)}</b> + (${pstr(R)})/(${Ddisp}). Il reste la fraction propre.`,board:lines([`f(x) = ${pstr(E)} + (${pstr(R)})/(${Ddisp})`],0)})}
+  const cs=e.r.map((r,i)=>{let den=F(1);e.r.forEach((s,j)=>{if(j!==i)den=mul(den,F(r-s))});return dv(peval(R,F(r)),den)});
+  const form=e.r.map((r,i)=>`${"abc"[i]}/(x ${r<0?"+":"−"} ${Math.abs(r)})`.replace("(x − 0)","x").replace("/(x + 0)","/x")).join(" + ").replace(/\/\(x − 0\)/g,"/x");
+  st.push({say:`Les pôles sont simples : on cherche (${pstr(R)})/(${Ddisp}) = ${form}.`.replace(/-/g,"−"),board:lines([`(${pstr(R)})/(${Ddisp}) = ${form}`],0)});
+  e.r.forEach((r,i)=>{const mk=`(x ${r<0?"+":"−"} ${Math.abs(r)})`.replace("(x − 0)","x");
+   const others=e.r.filter((_,j)=>j!==i);const odd=others.map(s=>`(${r} ${s<0?"+":"−"} ${Math.abs(s)})`).join("×");
+   st.push({say:`<b>Méthode du « cache » :</b> pour ${"abc"[i]}, on multiplie par ${mk} puis on remplace x par ${r}. Au numérateur : ${fs(peval(R,F(r)))} ; au dénominateur, on évalue les autres facteurs : ${odd}. Donc <mark>${"abc"[i]} = ${fs(cs[i])}</mark>.`.replace(/-/g,"−"),board:lines(cs.slice(0,i+1).map((c,j)=>`${"abc"[j]} = ${fs(c)}`),i)})});
+  const dsp=Object.keys(E).length?pstr(E)+" + ":"";
+  const parts=e.r.map((r,i)=>`(${fs(cs[i])})/(x ${r<0?"+":"−"} ${Math.abs(r)})`.replace(/\(x − 0\)/,"x"));
+  st.push({say:`<b>Décomposition :</b> f(x) = ${dsp}${parts.join(" + ")}. Contrôle en x = 3 : la somme vaut ${fmt((Object.keys(E).length?pevalF(E,3):0)+e.r.reduce((s,r,i)=>s+fnum(cs[i])/(3-r),0))} et f(3) = ${fmt(fx(3))} ✓.`.replace(/-/g,"−"),board:lines([`f(x) = ${dsp}${parts.join(" + ")}`],0)});
+  const Eint=Object.keys(E).length?sint(E):{};
+  const lns=e.r.map((r,i)=>`(${fs(cs[i])})·ln|${r===0?"x":"x "+(r<0?"+":"−")+" "+Math.abs(r)}|`);
+  const FF=x=>pevalF(Eint,x)+e.r.reduce((s,r,i)=>s+fnum(cs[i])*Math.log(Math.abs(x-r)),0);
+  st.push({say:`On intègre chaque terme : ∫ dx/(x − x₀) = ln|x − x₀|${Object.keys(E).length?` et ∫ ${pstr(E)} dx = ${pstr(Eint)}`:""}. Résultat : <b>F(x) = ${Object.keys(E).length?pstr(Eint)+" + ":""}${lns.join(" + ")} + C</b>. ${ctl(FF,fx,3)}`.replace(/-/g,"−"),board:`<div class="res">F(x) = ${Object.keys(E).length?pstr(Eint)+" + ":""}${lns.join(" + ")} + C</div>`.replace(/\+ \(−/g,"− (")});
+  return st}});
+/* 10. parties polaires de degré 2 */
+SC.push({id:"d2",title:"Éléments simples de degré 2 : les 4 étapes",ref:"Cours : ∫ (ax+b)/(x²+cx+d)^k dx : forme canonique, changement de variable, séparer en deux, J_k par IPP ; exemple ∫ dx/(x²+x+1)².",
+ params:[{id:"c",label:"Intégrale",type:"select",options:[["1","∫ dx/(x² + x + 1)"],["x","∫ x dx/(x² + x + 1)"],["2","∫ dx/(x² + x + 1)²"]]}],
+ build(v){const s3=Math.sqrt(3);const T=x=>(2*x+1)/s3;
+  const cfg={"1":{f:x=>1/(x*x+x+1),F:x=>2/s3*Math.atan(T(x)),Ft:"(2/√3)·arctan((2x+1)/√3)"},"x":{f:x=>x/(x*x+x+1),F:x=>0.5*Math.log(x*x+x+1)-1/s3*Math.atan(T(x)),Ft:"(1/2)·ln(x² + x + 1) − (1/√3)·arctan((2x+1)/√3)"},"2":{f:x=>1/Math.pow(x*x+x+1,2),F:x=>4/(3*s3)*Math.atan(T(x))+(2*x+1)/(3*(x*x+x+1)),Ft:"(4/(3√3))·arctan((2x+1)/√3) + (1/3)(2x+1)/(x² + x + 1)"}}[v.c];
+  const num=v.c==="x"?"x":"1",pw=v.c==="2"?"²":"";
+  const st=[
+  {say:`On veut ∫ ${num}/(x² + x + 1)${pw} dx. Le trinôme x² + x + 1 a un discriminant Δ = 1 − 4 = −3 &lt; 0 : <b>pas de racine réelle</b>, on ne peut pas le factoriser. On applique la méthode en 4 étapes.`,board:lines([`f(x) = ${num}/(x² + x + 1)${pw}`,`Δ = 1 − 4 = −3 < 0`],1)},
+  {say:`<b>Étape 1 : forme canonique.</b> x² + x + 1 = (x + 1/2)² − 1/4 + 1 = <b>(x + 1/2)² + 3/4</b> = (x + 1/2)² + (√3/2)².`,board:lines(["x² + x + 1 = (x + 1/2)² − 1/4 + 1","= (x + 1/2)² + (√3/2)²"],1)},
+  {say:`<b>Étape 2 : changement de variable.</b> On pose <b>x + 1/2 = (√3/2)·t</b>, donc dx = (√3/2) dt et x² + x + 1 = (3/4)(t² + 1). C'est ce qui fait apparaître t² + 1.`,board:lines(["x + 1/2 = (√3/2) t ; dx = (√3/2) dt","x² + x + 1 = (3/4)t² + 3/4 = (3/4)(t² + 1)"],1)}];
+  if(v.c==="1")st.push({say:`On remplace : ∫ dx/(x² + x + 1) = ∫ (√3/2)dt / ((3/4)(t² + 1)) = (4/3)(√3/2) ∫ dt/(t² + 1) = <b>(2/√3)∫ dt/(t² + 1)</b>.`,board:lines(["= (√3/2) × (4/3) ∫ dt/(t² + 1)","= (2/√3) ∫ dt/(t² + 1)"],1)},
+   {say:`<b>Étape 4 :</b> on connaît ∫ dt/(t² + 1) = arctan t. Donc F = (2/√3) arctan t + C, avec t = (2x + 1)/√3. <b>Résultat : ${cfg.Ft} + C.</b> ${ctl(cfg.F,cfg.f,0.7)}`,board:`<div class="res">F(x) = ${cfg.Ft} + C</div>`});
+  if(v.c==="x"){st.push({say:`Ici le numérateur contient x : on le réécrit avec la dérivée du dénominateur (2x + 1) : <b>x = (1/2)(2x + 1) − 1/2</b>. <b>Étape 3 : on sépare en deux.</b>`,board:lines(["x = (1/2)(2x + 1) − 1/2","∫ x/(x² + x + 1) dx = (1/2)∫ (2x + 1)/(x² + x + 1) dx − (1/2)∫ dx/(x² + x + 1)"],1)},
+   {say:`Le 1ᵉʳ morceau est de la forme u′/u : ∫ (2x + 1)/(x² + x + 1) dx = ln(x² + x + 1) (toujours positif, pas de valeur absolue). Le 2ᵉ est celui calculé avant : ∫ dx/(x² + x + 1) = (2/√3) arctan((2x + 1)/√3).`,board:lines(["(1/2)∫ (2x+1)/(x²+x+1) dx = (1/2) ln(x² + x + 1)","(1/2)∫ dx/(x²+x+1) = (1/2)(2/√3) arctan t = (1/√3) arctan t"],1)},
+   {say:`<b>Résultat : F(x) = ${cfg.Ft} + C.</b> ${ctl(cfg.F,cfg.f,0.7)}`,board:`<div class="res">F(x) = ${cfg.Ft} + C</div>`})}
+  if(v.c==="2"){st.push({say:`On remplace : ∫ dx/(x² + x + 1)² = ∫ (√3/2) dt / ((3/4)²(t² + 1)²) = (4/3)²(√3/2) ∫ dt/(t² + 1)² = <b>(8√3/9) J₂</b>, avec J₂ = ∫ dt/(t² + 1)². Pas d'étape 3 ici : le numérateur est constant.`,board:lines(["= (16/9)(√3/2) ∫ dt/(t² + 1)²","= (8√3/9) J₂","J₂ = ∫ dt/(t² + 1)²"],1)},
+   {say:`<b>Étape 4 : calcul de J₂.</b> On écrit 1 = (t² + 1) − t², donc J₂ = ∫ dt/(t² + 1) − ∫ t²/(t² + 1)² dt = arctan t − K, avec K = ∫ t · t/(t² + 1)² dt.`,board:lines(["1/(t²+1)² = 1/(t²+1) − t²/(t²+1)²","J₂ = arctan t − ∫ t · [t/(t²+1)²] dt"],1)},
+   {say:`IPP sur K : u(t) = t, v′(t) = t/(t² + 1)², donc u′ = 1 et v(t) = −1/(2(t² + 1)). Alors K = −t/(2(t² + 1)) + (1/2)∫ dt/(t² + 1) = −t/(2(t² + 1)) + (1/2) arctan t.`,board:lines(["u = t ; v′ = t/(t²+1)²","u′ = 1 ; v = −1/(2(t²+1))","K = −t/(2(t²+1)) + (1/2) arctan t"],2)},
+   {say:`Donc J₂ = arctan t + t/(2(t² + 1)) − (1/2) arctan t = <b>(1/2)(arctan t + t/(t² + 1))</b>.`,board:lines(["J₂ = (1/2)(arctan t + t/(t² + 1))"],0)},
+   {say:`On assemble : F = (8√3/9)·(1/2)(arctan t + t/(t² + 1)) = (4/(3√3))(arctan t + t/(t² + 1)). Avec t = (2x + 1)/√3, on a t/(t² + 1) = √3(2x + 1)/(4(x² + x + 1)), d'où <b>F(x) = ${cfg.Ft} + C</b>. ${ctl(cfg.F,cfg.f,0.7)}`,board:`<div class="res">F(x) = ${cfg.Ft} + C</div>`})}
+  return st}});
+/* 11. polynômes en sin/cos */
+const TRG=[{id:"a",p:3,q:2,t:"cos³x sin²x"},{id:"b",p:2,q:3,t:"cos²x sin³x"},{id:"c",p:4,q:2,t:"cos⁴x sin²x"},{id:"d",p:0,q:4,t:"sin⁴x"}];
+const lau=(k,p,q)=>{let r={0:F(1)};const mulz=(a,b)=>{const o={};for(const i in a)for(const j in b){const e=+i+ +j;o[e]=o[e]?add(o[e],mul(a[i],b[j])):mul(a[i],b[j])}return o};
+ for(let i=0;i<p;i++)r=mulz(r,{1:F(1,2),[-1]:F(1,2)});
+ for(let i=0;i<q;i++)r=mulz(r,{1:F(1,2),[-1]:F(-1,2)});/* (z−1/z)/(2i) : coefficient 1/(2i) géré à part */
+ return r};
+SC.push({id:"trg",title:"Intégrer cosᵖ x · sinᵠ x",ref:"Cours : polynôme en sin, cos : p impair (u = cos x), q impair (u = sin x), p et q pairs (linéariser). Exemples cos³x sin²x et cos⁴x sin²x.",
+ params:[{id:"c",label:"Intégrale",type:"select",options:TRG.map(e=>[e.id,e.t])}],
+ build(v){const e=TRG.find(x=>x.id===v.c);const f=x=>Math.pow(Math.cos(x),e.p)*Math.pow(Math.sin(x),e.q);
+  if(e.id==="a"){const FF=x=>Math.pow(Math.sin(x),3)/3-Math.pow(Math.sin(x),5)/5;return[
+   {say:`On veut F(x) = ∫ cos³x sin²x dx. L'exposant de cos est <b>impair</b> (3) : on garde un facteur cos x pour faire le changement de variable <b>u = sin x</b>.`,board:lines(["F(x) = ∫ cos³x sin²x dx","cos³x = cos²x · cos x"],1)},
+   {say:`On écrit cos²x = 1 − sin²x : F = ∫ (1 − sin²x) sin²x · <b>cos x dx</b>. Avec u = sin x on a du = cos x dx : <b>F = ∫ (1 − u²) u² du</b>. On est ramené à un polynôme.`,board:lines(["cos²x = 1 − sin²x","u = sin x ⇒ du = cos x dx","F = ∫ (1 − u²) u² du"],2)},
+   {say:`On développe et on intègre : ∫ (u² − u⁴) du = u³/3 − u⁵/5. On revient à x : <b>F(x) = sin³x/3 − sin⁵x/5 + C</b>. ${ctl(FF,f,0.9)}`,board:`<div class="res">F(x) = sin³x/3 − sin⁵x/5 + C</div>`}]}
+  if(e.id==="b"){const FF=x=>-Math.pow(Math.cos(x),3)/3+Math.pow(Math.cos(x),5)/5;return[
+   {say:`Ici F(x) = ∫ cos²x sin³x dx : l'exposant de sin est <b>impair</b>. On garde un facteur sin x et on pose <b>u = cos x</b>, du = −sin x dx.`,board:lines(["sin³x = sin²x · sin x","u = cos x ⇒ du = −sin x dx"],1)},
+   {say:`Comme sin²x = 1 − cos²x = 1 − u², on obtient <b>F = −∫ u² (1 − u²) du</b>. Le signe − vient de du = −sin x dx.`,board:lines(["F = ∫ cos²x (1 − cos²x) sin x dx","F = −∫ u²(1 − u²) du"],1)},
+   {say:`−∫ (u² − u⁴) du = −u³/3 + u⁵/5. On revient à x : <b>F(x) = −cos³x/3 + cos⁵x/5 + C</b>. ${ctl(FF,f,0.9)}`,board:`<div class="res">F(x) = −cos³x/3 + cos⁵x/5 + C</div>`}]}
+  /* p et q pairs : linéarisation exacte */
+  const L=lau(0,e.p,e.q);const sgn=(e.q/2%2===0)?F(1):F(-1);const fac=dv(sgn,F(Math.pow(2,e.q)));/* 1/(2i)^q = 1/(−4)^{q/2} → signe (−1)^{q/2}/2^q ; mais (1/2)^q déjà inclus dans lau pour q */
+  /* lau a déjà mis (1/2)^p et (±1/2)^q ; il reste le facteur réel (−1)^{q/2}·... : (z−1/z)/(2i) donc (1/2i)^q = (1/2)^q·(1/i)^q = (1/2)^q·(−1)^{q/2} */
+  const sg=(e.q/2)%2?F(-1):F(1);const coefs={};for(const k in L)coefs[k]=mul(L[k],sg);
+  const zs=k=>k===0?"1":`e^(${Math.abs(k)===1?"":Math.abs(k)}ix)`.replace("e^(ix)","e^(ix)");
+  const ks=Object.keys(coefs).map(Number).sort((a,b)=>b-a);
+  const kz=ks.filter(k=>!isz(coefs[k]));const cstr=kz.map(k=>sumS([{c:coefs[k],s:k===0?"":`e^(${k<0?"−":""}${Math.abs(k)===1?"":Math.abs(k)}ix)`}]));const cstrAll=sumS(kz.map(k=>({c:coefs[k],s:k===0?"":`e^(${k<0?"−":""}${Math.abs(k)===1?"":Math.abs(k)}ix)`})));
+  const cosc=[];const posk=ks.filter(k=>k>0).sort((a,b)=>a-b);
+  const A0=coefs[0]||F(0);const terms=[];posk.forEach(k=>{const c=mul(F(2),coefs[k]);if(!isz(c))terms.push({k,c})});
+  const cosS=sumS((isz(A0)?[]:[{c:A0,s:""}]).concat(terms.map(t=>({c:t.c,s:`cos(${t.k}x)`}))));
+  const intS=sumS((isz(A0)?[]:[{c:A0,s:"x"}]).concat(terms.map(t=>({c:dv(t.c,F(t.k)),s:`sin(${t.k}x)`}))));
+  const FF=x=>(A0.n?fnum(A0)*x:0)+terms.reduce((s,t)=>s+fnum(t.c)/t.k*Math.sin(t.k*x),0);
+  const cosx=Array.from({length:e.p}).length;
+  return[
+   {say:`On veut F(x) = ∫ ${e.t} dx avec <b>p = ${e.p} et q = ${e.q} pairs</b> : le changement de variable ne marche pas, il faut <b>linéariser</b> (transformer le produit en somme de cos(kx)) grâce aux formules d'Euler.`,board:lines([`F(x) = ∫ ${e.t} dx`,"p et q pairs → on linéarise"],1)},
+   {say:`<b>Euler :</b> cos x = (e^(ix) + e^(−ix))/2 et sin x = (e^(ix) − e^(−ix))/(2i). On pose z = e^(ix) : ${e.t} = ${e.p?`((z + 1/z)/2)${sup(e.p)} `:""}${e.q?`((z − 1/z)/(2i))${sup(e.q)}`:""}.`,board:lines(["cos x = (z + 1/z)/2","sin x = (z − 1/z)/(2i)  avec z = e^(ix)"],1)},
+   {say:`On regroupe les constantes : ${e.p?`1/2${sup(e.p)} `:""}× (1/(2i))${sup(e.q)} = ${fs(F(1,Math.pow(2,e.p+e.q)))}${sg.n<0?" × (−1)":""} (car i${sup(e.q)} = ${sg.n<0?"−1":"1"}). Donc ${e.t} = ${fs(mul(sg,F(1,Math.pow(2,e.p+e.q))))}·(z + 1/z)${sup(e.p)}(z − 1/z)${sup(e.q)}.`,board:lines([`${e.t} = ${fs(mul(sg,F(1,Math.pow(2,e.p+e.q))))} (z + 1/z)${sup(e.p)} (z − 1/z)${sup(e.q)}`],0)},
+   {say:`On développe le produit et on regroupe les puissances de z (calcul exact) : ${e.t} = ${cstrAll}.`,board:lines(cstr,cstr.length-1)},
+   {say:`Les termes e^(ikx) et e^(−ikx) sont <b>conjugués</b> et de même coefficient : ils se regroupent en 2·coefficient·cos(kx) (car e^(ikx) + e^(−ikx) = 2cos kx). On trouve <b>${e.t} = ${cosS}</b>.`,board:lines([`${e.t} = ${cosS}`],0)},
+   {say:`On intègre terme à terme : ∫ cos(kx) dx = sin(kx)/k. Donc <b>F(x) = ${intS} + C</b>. ${ctl(FF,f,0.8)}`,board:`<div class="res">F(x) = ${intS} + C</div>`}]}});
+/* 12. Bioche et sh/ch */
+SC.push({id:"bio",title:"Règles de Bioche et fractions en sin, cos",ref:"Cours : fractions en sin, cos (Bioche, t = tan(x/2)) ; exemples cos²x/sin x, 1/(4 sin x − 3 cos x).",
+ params:[{id:"c",label:"Intégrale",type:"select",options:[["a","∫ cos²x / sin x dx"],["b","∫ dx/(4 sin x − 3 cos x)"]]}],
+ build(v){
+  if(v.c==="a"){const f=x=>Math.cos(x)**2/Math.sin(x),FF=x=>Math.cos(x)+0.5*Math.log(Math.abs(Math.cos(x)-1))-0.5*Math.log(Math.abs(Math.cos(x)+1));const x0=0.7;
+   const w=T=>f(T(x0))*(((T(x0+1e-6)-T(x0-1e-6))/2e-6));
+   return[
+   {say:`On a une fraction en sin et cos : on pose <b>ω(x) = G(sin x, cos x) dx</b> = (cos²x/sin x) dx et on teste les <b>règles de Bioche</b> : ω(−x), ω(π − x), ω(π + x). Test numérique en x = ${x0} : ω(x) ↔ ${fmt(f(x0))}.`,board:lines(["ω(x) = cos²x / sin x dx"],0)},
+   {say:`Pour ω(−x) : on remplace x par −x <b>et dx par −dx</b> : (cos²x/(−sin x))(−dx) = (cos²x/sin x) dx. Numériquement ${fmt(w(x=>-x))} = ${fmt(f(x0))}. <b>ω(−x) = ω(x)</b> ✓ : on pose <b>t = cos x</b>.`,board:lines(["ω(−x) = (cos²x/(−sin x))·(−dx) = ω(x) ✓","→ t = cos x ; dt = −sin x dx"],1)},
+   {say:`On écrit F = ∫ (cos²x/sin²x) · <b>sin x dx</b> = ∫ t²/(1 − t²) · (−dt) = <b>∫ t²/(t² − 1) dt</b>. (On a utilisé sin²x = 1 − t² et sin x dx = −dt.)`,board:lines(["F = ∫ cos²x/sin²x · sin x dx","= −∫ t²/(1 − t²) dt","= ∫ t²/(t² − 1) dt"],2)},
+   {say:`Fraction rationnelle en t : degré num = degré dén, donc t²/(t² − 1) = 1 + 1/(t² − 1) = <b>1 + (1/2)/(t − 1) − (1/2)/(t + 1)</b>.`,board:lines(["t²/(t² − 1) = 1 + 1/((t − 1)(t + 1))","= 1 + (1/2)/(t − 1) − (1/2)/(t + 1)"],1)},
+   {say:`On intègre en t : ∫ = t + (1/2)ln|t − 1| − (1/2)ln|t + 1|. On revient à x avec t = cos x : <b>F(x) = cos x + (1/2)ln|cos x − 1| − (1/2)ln|cos x + 1| + C</b>. ${ctl(FF,f,x0)}`,board:`<div class="res">F(x) = cos x + ½ ln|cos x − 1| − ½ ln|cos x + 1| + C</div>`}]}
+  if(v.c==="b"){const f=x=>1/(4*Math.sin(x)-3*Math.cos(x)),FF=x=>{const t=Math.tan(x/2);return 0.2*Math.log(Math.abs(t-1/3))-0.2*Math.log(Math.abs(t+3))};const x0=1.5;return[
+   {say:`ω(x) = dx/(4 sin x − 3 cos x). On teste Bioche : ω(−x) = −dx/(−4 sin x − 3 cos x) ≠ ω(x) ; ω(π − x) et ω(π + x) ne sont pas égales à ω(x) non plus. <b>Aucune règle ne s'applique</b> : on prend <b>t = tan(x/2)</b>.`,board:lines(["ω(−x) ≠ ω(x)","ω(π − x) ≠ ω(x)","ω(π + x) ≠ ω(x)","→ t = tan(x/2)"],3)},
+   {say:`Avec t = tan(x/2) : <b>dx = 2dt/(1 + t²)</b>, <b>sin x = 2t/(1 + t²)</b>, <b>cos x = (1 − t²)/(1 + t²)</b>. (Contrôle en x = ${x0} : t = ${fmt(Math.tan(x0/2))}, 2t/(1 + t²) = ${fmt(2*Math.tan(x0/2)/(1+Math.tan(x0/2)**2))} = sin ${x0} = ${fmt(Math.sin(x0))} ✓.)`,board:lines(["dx = 2dt/(1 + t²)","sin x = 2t/(1 + t²)","cos x = (1 − t²)/(1 + t²)"],2)},
+   {say:`On remplace : dénominateur 4 sin x − 3 cos x = (8t − 3(1 − t²))/(1 + t²) = (3t² + 8t − 3)/(1 + t²). Donc <b>F = ∫ 2 dt/(3t² + 8t − 3)</b> (le facteur 1 + t² se simplifie).`,board:lines(["4 sin x − 3 cos x = (3t² + 8t − 3)/(1 + t²)","F = ∫ [(1 + t²)/(3t² + 8t − 3)] · [2/(1 + t²)] dt","F = ∫ 2/(3t² + 8t − 3) dt"],2)},
+   {say:`On factorise : 3t² + 8t − 3 = 3(t − 1/3)(t + 3) (racines 1/3 et −3). On décompose : 2/(3(t − 1/3)(t + 3)) = a/(t − 1/3) + b/(t + 3). Méthode du cache : a = 2/(3(1/3 + 3)) = <b>1/5</b> ; b = 2/(3(−3 − 1/3)) = <b>−1/5</b>.`,board:lines(["3t² + 8t − 3 = 3(t − 1/3)(t + 3)","a = 2 / (3(1/3 + 3)) = 1/5","b = 2 / (3(−3 − 1/3)) = −1/5"],2)},
+   {say:`On intègre : (1/5)ln|t − 1/3| − (1/5)ln|t + 3|. On revient à x : <b>F(x) = (1/5)ln|tan(x/2) − 1/3| − (1/5)ln|tan(x/2) + 3| + C</b>. ${ctl(FF,f,x0)}`,board:`<div class="res">F(x) = (1/5) ln|tan(x/2) − 1/3| − (1/5) ln|tan(x/2) + 3| + C</div>`}]}
+  return[]}});
+
+/*DOM*/
+/* ===== rendu LaTeX : conversion des notations unicode en TeX (MathJax) ===== */
+const TXE=(()=>{
+const SUP={"⁰":"0","¹":"1","²":"2","³":"3","⁴":"4","⁵":"5","⁶":"6","⁷":"7","⁸":"8","⁹":"9","⁺":"+","⁻":"-","⁽":"(","⁾":")","ⁿ":"n","ᵏ":"k","ˣ":"x","ᵃ":"a","ᵇ":"b","ᶜ":"c","ᵈ":"d","ᵉ":"e","ᶠ":"f","ᵍ":"g","ʰ":"h","ⁱ":"i","ʲ":"j","ˡ":"l","ᵐ":"m","ᵒ":"o","ᵖ":"p","ʳ":"r","ˢ":"s","ᵗ":"t","ᵘ":"u","ᵛ":"v","ʷ":"w","ʸ":"y","ᶻ":"z"};
+const SUB={"₀":"0","₁":"1","₂":"2","₃":"3","₄":"4","₅":"5","₆":"6","₇":"7","₈":"8","₉":"9","₊":"+","₋":"-","ₐ":"a","ₙ":"n","ₖ":"k","ₓ":"x","ₒ":"o","ᵢ":"i","ⱼ":"j","ₘ":"m","ₚ":"p","ₛ":"s","ₜ":"t","ₑ":"e","ₗ":"l","ₕ":"h"};
+const SYM={"−":"-","·":"\\cdot ","×":"\\times ","÷":"\\div ","≤":"\\leq ","≥":"\\geq ","≠":"\\neq ","≈":"\\approx ","∼":"\\sim ","±":"\\pm ","∞":"\\infty ","→":"\\to ","↦":"\\mapsto ","⇒":"\\Rightarrow ","⇔":"\\Leftrightarrow ","⇐":"\\Leftarrow ","∈":"\\in ","∉":"\\notin ","∀":"\\forall ","∃":"\\exists ","∪":"\\cup ","∩":"\\cap ","⊂":"\\subset ","∅":"\\varnothing ","∘":"\\circ ","…":"\\cdots ","∫":"\\int ","∑":"\\sum ","Σ":"\\sum ","ℝ":"\\mathbb{R}","ℂ":"\\mathbb{C}","ℕ":"\\mathbb{N}","ℤ":"\\mathbb{Z}","′":"'","″":"''","‴":"'''","π":"\\pi ","θ":"\\theta ","φ":"\\varphi ","ψ":"\\psi ","λ":"\\lambda ","μ":"\\mu ","ω":"\\omega ","γ":"\\gamma ","α":"\\alpha ","β":"\\beta ","δ":"\\delta ","Δ":"\\Delta ","ε":"\\varepsilon ","ρ":"\\rho ","σ":"\\sigma ","τ":"\\tau ","ξ":"\\xi ","ζ":"\\zeta ","η":"\\eta ","κ":"\\kappa ","ν":"\\nu ","Ω":"\\Omega ","Γ":"\\Gamma ","Φ":"\\Phi ","~":"\\sim ","<":"\\lt ",">":"\\gt ","{":"\\{ ","}":"\\} ","%":"\\% ","&":"\\& ","#":"\\# ","_":"\\_ ","≡":"\\equiv ","∥":"\\parallel ","⟂":"\\perp ","∠":"\\angle ","°":"^{\\circ}","∗":"*","ᵀ":"^{T}","↔":"\\leftrightarrow ","⟹":"\\Longrightarrow ","≃":"\\simeq ","⊥":"\\perp "};
+const FUNS={sin:"\\sin ",cos:"\\cos ",tan:"\\tan ",ln:"\\ln ",exp:"\\exp ",lim:"\\lim ",deg:"\\deg ",max:"\\max ",min:"\\min ",arg:"\\arg ",ch:"\\operatorname{ch}",sh:"\\operatorname{sh}",th:"\\operatorname{th}",arcsin:"\\arcsin ",arccos:"\\arccos ",arctan:"\\arctan ",Re:"\\operatorname{Re}",Im:"\\operatorname{Im}",mod:"\\bmod ",gcd:"\\gcd ",pgcd:"\\gcd ",sup:"\\sup ",inf:"\\inf ",ker:"\\ker ",det:"\\det "};
+const STOP=new Set("peu due qui que ont on si ici une il le la les des par sur ou se ce ci pas est de du en et un ne nu ta te tu me ma ni ce cet ait eu au aux ai an que par car ici une dire ex ent aie eue nue tue dut eut ete tant rien mais cas fait pied peut dont ou où".split(" "));
+const VL=/^[abcdefghikmnpqrtuxyzABCDEFGHIKMNPQRTUXYZ]{1,3}$/;
+const ISW=c=>/[A-Za-zÀ-ÿ]/.test(c);
+/* extraction des racines et fractions -> espaces réservés */
+function extract(s,st){
+ const CL=/[¯0-9A-Za-zπ′″²³⁴⁵⁶⁷⁸⁹⁰¹ᵏⁿ₀-₉ᵃ-ᶻε!\u0001\u0002\u0003]/;
+ const mb=(o,k,d0)=>{let d=0;if(d0>0){for(;k<o.length;k++){if(o[k]==="(")d++;else if(o[k]===")"){d--;if(d===0)return k}}}else{for(;k>=0;k--){if(o[k]===")")d++;else if(o[k]==="("){d--;if(d===0)return k}}}return -1};
+ const ph=(o)=>{st.push(o);return "\u0001"+(st.length-1)+"\u0002"};
+ /* racines */
+ let o=s.replace(/([0-9A-Za-z)⁰-⁹¹²³ⁿ])\s\/\s(?=[0-9A-Za-z(√−])/g,"$1/"),i=0;
+ while((i=o.indexOf("√",i))>=0){let j=i+1,body,end;
+  if(o[j]==="("){const m=mb(o,j,1);if(m>0){body=o.slice(j+1,m);end=m+1}}
+  if(body===undefined){const m=/^(?:\d+[⁰¹²³⁴⁵⁶⁷⁸⁹]*|[A-Za-zπ][⁰¹²³⁴⁵⁶⁷⁸⁹]*|\u0001\d+\u0002)/.exec(o.slice(j));if(m){body=m[0];end=j+m[0].length}}
+  if(body===undefined){i=j;continue}
+  const h=ph({t:"s",b:body});o=o.slice(0,i)+h+o.slice(end);i+=h.length}
+ /* fractions */
+ let pos=0;
+ while(true){const k=o.indexOf("/",pos);if(k<0)break;
+  if(k===0||k===o.length-1||o[k-1]===" "||o[k+1]===" "){pos=k+1;continue}
+  let ls,num;
+  let pp=k-1;while(pp>0&&/[⁰-⁹¹²³ⁿᵏ⁺⁻]/.test(o[pp]))pp--;
+  if(o[pp]===")"){const m=mb(o,pp,-1);if(m<0){pos=k+1;continue}let a=m;while(a>0&&/[A-Za-z′″⁰-⁹¹²³⁽⁾ε]/.test(o[a-1]))a--;if(a>0&&o[a-1]==="^"){a--;while(a>0&&/[A-Za-z]/.test(o[a-1]))a--}
+   num=(a===m&&pp===k-1)?o.slice(m+1,k-1):o.slice(a,k);ls=a}
+  else{let a=k;while(a>0&&CL.test(o[a-1]))a--;if(a===k){pos=k+1;continue}ls=a;num=o.slice(a,k);
+   if(ls>0&&(o[ls-1]==="−"||o[ls-1]==="-")&&(ls===1||" (=,;:".includes(o[ls-2]))){ls--;num=o.slice(ls,k)}}
+  let re,den;
+  if(o[k+1]==="("){const m=mb(o,k+1,1);if(m<0){pos=k+1;continue}re=m+1;den=o.slice(k+2,m);let r2=re;if(o[r2]==="^"){r2++;if(o[r2]==="("){const q=mb(o,r2,1);if(q>0)r2=q+1}else while(r2<o.length&&/[0-9A-Za-z]/.test(o[r2]))r2++}else while(r2<o.length&&/[⁰-⁹¹²³ⁿᵏ⁺⁻]/.test(o[r2]))r2++;if(r2>re){den="("+den+")"+o.slice(re,r2);re=r2}}
+  else{let b=k+1;if(o[b]==="−"||o[b]==="-")b++;if(o[b]==="|"){const q=o.indexOf("|",b+1);if(q>0)b=q+1}while(b<o.length&&CL.test(o[b]))b++;if(b===k+1||b===k+2&&(o[k+1]==="−"||o[k+1]==="-")){pos=k+1;continue}
+   if(o[b]==="("){const m=mb(o,b,1);if(m>0)b=m+1}re=b;den=o.slice(k+1,b)}
+  const h=ph({t:"f",n:num,d:den});o=o.slice(0,ls)+h+o.slice(re);pos=ls+h.length}
+ return o}
+/* conversion caractère par caractère */
+function conv(s,st,disp){
+ let o="",i=0;const n=s.length;
+ const grab=(map,i)=>{let r="";while(i<n&&map[s[i]]!==undefined){r+=map[s[i]];i++}return [r,i]};
+ while(i<n){const c=s[i];
+  if(c==="\u0001"){const m=/^\u0001(\d+)\u0002/.exec(s.slice(i));let e=st[+m[1]];i+=m[0].length;
+   if(e.t==="s"){o+="\\sqrt{"+conv(e.b,st,disp)+"}";continue}
+   let ed=e.d;{const mi=/^\u0001(\d+)\u0002$/.exec(e.n);if(mi&&st[+mi[1]].t==="f"){const inn=st[+mi[1]];const w=/[+−-]/.test(ed)&&!/^\(.*\)[^()]*$/.test(ed);e={t:"f",n:inn.n,d:inn.d+(w?"("+ed+")":ed)};ed=e.d}}
+   let nn=e.n,sg="";if(/^[−-][^−+-]*$/.test(nn)){sg="-";nn=nn.slice(1)}
+   o+=sg+(disp?"\\dfrac{":"\\frac{")+conv(nn,st,disp)+"}{"+conv(e.d,st,disp)+"}";continue}
+  if(SUP[c]!==undefined){const [r,j]=grab(SUP,i);o+="^{"+r+"}";i=j;continue}
+  if(SUB[c]!==undefined){const [r,j]=grab(SUB,i);o+="_{"+r+"}";i=j;continue}
+  if(c==="^"&&s[i+1]==="("){let d=0,k=i+1;for(;k<n;k++){if(s[k]==="(")d++;else if(s[k]===")"){d--;if(d===0)break}}
+   o+="^{"+conv(s.slice(i+2,k),st,disp)+"}";i=k+1;continue}
+  if(/[A-Za-z]/.test(c)){let j=i;while(j<n&&/[A-Za-z]/.test(s[j]))j++;const w=s.slice(i,j);
+   /* fonctions */
+   if(FUNS[w]){o+=FUNS[w];i=j;continue}
+   if(/^d[xtuyz]$/.test(w)){o+=(/[A-Za-z0-9})]$/.test(o)?"\\,":"")+"\\mathrm{d}"+w[1];i=j;continue}
+   /* mots collés : dx, dt, cos... à l'intérieur ? */
+   let r="";let p=0;while(p<w.length){let f=null;for(const k of Object.keys(FUNS).sort((a,b)=>b.length-a.length)){if(w.startsWith(k,p)&&k.length>=3){f=k;break}}if(f){r+=FUNS[f];p+=f.length}else{r+=w[p];p++}}
+   o+=r;i=j;continue}
+  if(c===","&&/\d/.test(s[i-1]||"")&&/\d/.test(s[i+1]||"")){o+="{,}";i++;continue}
+  if(c===" "){let k=i;while(s[k]===" ")k++;const pv=o[o.length-1]||"",nx=s[k]||"";if(/[A-Za-z0-9}]/.test(pv)&&/[A-Za-z0-9\u0001]/.test(nx))o+="\\,";i=k;continue}
+  if(c==="¯"){o=o.replace(/([A-Za-z]|\\[a-z]+ |\))$/,m=>"\\overline{"+m+"}");i++;continue}
+  if(SYM[c]!==undefined){o+=SYM[c];i++;continue}
+  o+=c;i++}
+ return o}
+const m2t=(raw,disp)=>{const st=[];const s=extract(raw,st);let t=conv(s,st,disp);return (disp&&/\\dfrac|\\int|\\sum|\\sqrt/.test(t)?"\\displaystyle ":"")+t};
+/* segmentation texte / maths */
+const IV=/[\[\]][0-9A-Za-zπ∞+−\-\s,.√/²·()]{1,36}?;[0-9A-Za-zπ∞+−\-\s,.√/²·()]{1,36}?[\[\]]|\((?![^;)]*[A-Za-zÀ-ÿ]{4})[0-9A-Za-zα-ωπ∞+−\-,.√/²]{1,16}\s;\s[0-9A-Za-zα-ωπ∞+−\-,.√/²]{1,16}\)/g;
+function node(text,disp,blk){
+ if(!node._iv&&new RegExp(IV.source).test(text.replace(/&lt;/g,"<"))){const IV2=new RegExp(IV.source,"g");node._iv=1;const t0=text.replace(/&lt;/g,"<").replace(/&gt;/g,">").replace(/&amp;/g,"&");let out="",last=0,m;
+  while((m=IV2.exec(t0))){out+=node(t0.slice(last,m.index),disp,blk);out+="\\("+m2t(m[0].replace(/\s*;\s*/g,"§;§"),false).replace(/§/g,"\\,")+"\\)";last=m.index+m[0].length}
+  out+=node(t0.slice(last),disp,blk);node._iv=0;return out}
+ text=text.replace(/([A-Za-z])\u0304/g,"$1¯").replace(/&lt;/g,"<").replace(/&gt;/g,">").replace(/&amp;/g,"&").replace(/&nbsp;/g," ");
+ const re=/([A-Za-zÀ-ÿ]+)|(\d+(?:,\d+)?)|(\s+)|([\s\S])/g;const T=[];let m;
+ while((m=re.exec(text))){if(m[1])T.push({k:"w",s:m[1]});else if(m[2])T.push({k:"n",s:m[2]});else if(m[3])T.push({k:"s",s:m[3]});else T.push({k:"o",s:m[4]})}
+ const STRONG=new Set("¯=≠≤≥<>+×÷∼≈±∈∉⇒⇔→↦∞∫∑Σ√π∀∃∪∩⊂∘≡^²³⁴⁵⁶⁷⁸⁹⁰¹ⁿᵏˣ₀₁₂₃₄₅₆₇₈₉⁺⁻ᵃᵇᵈᵉ".split("").concat(Object.keys(SUP),Object.keys(SUB)));
+ const GREEK=/[α-ωΑ-Ωℝℂℕℤ′″‴∅]/;
+ T.forEach((t,i)=>{t.m=null;
+  if(t.k==="w"){const w=t.s;
+   if(FUNS[w]||w==="dx")t.m=true;
+   else if(["dt","du","dy","dz"].includes(w)){const pv=T.slice(0,i).reverse().find(q=>q.k!=="s");t.m=!!pv&&(pv.k==="w"&&!STOP.has(pv.s)&&(VL.test(pv.s)||FUNS[pv.s])||pv.k==="n"||(pv.k==="o"&&/[)}\]'′∞∫+\-−=·×]/.test(pv.s)))}
+   else if(/[À-ÿ]/.test(w))t.m=false;
+   else if(w.length===1){t.m=(w==="a"||w==="A")?(((T[i+1]&&T[i+1].k==="s"&&T[i+2]&&T[i+2].k==="w"&&FUNS[T[i+2].s]))?true:"?"):true;if(i+1<T.length&&(T[i+1].s==="'"||T[i+1].s==="’")&&T[i+2]&&T[i+2].k==="w")t.m=false}
+   else t.m=(VL.test(w)&&!STOP.has(w.toLowerCase()))?true:false}
+  else if(t.k==="n")t.m=true;
+  else if(t.k==="s")t.m="s";
+  else{const c=t.s;if(STRONG.has(c)||GREEK.test(c))t.m=true;else if("(){}[]|/,;:.!?'’-−·…*«»“”\"".includes(c))t.m="?";else t.m=false}});
+ const near=(i,d)=>{let j=i+d;while(T[j]&&T[j].k==="s")j+=d;return T[j]};
+ for(let pass=0;pass<4;pass++)T.forEach((t,i)=>{if(t.m!=="?")return;const c=t.s,P=T[i-1],N=T[i+1],Pm=P&&P.m===true,Nm=N&&N.m===true;
+  const Ps=near(i,-1),Ns=near(i,1),Pms=Ps&&Ps.m===true,Nms=Ns&&Ns.m===true;
+  let r=null;
+  if(c==="a"||c==="A"){const OPS="=+−-×·/^≤≥<>≠≈(),;|";const op=x=>x&&((x.k==="o"&&OPS.includes(x.s))||x.k==="n");
+   const ww=(x,d)=>{let j=T.indexOf(x);return null};
+   const nw=Ns&&Ns.k==="w"?Ns.s:"",pw=Ps&&Ps.k==="w"?Ps.s:"";
+   const afterEt=(nw==="et"||nw==="ou")&&(()=>{let j=T.indexOf(Ns)+1;while(T[j]&&T[j].k==="s")j++;return T[j]&&T[j].k==="w"&&T[j].s.length===1})();
+   const beforeEt=(pw==="et"||pw==="ou")&&(()=>{let j=T.indexOf(Ps)-1;while(T[j]&&T[j].k==="s")j--;return T[j]&&T[j].k==="w"&&T[j].s.length===1})();
+   r=(op(Ps)||op(Ns)||afterEt||beforeEt)?true:null}
+  else if("([{".includes(c))r=Nm?true:null;
+  else if(")]}".includes(c))r=Pm?true:null;
+  else if(c==="|")r=(Nm||Pm)?true:null;
+  else if(c==="/"||c==="·"||c==="*")r=(Pms&&Nms)?true:null;
+  else if(c==="-"||c==="−")r=Nms&&(Pms||!Ps||/[=(,;:]/.test(Ps.s)||Ps.m===true)?true:null;
+  else if(c===","||c===";"||c===":")r=(Pm&&Nms)?true:null;
+  else if(c==="!")r=(Pm&&!(N&&N.k==="w"))?true:null;
+  else if(c==="'"||c==="’")r=(Pm&&!(N&&N.k==="w"))?true:null;
+  else if(c==="…")r=(Pms||Nms)?true:null;
+  else r=null;
+  if(r===true)t.m=true});
+ T.forEach(t=>{if(t.m==="?"||t.m===null)t.m=false});
+ let out="",i=0;
+ while(i<T.length){if(T[i].m===true){let j=i,last=i;while(j<T.length){if(T[j].m===true)last=j;else if(!(T[j].m==="s"&&T[j+1]&&(T[j+1].m===true)))break;j++}
+   const raw=T.slice(i,last+1).map(t=>t.s).join("");
+   if(/^\d+(?:,\d+)?$/.test(raw))out+=raw;else{const tex=m2t(raw,disp||(blk&&raw.length>=16&&/[=⇒⇔]/.test(raw)&&/[=]/.test(raw)&&!/^[^=]{0,3}=[^=]{0,5}$/.test(raw)));
+    if(blk&&raw.length>=16&&/[=⇒⇔]/.test(raw)&&!/^[^=]{0,3}=[^=]{0,5}$/.test(raw))out+="\\["+m2t(raw,true)+"\\]";else out+="\\("+tex+"\\)"}i=last+1}
+  else{out+=T[i].s;i++}}
+ return out.replace(/&/g,"&amp;").replace(/\\\(/g,"\\(").replace(/</g,"&lt;")}
+const html=(h,disp,say)=>h.split(/(<svg[\s\S]*?<\/svg>)/).map((p,i)=>{if(i%2)return p;let last="";return p.replace(/(<[^>]*>)|([^<]+)/g,(m,tag,txt)=>{if(tag){last=tag;return tag}
+  const ok=say&&!/^<(mark|b|i|sub|sup)\b/.test(last);let x=txt.replace(/-(?=\d)/g,"−");
+  if(ok)x=x.replace(/([.!?])\s+(?=[A-ZÉÈÀÂÎÔÛ])/g,"$1<br class=sp>");
+  return x.split("<br class=sp>").map(y=>node(y,disp,ok)).join("<br class=sp>")}).replace(/&amp;lt;/g,"&lt;")}).join("").replace(/\\\]([ \u00a0]?)([.,;])(?![0-9])/g,(m,sp,p)=>"\\,"+p+"\\]");
+return{node,html,m2t,tx1:s=>node(s,false)}})();
+
+
+const mjt=els=>{const f=()=>{MathJax.startup.promise=MathJax.startup.promise.then(()=>MathJax.typesetPromise(els)).then(()=>document.querySelectorAll("mjx-assistive-mml").forEach(e=>e.remove())).catch(()=>{})};if(window.__mjr)f();else(window.__mjq=window.__mjq||[]).push(f)};
+
+if(typeof document!=="undefined"){
+const host=document.getElementById("scenes"),nav=document.getElementById("nav");
+SC.forEach((sc,ix)=>{const CODE="I"+(ix+1);
+ const sec=document.createElement("section");sec.id="s-"+sc.id;
+ const ps=(sc.params||[]).map(p=>p.type==="select"?`<label for="${sc.id}_${p.id}">${p.label}</label><select id="${sc.id}_${p.id}">${p.options.map(o=>`<option value="${o[0]}"${(p.value||p.options[0][0])===o[0]?" selected":""}>${o[1]}</option>`).join("")}</select>`:`<label for="${sc.id}_${p.id}">${p.label}</label><input type="text" id="${sc.id}_${p.id}" value="${p.value}">`).join("");
+ sec.innerHTML=`<div><h2><span class="cd">${CODE}</span> ${TXE.tx1(sc.title)}</h2><p>${TXE.tx1(sc.ref)}</p></div>${ps?`<div class="row">${ps}${(sc.params||[]).some(p=>p.type==="text")?`<button id="${sc.id}_go">Poser</button>`:""}</div>`:""}
+ <div class="row"><button class="p" id="${sc.id}_play">Lecture</button><button id="${sc.id}_prev">◀ Précédent</button><button id="${sc.id}_next">Suivant ▶</button><label for="${sc.id}_sp">Lent</label><input type="range" id="${sc.id}_sp" min="800" max="4000" step="200" value="2600" style="direction:rtl;max-width:110px"><label for="${sc.id}_sp">Rapide</label></div>
+ <div class="bubble" id="${sc.id}_say" aria-live="polite"></div><div class="stage" id="${sc.id}_board"></div>`;
+ host.appendChild(sec);mjt([sec]);
+ const a=document.createElement("a");a.href="#s-"+sc.id;a.textContent=CODE+" · "+sc.title;nav.appendChild(a);
+ const $=s=>document.getElementById(sc.id+"_"+s);
+ let steps=[],t=0,timer=null,speed=2600;
+ const stop=()=>{if(timer){clearInterval(timer);timer=null}$("play").textContent="Lecture"};
+ 
+const mn=h=>TXE.html(h,true,false);
+
+ const draw=()=>{const s=steps[t];$("say").innerHTML=TXE.html(s.say,false,true);$("board").innerHTML=TXE.html(s.board,true,false);mjt([$("say"),$("board")]);$("prev").disabled=t===0;$("next").disabled=t===steps.length-1};
+ const vals=()=>{const v={};(sc.params||[]).forEach(p=>{v[p.id]=$(p.id).value});return v};
+ const rebuild=()=>{stop();steps=sc.build(vals());t=0;draw()};
+ $("next").onclick=()=>{stop();if(t<steps.length-1){t++;draw()}};
+ $("prev").onclick=()=>{stop();if(t>0){t--;draw()}};
+ const tick=()=>{if(t<steps.length-1){t++;draw()}else stop()};
+ $("play").onclick=()=>{if(timer){stop();return}if(t===steps.length-1){t=0;draw()}$("play").textContent="Pause";timer=setInterval(tick,speed)};
+ $("sp").oninput=e=>{speed=+e.target.value;if(timer){clearInterval(timer);timer=setInterval(tick,speed)}};
+ (sc.params||[]).forEach(p=>{if(p.type==="select")$(p.id).onchange=rebuild});
+ if($("go"))$("go").onclick=rebuild;
+ rebuild();
+});}
+</script>
+
+<script>
+/* mode intégré dans le site : ?s=<scène>&embed=1 n'affiche que cette scène et signale sa hauteur à la page parente */
+(function(){var q=new URLSearchParams(location.search),s=q.get("s");if(!s||q.get("embed")!=="1")return;
+var id=CSS.escape(s);var css="main>h1,main>p,nav,.cd{display:none!important}section{display:none!important}"
++"#s-"+id+",section#"+id+"{display:block!important}body,main{margin:0!important;padding:0!important;background:transparent!important}"
++"main{max-width:none!important}section{margin:0!important;border:0!important;box-shadow:none!important}";
+var st=document.createElement("style");st.textContent=css;document.head.appendChild(st);
+document.documentElement.classList.add("embed");
+function post(){parent.postMessage({anim:1,h:Math.ceil(document.documentElement.scrollHeight)},"*")}
+if(window.ResizeObserver)new ResizeObserver(post).observe(document.documentElement);
+window.addEventListener("load",post);setInterval(post,1500);
+})();
+</script>
