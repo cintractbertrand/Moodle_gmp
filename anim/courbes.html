@@ -1,0 +1,588 @@
+<!doctype html>
+<html lang="fr">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>html{color-scheme:light}body{margin:0;font:14px/1.5 system-ui,-apple-system,"Segoe UI",sans-serif}[hidden]{display:none!important}img{max-width:100%}</style>
+<title>Courbes et polaires en animations</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<script>window.MathJax={loader:{load:[]},tex:{inlineMath:[["\\(","\\)"]],displayMath:[["\\[","\\]"]],processEscapes:false},svg:{fontCache:"global"},options:{enableMenu:false,enableAssistiveMml:false},startup:{typeset:false,ready:function(){MathJax.startup.defaultReady();window.__mjr=1;(window.__mjq||[]).forEach(function(f){f()});}}};</script>
+<script async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-svg.min.js"></script>
+
+<style>
+/* Layout: une scène = un passage du cours (titre, réglages, commentaire du prof, tableau animé) */
+:root{--bg:#f6f7f9;--card:#fff;--fg:#1d2433;--mut:#5b6577;--line:#d9dee7;--accent:#1f5fbf;--hl:#ffe08a;--hl2:#bfe3d0;--bad:#b3261e;
+--mono:ui-monospace,"SF Mono",Menlo,Consolas,monospace;--sans:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#10141c;--card:#171d29;--fg:#e6eaf2;--mut:#9aa5b8;--line:#2b3446;--accent:#6aa3ff;--hl:#6b5a14;--hl2:#1f5a43;--bad:#ff8a80;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#10141c;--card:#171d29;--fg:#e6eaf2;--mut:#9aa5b8;--line:#2b3446;--accent:#6aa3ff;--hl:#6b5a14;--hl2:#1f5a43;--bad:#ff8a80;color-scheme:dark}
+body{background:var(--bg);color:var(--fg);font-family:var(--sans);font-size:16px;line-height:1.5;padding-block:20px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+main{max-width:780px;margin:0 auto;display:flex;flex-direction:column;gap:22px}
+h1{font-size:1.4rem;margin:0}h2{font-size:1.1rem;margin:0 0 2px}p{margin:0;color:var(--mut)}
+nav{display:flex;flex-wrap:wrap;gap:6px 12px;font-size:.9rem}nav a{color:var(--accent)}
+section{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:16px;display:flex;flex-direction:column;gap:12px;min-width:0}
+.row{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+label{font-size:.9rem;color:var(--mut)}
+input[type=text],select{font:inherit;font-family:var(--mono);padding:6px 8px;border:1px solid var(--line);border-radius:6px;background:var(--bg);color:var(--fg);min-width:0;max-width:100%}
+input[type=text]{width:14em}
+button{font:inherit;padding:6px 12px;border:1px solid var(--line);border-radius:6px;background:var(--bg);color:var(--fg);cursor:pointer}
+button.p{background:var(--accent);color:var(--bg);border-color:var(--accent)}
+button:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+button:disabled{opacity:.45;cursor:default}
+.bubble{border-left:4px solid var(--accent);background:var(--bg);padding:10px 12px;border-radius:0 8px 8px 0;min-height:3.2em;line-height:1.7}
+mark{background:var(--hl);color:inherit;border-radius:3px;padding:0 3px}
+.stage{overflow-x:auto;font-family:var(--mono)}
+.board{display:flex;align-items:flex-start}
+.board table{border-collapse:collapse}.board td{min-width:3.4em;height:2.2em;text-align:center;padding:0 4px;box-sizing:border-box;white-space:nowrap}
+.board .left{padding-right:10px}.board .right{border-left:2px solid var(--fg);padding-left:6px}
+.board td.rule{border-top:2px solid var(--fg)}
+.board td.lab{min-width:1.4em;padding:0 2px}
+.hl{background:var(--hl);border-radius:4px;font-weight:700}.hk{background:var(--hl2);border-radius:4px}
+.hq{outline:2px solid var(--accent);border-radius:4px;font-weight:700}
+.tab td,.tab th{border:1px solid var(--line);padding:4px 10px;text-align:center;font-weight:400}
+.lines{display:flex;flex-direction:column;gap:6px;font-family:var(--mono)}
+.lines div{padding:2px 6px;border-radius:4px;white-space:nowrap}
+.lines .new{background:var(--hl2)}
+.res{border:2px solid var(--accent);border-radius:8px;padding:8px 10px;font-family:var(--mono);overflow-x:auto}
+.ok{color:var(--accent)}.err{color:var(--bad)}
+svg{max-width:100%;height:auto;display:block;font-family:var(--sans)}
+svg text{fill:var(--fg);font-size:11px}
+svg .ax{stroke:var(--mut);stroke-width:1;fill:none}svg .gr{stroke:var(--line);stroke-width:1;fill:none}
+svg .cv{stroke:var(--accent);stroke-width:2;fill:none}svg .dsh{stroke:var(--mut);stroke-dasharray:4 3;fill:none}
+svg .cv2{stroke:var(--bad);stroke-width:2;fill:none}svg .cv3{stroke:var(--mut);stroke-width:1.5;stroke-dasharray:4 3;fill:none}svg .fillp{fill:var(--accent);opacity:.28;stroke:none}svg .fillm{fill:var(--bad);opacity:.28;stroke:none}svg .rect{fill:var(--accent);opacity:.3;stroke:var(--accent);stroke-width:1}svg .rectU{fill:var(--bad);opacity:.15;stroke:var(--bad);stroke-width:1}h2 .cd{display:inline-block;background:var(--accent);color:var(--bg);border-radius:6px;padding:0 8px;margin-right:6px;font-size:.95em}.rt{white-space:nowrap}.rt .ov{border-top:1.5px solid currentColor;padding:0 1px;margin-left:1px}svg .tg{stroke:var(--accent);stroke-width:2;fill:none}svg .vec{stroke:var(--accent);stroke-width:2}svg .pt{fill:var(--bad)}svg .pk{fill:var(--accent)}svg .pe{fill:none;stroke:var(--accent);stroke-width:1.5}
+.fq{display:inline-flex;flex-direction:column;vertical-align:middle;text-align:center;margin:0 2px;line-height:1.25;font-size:.95em}.fq .nu{border-bottom:1.5px solid currentColor;padding:0 3px}.fq .de{padding:0 3px}br.sp{display:block;content:"";margin-top:.55em}.bubble{line-height:1.95;padding:14px 16px}.bubble mjx-container[display="true"]{margin:.55em 0 !important}.lines{gap:10px}.lines div{padding:6px 10px;white-space:normal}.lines,.res,.stage{font-family:inherit}.res{padding:12px 14px;font-size:1.05em}mjx-container[jax="SVG"] svg{overflow:visible}section h2 mjx-container,nav mjx-container{font-size:100%}/*ovf*/mjx-container svg{display:inline!important}mjx-assistive-mml{display:none!important}mjx-assistive-mml{position:absolute!important;width:1px!important;height:1px!important;overflow:hidden!important;clip:rect(0 0 0 0)!important;left:0!important;top:0!important}mjx-container{position:relative}mjx-container{max-width:100%;overflow-x:auto;overflow-y:hidden}mjx-container[display=true]{margin:.5em 0!important}.bubble,.lines,.res,.stage,#board,#say{max-width:100%;overflow-x:auto}.ref{overflow-x:auto;max-width:100%}</style>
+<main>
+<h1>Courbes paramétrées et polaires : les animations du cours</h1>
+<p>Chaque animation reprend un passage du cours. Appuie sur Lecture, ou avance à ton rythme avec Suivant.</p>
+<nav id="nav"></nav>
+<div id="scenes" style="display:contents"></div>
+</main>
+<script>
+/* =================== calcul exact =================== */
+function gcd(a,b){a=Math.abs(a);b=Math.abs(b);while(b){[a,b]=[b,a%b]}return a}
+function F(n,d=1){if(d<0){n=-n;d=-d}const g=gcd(n,d)||1;return{n:n/g,d:d/g}}
+const add=(x,y)=>F(x.n*y.d+y.n*x.d,x.d*y.d),sub=(x,y)=>F(x.n*y.d-y.n*x.d,x.d*y.d),mul=(x,y)=>F(x.n*y.n,x.d*y.d),dv=(x,y)=>F(x.n*y.d,x.d*y.n);
+const isz=x=>x.n===0, fs=x=>x.d===1?String(x.n):x.n+"/"+x.d, fnum=x=>x.n/x.d;
+const sup=n=>String(n).split("").map(c=>"⁰¹²³⁴⁵⁶⁷⁸⁹"[+c]).join("");
+const sub_=n=>String(n).split("").map(c=>"₀₁₂₃₄₅₆₇₈₉"[+c]).join("");
+/* un polynôme = objet {puissance: Fraction} sans coefficient nul */
+function clean(m){const r={};for(const k in m)if(!isz(m[k]))r[k]=m[k];return r}
+function fromDesc(a){const m={};a.forEach((c,i)=>{m[a.length-1-i]=typeof c==="number"?F(c):c});return clean(m)}
+function fromAsc(a){const m={};a.forEach((c,i)=>{m[i]=typeof c==="number"?F(c):c});return clean(m)}
+const pows=m=>Object.keys(m).map(Number).sort((a,b)=>a-b);
+const deg=m=>{const p=pows(m);return p.length?p[p.length-1]:-1};
+const low=m=>{const p=pows(m);return p.length?p[0]:-1};
+const empty=m=>pows(m).length===0;
+function padd(a,b){const r={...a};for(const k in b)r[k]=r[k]?add(r[k],b[k]):b[k];return clean(r)}
+function pscale(a,c){const r={};for(const k in a)r[k]=mul(a[k],c);return clean(r)}
+function pshift(a,s){const r={};for(const k in a)r[+k+s]=a[k];return r}
+const psub=(a,b)=>padd(a,pscale(b,F(-1)));
+function pmul(a,b){let r={};for(const i in a)for(const j in b){const p=+i+ +j;r[p]=r[p]?add(r[p],mul(a[i],b[j])):mul(a[i],b[j])}return clean(r)}
+function pderiv(a){const r={};for(const k in a)if(+k>0)r[k-1]=mul(a[k],F(+k));return clean(r)}
+function peval(a,x){let s=F(0);for(const k in a){let t=F(1);for(let i=0;i<+k;i++)t=mul(t,x);s=add(s,mul(a[k],t))}return s}
+function pevalF(a,x){let s=0;for(const k in a)s+=fnum(a[k])*Math.pow(x,+k);return s}
+const peq=(a,b)=>empty(psub(a,b));
+let VAR="x";
+function term(c,p,first){if(isz(c))return"";const neg=c.n<0,ab=F(Math.abs(c.n),c.d);
+ let b=(p>0&&ab.n===1&&ab.d===1)?"":(ab.d===1||p===0?fs(ab):"("+fs(ab)+")");
+ b+=p>0?(p===1?VAR:VAR+sup(p)):"";
+ return first?(neg?"−"+b:b):(neg?"− ":"+ ")+b}
+function pstr(m,asc){const p=pows(m);if(!p.length)return"0";if(!asc)p.reverse();let o="";p.forEach((k,i)=>{const t=term(m[k],k,i===0);o+=(i&&t.startsWith("")?" ":"")+t});return o}
+const one=(c,p)=>term(c,p,true);
+function parseList(s){return s.split(/[,;\s]+/).filter(Boolean).map(t=>{const m=t.match(/^(-?\d+)(?:\/(\d+))?$/);if(!m||(m[2]&&+m[2]===0))throw 0;return F(+m[1],m[2]?+m[2]:1)})}
+
+/* =================== division (décroissante ou croissante) =================== */
+function divModel(A,B,asc,order){
+ const its=[];let R={...A};const dB=deg(B);
+ if(!asc){while(!empty(R)&&deg(R)>=dB){const lp=deg(R),qp=lp-dB,c=dv(R[lp],B[dB]);const prod=pscale(pshift(B,qp),c);const Rn=psub(R,prod);its.push({lp,qp,c,prod,Rold:R,Rn});R=Rn}}
+ else{for(let s=0;s<=order;s++){const c=R[s]?dv(R[s],B[0]):F(0);const prod=pscale(pshift(B,s),c);const Rn=psub(R,prod);its.push({lp:s,qp:s,c,prod,Rold:R,Rn});R=Rn}}
+ const Q={};its.forEach(it=>{if(!isz(it.c))Q[it.qp]=it.c});
+ const dA=deg(A);
+ let colsL,colsR;
+ if(!asc){const wp=Math.max(dB,dA-dB,0);colsL=range(dA,0,-1);colsR=range(wp,0,-1)}
+ else{const mp=Math.max(dA,order+dB);colsL=range(0,mp,1);colsR=range(0,Math.max(dB,order),1)}
+ return{A,B,asc,order,its,Q,R,dA,dB,colsL,colsR,N:4*its.length+1};
+}
+function range(a,b,s){const r=[];for(let i=a;s>0?i<=b:i>=b;i+=s)r.push(i);return r}
+function divCheck(D){return peq(padd(pmul(D.B,D.Q),D.R),D.A)}
+function divSay(D,t){
+ const {A,B,asc,its,order,dB}=D;
+ if(t===0)return asc?`On pose la DSPC à l'ordre <b>${order}</b> : on range A et B <b>suivant les puissances croissantes</b>. On veut A = B×Q + ${VAR}<sup>${order+1}</sup>×R avec deg Q ≤ ${order}.`
+  :`On pose la division : <b>A = ${pstr(A)}</b> à gauche, <b>B = ${pstr(B)}</b> à droite. On veut A = B×Q + R avec deg R &lt; deg B = ${dB}.`+(D.dA<dB?" Ici deg A &lt; deg B : la division est déjà finie.":"");
+ if(t===D.N){
+  if(asc){const Rp={};for(const k in D.R)Rp[k-order-1]=D.R[k];return `On s'arrête à l'ordre ${order}. <b>Q = ${pstr(D.Q,true)}</b> et le reste est <b>${pstr(D.R,true)} = ${VAR}${sup(order+1)}×(${pstr(Rp,true)})</b>.`}
+  return D.R&&!empty(D.R)?`Le reste <b>${pstr(D.R)}</b> a pour degré ${deg(D.R)}, strictement inférieur à ${dB} : on s'arrête. <b>Q = ${pstr(D.Q)}</b> et <b>R = ${pstr(D.R)}</b>.`
+   :`Le reste est nul : on s'arrête. <b>Q = ${pstr(D.Q)}</b> et <b>R = 0</b>, donc B divise A.`}
+ const i=Math.floor((t-1)/4),ph=(t-1)%4,it=its[i];
+ const src=i?"le reste":"A";
+ const lr=one(it.Rold[it.lp]||F(0),it.lp),lb=asc?one(B[0],0):one(B[dB],dB),q=one(it.c,it.qp),zero=isz(it.c);
+ const lead=asc?"de plus bas degré":"de plus haut degré";
+ if(ph===0)return `<b>Étape ${i+1}.</b> On regarde seulement les termes ${lead} : <mark>${lr||"0"}</mark> dans ${src} et <mark>${lb}</mark> dans B.`;
+ if(ph===1)return zero?`Le terme de degré ${it.lp} du reste est nul : le terme du quotient est <mark>0</mark>.`:`Par quoi faut-il multiplier ${lb} pour obtenir ${lr} ? ${lr} ÷ ${lb} = <mark>${q}</mark>. On l'écrit au quotient, sous B.`;
+ if(ph===2)return zero?`0 × B = 0 : il n'y a rien à écrire.`:`On multiplie <b>tout</b> B par ${q} et on écrit le résultat sous ${src}, en alignant les puissances de X : ${q}·B = ${pstr(it.prod,asc)}.`;
+ const Rn=it.Rn;return zero?`Rien à soustraire, on passe au terme suivant.`:`On soustrait la parenthèse, c'est-à-dire qu'on change tous ses signes : le terme de degré ${it.lp} disparaît. Il reste <mark>${empty(Rn)?"0":pstr(Rn,asc)}</mark>.`;
+}
+function divBoard(D,t){
+ const {A,B,asc,its,N,colsL,colsR,dB}=D;
+ const cur=t>0&&t<N?{i:Math.floor((t-1)/4),ph:(t-1)%4}:null;
+ const reached=(i,ph)=>t>=4*i+ph+1;
+ const row=(m,cols,cls,lab,rule)=>{let seen=false;return `<tr><td class="lab">${lab||""}</td>`+cols.map(p=>{const v=m[p];const tt=v?term(v,p,!seen):"";if(tt)seen=true;return `<td class="${(cls&&cls(p))||""} ${rule?"rule":""}">${tt}</td>`}).join("")+`<td class="lab">${lab?")":""}</td></tr>`};
+ let L=row(A,colsL,p=>cur&&cur.i===0&&cur.ph<=1&&its[0]&&p===its[0].lp?"hl":"","");
+ its.forEach((it,i)=>{const isCur=cur&&cur.i===i;
+  if(reached(i,2)&&!isz(it.c))L+=row(it.prod,colsL,()=>isCur&&cur.ph===2?"hk":"","− (");
+  if(reached(i,3)&&!isz(it.c)){const nx=its[i+1];L+=row(it.Rn,colsL,p=>isCur&&cur.ph===3?"hk":(cur&&cur.i===i+1&&cur.ph<=1&&nx&&p===nx.lp?"hl":""),"",true)}
+ });
+ const leadB=asc?0:dB;
+ let seenB=false,seenQ=false;
+ const RB=`<tr>`+colsR.map(p=>{const c=B[p];const tt=c?term(c,p,!seenB):"";if(tt)seenB=true;return `<td class="${cur&&cur.ph<=1&&p===leadB?"hl":""}">${tt}</td>`}).join("")+`</tr>`;
+ const RQ=`<tr>`+colsR.map(p=>{let v=null,h="";its.forEach((it,i)=>{if(it.qp===p&&reached(i,1)){v=it.c;if(cur&&cur.i===i&&cur.ph===1)h="hq"}});const tt=v&&!isz(v)?term(v,p,!seenQ):"";if(tt)seenQ=true;return `<td class="rule ${h}">${tt}</td>`}).join("")+`</tr>`;
+ let out=`<div class="board"><div class="left"><table>${L}</table></div><div class="right"><table>${RB+RQ}</table></div></div>`;
+ if(t===N)out+=`<div class="res">A = B·Q + ${D.asc?"reste":"R"}<br>(${pstr(B,asc)})·(${pstr(D.Q,asc)}) + (${empty(D.R)?"0":pstr(D.R,asc)})<br><span class="${divCheck(D)?"ok":"err"}">Vérification : B·Q + R = A ${divCheck(D)?"✓":"✗"}</span></div>`;
+ return out;
+}
+function divSteps(D,extra){const s=[];for(let t=0;t<=D.N;t++)s.push({say:divSay(D,t),board:divBoard(D,t)});return s}
+
+/* =================== dessins =================== */
+function niceTicks(a,b){const span=b-a;let st=Math.pow(10,Math.floor(Math.log10(span/4)));if(span/st>8)st*=2;if(span/st>8)st*=2.5;const r=[];for(let v=Math.ceil(a/st)*st;v<=b+1e-9;v+=st)r.push(Math.round(v/st)*st);return r}
+function graphSvg(o){const W=380,H=240,pl=30,pr=14,pt=14,pb=24;const {f,xmin,xmax}=o;let {ymin,ymax}=o;
+ if(ymin===undefined){let lo=1e9,hi=-1e9;for(let i=0;i<=200;i++){const y=f(xmin+(xmax-xmin)*i/200);lo=Math.min(lo,y);hi=Math.max(hi,y)}const pad=(hi-lo)*0.12||1;ymin=Math.min(lo,0)-pad;ymax=Math.max(hi,0)+pad}
+ const X=x=>pl+(x-xmin)/(xmax-xmin)*(W-pl-pr),Y=y=>pt+(ymax-y)/(ymax-ymin)*(H-pt-pb);
+ let s=`<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="${o.label||"graphe"}">`;
+ niceTicks(xmin,xmax).forEach(v=>{s+=`<line class="gr" x1="${X(v)}" y1="${pt}" x2="${X(v)}" y2="${H-pb}"/><text x="${X(v)}" y="${H-pb+13}" text-anchor="middle">${+v.toFixed(2)}</text>`});
+ niceTicks(ymin,ymax).forEach(v=>{s+=`<line class="gr" x1="${pl}" y1="${Y(v)}" x2="${W-pr}" y2="${Y(v)}"/><text x="${pl-4}" y="${Y(v)+4}" text-anchor="end">${+v.toFixed(2)}</text>`});
+ if(ymin<0&&ymax>0)s+=`<line class="ax" x1="${pl}" y1="${Y(0)}" x2="${W-pr}" y2="${Y(0)}"/>`;
+ if(xmin<0&&xmax>0)s+=`<line class="ax" x1="${X(0)}" y1="${pt}" x2="${X(0)}" y2="${H-pb}"/>`;
+ let d="",pen=false;for(let i=0;i<=240;i++){const x=xmin+(xmax-xmin)*i/240,y=f(x);if(y<ymin||y>ymax){pen=false;continue}d+=(pen?"L":"M")+X(x).toFixed(1)+" "+Y(y).toFixed(1)+" ";pen=true}
+ s+=`<path class="cv" d="${d}"/>`;
+ (o.marks||[]).forEach(m=>{if(m.drop)s+=`<line class="dsh" x1="${X(m.x)}" y1="${Y(m.y)}" x2="${X(m.x)}" y2="${Y(0)}"/>`;
+  s+=`<circle class="${m.ok?"pk":"pt"}" cx="${X(m.x)}" cy="${Y(m.y)}" r="5"/>`;if(m.label)s+=`<text x="${X(m.x)+7}" y="${Y(m.y)-7}">${m.label}</text>`});
+ return s+"</svg>"}
+function planeSvg(o){const S=300,R=o.R,pad=18,C=S/2;const X=x=>C+x/R*(C-pad),Y=y=>C-y/R*(C-pad);
+ let s=`<svg viewBox="0 0 ${S} ${S}" style="max-width:320px" role="img" aria-label="plan complexe">`;
+ for(let v=-Math.floor(R);v<=Math.floor(R);v++){if(!v)continue;s+=`<line class="gr" x1="${X(v)}" y1="${pad/2}" x2="${X(v)}" y2="${S-pad/2}"/><line class="gr" x1="${pad/2}" y1="${Y(v)}" x2="${S-pad/2}" y2="${Y(v)}"/><text x="${X(v)}" y="${C+12}" text-anchor="middle">${String(v).replace("-","−")}</text><text x="${C-4}" y="${Y(v)+4}" text-anchor="end">${v===1?"i":v===-1?"−i":String(v).replace("-","−")+"i"}</text>`}
+ s+=`<line class="ax" x1="${pad/2}" y1="${C}" x2="${S-pad/2}" y2="${C}"/><line class="ax" x1="${C}" y1="${pad/2}" x2="${C}" y2="${S-pad/2}"/>`;
+ if(o.circle)s+=`<circle class="pe" cx="${C}" cy="${C}" r="${(o.circleR||1)/R*(C-pad)}" style="stroke-dasharray:3 3"/>`;
+ if(o.poly){s+=`<polyline class="vec" fill="none" points="${o.poly.map(p=>X(p[0]).toFixed(1)+","+Y(p[1]).toFixed(1)).join(" ")}${o.closed?" "+X(o.poly[0][0]).toFixed(1)+","+Y(o.poly[0][1]).toFixed(1):""}"/>`}
+ (o.links||[]).forEach(l=>{s+=`<line class="dsh" x1="${X(l[0])}" y1="${Y(l[1])}" x2="${X(l[2])}" y2="${Y(l[3])}"/>`});
+ (o.vecs||[]).forEach(l=>{s+=`<line class="vec" x1="${X(0)}" y1="${Y(0)}" x2="${X(l[0])}" y2="${Y(l[1])}"/>`});
+ if(o.arc){const r=o.arc.r/R*(C-pad),th=o.arc.th,x2=C+r*Math.cos(th),y2=C-r*Math.sin(th);s+=`<path class="vec" fill="none" d="M ${C+r} ${C} A ${r} ${r} 0 ${Math.abs(th)>Math.PI?1:0} ${th>0?0:1} ${x2.toFixed(1)} ${y2.toFixed(1)}"/><text x="${C+r+4}" y="${C-4}">θ</text>`}
+ (o.pts||[]).forEach(p=>{s+=`<circle class="${p.hl?"pt":"pk"}" cx="${X(p.re)}" cy="${Y(p.im)}" r="5.5"/>`;if(p.m>1)s+=`<circle class="pe" cx="${X(p.re)}" cy="${Y(p.im)}" r="9"/>`;
+  s+=`<text x="${X(p.re)+9}" y="${Y(p.im)-8}">${p.label}${p.m>1?" (×"+p.m+")":""}</text>`});
+ return s+"</svg>"}
+const lines=(arr,k)=>`<div class="lines">`+arr.map((l,i)=>`<div class="${i===k?"new":""}">${l}</div>`).join("")+`</div>`;
+const stdP=F;
+
+/* =================== scènes : nombres complexes =================== */
+const SC=[];
+/* complexes rationnels exacts */
+const Zc=(re,im=0)=>({re:typeof re==="number"?F(re):re,im:typeof im==="number"?F(im):im});
+const zadd=(a,b)=>({re:add(a.re,b.re),im:add(a.im,b.im)}),zsub=(a,b)=>({re:sub(a.re,b.re),im:sub(a.im,b.im)});
+const zmul=(a,b)=>({re:sub(mul(a.re,b.re),mul(a.im,b.im)),im:add(mul(a.re,b.im),mul(a.im,b.re))});
+const zconj=a=>({re:a.re,im:mul(a.im,F(-1))});
+const zn2=a=>add(mul(a.re,a.re),mul(a.im,a.im));
+const zdiv=(a,b)=>{const d=zn2(b),n=zmul(a,zconj(b));return{re:dv(n.re,d),im:dv(n.im,d)}};
+const zeq=(a,b)=>isz(sub(a.re,b.re))&&isz(sub(a.im,b.im));
+const fr=x=>fs(x);
+function imS(y){const ab=F(Math.abs(y.n),y.d);if(ab.d===1)return ab.n===1?"i":ab.n+"i";return (ab.n===1?"i":ab.n+"i")+"/"+ab.d}
+function zstr(z){const a=!isz(z.re),b=!isz(z.im);if(!a&&!b)return"0";if(!b)return fr(z.re);if(!a)return (z.im.n<0?"−":"")+imS(z.im);return fr(z.re)+(z.im.n<0?" − ":" + ")+imS(z.im)}
+function zs(z){const s=zstr(z);return (a=>a)(s)}
+const zp=z=>{const s=zstr(z);return (!isz(z.re)&&!isz(z.im))||z.re.d!==1?"("+s+")":(z.re.n<0||(isz(z.re)&&z.im.n<0)?"("+s+")":s)};
+const ipow=(z,n)=>{let r=Zc(1);for(let i=0;i<n;i++)r=zmul(r,z);return r};
+const piS=q=>{if(q.n===0)return"0";const neg=q.n<0,n=Math.abs(q.n);return (neg?"−":"")+(n===1?"":n)+"π"+(q.d===1?"":"/"+q.d)};
+const C_=(n,k)=>{let r=1;for(let i=1;i<=k;i++)r=r*(n-k+i)/i;return Math.round(r)};
+const cpl=(o)=>`<div class="stage">${planeSvg(o)}</div>`;
+const NL=s=>s.replace(/-(?=\d)/g,"−");
+
+/* graphe à échelles libres */
+function g2(o){const W=o.W||360,H=o.H||o.W||320,pl=34,pr=14,pt=12,pb=26;const {xmin,xmax,ymin,ymax}=o;
+ const X=x=>pl+(x-xmin)/(xmax-xmin)*(W-pl-pr),Y=y=>pt+(ymax-y)/(ymax-ymin)*(H-pt-pb);
+ let s=`<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="${o.label||"graphe"}">`;
+ const tx=o.tx||niceTicks(xmin,xmax).map(v=>({v,l:String(+v.toFixed(2)).replace("-","−")})),ty=o.ty||niceTicks(ymin,ymax).map(v=>({v,l:String(+v.toFixed(2)).replace("-","−")}));
+ tx.forEach(t=>{s+=`<line class="gr" x1="${X(t.v)}" y1="${pt}" x2="${X(t.v)}" y2="${H-pb}"/><text x="${X(t.v)}" y="${H-pb+14}" text-anchor="middle">${t.l}</text>`});
+ ty.forEach(t=>{s+=`<line class="gr" x1="${pl}" y1="${Y(t.v)}" x2="${W-pr}" y2="${Y(t.v)}"/><text x="${pl-4}" y="${Y(t.v)+4}" text-anchor="end">${t.l}</text>`});
+ if(ymin<0&&ymax>0)s+=`<line class="ax" x1="${pl}" y1="${Y(0)}" x2="${W-pr}" y2="${Y(0)}"/>`;
+ if(xmin<0&&xmax>0)s+=`<line class="ax" x1="${X(0)}" y1="${pt}" x2="${X(0)}" y2="${H-pb}"/>`;
+ (o.fills||[]).forEach(fl=>{const n=80;let d=`M ${X(fl.a)} ${Y(0)} `;for(let i=0;i<=n;i++){const x=fl.a+(fl.b-fl.a)*i/n;d+=`L ${X(x).toFixed(1)} ${Y(Math.max(ymin,Math.min(ymax,fl.f(x)))).toFixed(1)} `}d+=`L ${X(fl.b)} ${Y(0)} Z`;s+=`<path class="${fl.cls||"fillp"}" d="${d}"/>`});
+ (o.rects||[]).forEach(r=>{const y0=Y(0),y1=Y(r.y);s+=`<rect class="${r.cls||"rect"}" x="${X(r.x0).toFixed(1)}" y="${Math.min(y0,y1).toFixed(1)}" width="${(X(r.x1)-X(r.x0)).toFixed(1)}" height="${Math.abs(y0-y1).toFixed(1)}"/>`});
+ (o.lines||[]).forEach(l=>{s+=`<line class="${l.cls||"dsh"}" x1="${X(l.p[0])}" y1="${Y(l.p[1])}" x2="${X(l.q[0])}" y2="${Y(l.q[1])}"/>`;if(l.l)s+=`<text x="${X(l.q[0])-4}" y="${Y(l.q[1])-5}" text-anchor="end">${l.l}</text>`});
+ (o.curves||[]).forEach(c=>{const a=Math.max(c.dom?c.dom[0]:xmin,xmin),b=Math.min(c.dom?c.dom[1]:xmax,xmax);let d="",pen=false;const N=300;
+  for(let i=0;i<=N;i++){const x=a+(b-a)*i/N,y=c.f(x);if(!isFinite(y)||y<ymin-1e-9||y>ymax+1e-9){pen=false;continue}d+=(pen?"L":"M")+X(x).toFixed(1)+" "+Y(y).toFixed(1)+" ";pen=true}
+  s+=`<path class="${c.cls||"cv"}" d="${d}"/>`});
+ (o.pts||[]).forEach(p=>{s+=`<circle class="${p.cls||"pt"}" cx="${X(p.x)}" cy="${Y(p.y)}" r="5"/>`;if(p.l)s+=`<text x="${X(p.x)+7}" y="${Y(p.y)-7}">${p.l}</text>`});
+ return `<div class="stage">${s}</svg></div>`}
+const PIT=(lo,hi,step)=>{const r=[];for(let k=Math.ceil(lo/step-1e-9);k*step<=hi+1e-9;k++){const v=k*step;const n=Math.round(v/(Math.PI/2));const l=n===0?"0":(n%2===0?(n/2===1?"π":n/2===-1?"-π":n/2+"π"):(n===1?"":n===-1?"−":n)+"π/2");r.push({v,l:l.replace(/^-/,"−")})}return r};
+const tang=(x,y,m,len)=>{const n=Math.hypot(1,m),dx=len/n,dy=len*m/n;return{p:[x-dx,y-dy],q:[x+dx,y+dy],cls:"tg"}};
+const PI=Math.PI;
+/* =================== scènes : équations différentielles =================== */
+const fmt=n=>{let s=(Math.abs(n)<1e-3&&n!==0)?n.toExponential(3):(+n.toPrecision(6))+"";s=s.replace(/e([+-]?)(\d+)/,(m,g,d)=>"×10"+(g==="-"?"⁻":"")+sup(+d));return s.replace(".",",").replace("-","−")};
+const d1=(f,x)=>(f(x+1e-5)-f(x-1e-5))/2e-5;
+const d2=(f,x)=>{const h=1e-3;return (f(x+h)-2*f(x)+f(x-h))/(h*h)};
+const GW={W:340,H:250};
+
+/* ===== bibliothèque : TeX explicite et algèbre linéaire exacte ===== */
+const T=s=>"⟦"+s+"⟧", TD=s=>"⟦⟦"+s+"⟧⟧";
+const tf=x=>{if(typeof x==="number")x=F(x);return x.d===1?String(x.n):(x.n<0?"-":"")+"\\frac{"+Math.abs(x.n)+"}{"+x.d+"}"};
+const tfp=x=>{if(typeof x==="number")x=F(x);return x.n<0?"("+tf(x)+")":tf(x)};
+const tcoef=(x,v)=>{/* x·v pour l'écriture d'un terme (v = "x", "\\lambda_1"...) ; 1 et -1 simplifiés */if(typeof x==="number")x=F(x);if(x.n===0)return"0";if(x.d===1&&x.n===1)return v;if(x.d===1&&x.n===-1)return"-"+v;return tf(x)+v};
+const mat=M=>"\\begin{pmatrix}"+M.map(r=>r.map(tf).join("&")).join("\\\\")+"\\end{pmatrix}";
+const vcol=v=>"\\begin{pmatrix}"+v.map(tf).join("\\\\")+"\\end{pmatrix}";
+const vrow=v=>"\\begin{pmatrix}"+v.map(tf).join("\\\\")+"\\end{pmatrix}";
+const matAug=(M,k)=>{const n=M[0].length;return "\\left(\\begin{array}{"+"c".repeat(n-k)+"|"+"c".repeat(k)+"}"+M.map(r=>r.map(tf).join("&")).join("\\\\")+"\\end{array}\\right)"};
+const FM=M=>M.map(r=>r.map(x=>typeof x==="number"?F(x):x));
+const FV=v=>v.map(x=>typeof x==="number"?F(x):x);
+const mT=M=>M[0].map((_,j)=>M.map(r=>r[j]));
+const mmul=(A,B)=>A.map(r=>B[0].map((_,j)=>r.reduce((s,a,k)=>add(s,mul(a,B[k][j])),F(0))));
+const madd=(A,B)=>A.map((r,i)=>r.map((a,j)=>add(a,B[i][j])));
+const msc=(A,c)=>A.map(r=>r.map(a=>mul(a,c)));
+const mI=n=>Array.from({length:n},(_,i)=>Array.from({length:n},(_,j)=>F(i===j?1:0)));
+const dotF=(u,v)=>u.reduce((s,a,i)=>add(s,mul(a,v[i])),F(0));
+const crossF=(u,v)=>[sub(mul(u[1],v[2]),mul(u[2],v[1])),sub(mul(u[2],v[0]),mul(u[0],v[2])),sub(mul(u[0],v[1]),mul(u[1],v[0]))];
+function detF(M){const n=M.length;if(n===1)return M[0][0];if(n===2)return sub(mul(M[0][0],M[1][1]),mul(M[0][1],M[1][0]));let s=F(0);for(let j=0;j<n;j++){const m=M.slice(1).map(r=>r.filter((_,k)=>k!==j));const t=mul(M[0][j],detF(m));s=(j%2)?sub(s,t):add(s,t)}return s}
+const minorF=(M,i,j)=>detF(M.filter((_,r)=>r!==i).map(r=>r.filter((_,k)=>k!==j)));
+/* opération sur les lignes, notation L_i */
+const opTex=(i,j,c)=>{/* L_i <- L_i - c L_j */const s=c.n<0?"+":"-";const a=F(Math.abs(c.n),c.d);return "L_{"+(i+1)+"}\\leftarrow L_{"+(i+1)+"}"+s+(a.n===1&&a.d===1?"":tf(a))+"L_{"+(j+1)+"}"};
+/* Gauss-Jordan avec historique ; k = nombre de colonnes du second membre (pour la barre) ; renvoie {steps, M, pivots} */
+function gaussJordan(M0,opts={}){const M=M0.map(r=>r.slice());const m=M.length,n=M[0].length-(opts.aug||0);const steps=[{M:M.map(r=>r.slice()),op:null}];const piv=[];let r=0;
+ for(let c=0;c<n&&r<m;c++){let p=-1;for(let i=r;i<m;i++)if(!isz(M[i][c])){p=i;break}if(p<0)continue;
+  if(p!==r){[M[p],M[r]]=[M[r],M[p]];steps.push({M:M.map(x=>x.slice()),op:"L_{"+(r+1)+"}\\leftrightarrow L_{"+(p+1)+"}"})}
+  if(!(M[r][c].n===1&&M[r][c].d===1)){const q=M[r][c];M[r]=M[r].map(x=>dv(x,q));steps.push({M:M.map(x=>x.slice()),op:"L_{"+(r+1)+"}\\leftarrow "+(q.n<0?"-":"")+(q.d===1?"\\frac{1}{"+Math.abs(q.n)+"}":"\\frac{"+q.d+"}{"+Math.abs(q.n)+"}")+"L_{"+(r+1)+"}"})}
+  for(let i=0;i<m;i++){if(i===r||isz(M[i][c]))continue;const q=M[i][c];M[i]=M[i].map((x,j)=>sub(x,mul(q,M[r][j])));steps.push({M:M.map(x=>x.slice()),op:opTex(i,r,q)})}
+  piv.push(c);r++}
+ return{steps,M,pivots:piv}}
+/* base du noyau de M (matrice de coefficients, sans second membre) */
+function nullBasis(M){const g=gaussJordan(M);const n=M[0].length,free=[];for(let c=0;c<n;c++)if(!g.pivots.includes(c))free.push(c);
+ return free.map(f=>{const v=Array.from({length:n},()=>F(0));v[f]=F(1);g.pivots.forEach((pc,i)=>{v[pc]=mul(g.M[i][f],F(-1))});return v})}
+const eqLine=(coefs,names)=>{let o="";coefs.forEach((c,i)=>{if(isz(c))return;const a=F(Math.abs(c.n),c.d);const neg=c.n<0;const t=(a.n===1&&a.d===1?"":tf(a))+names[i];o+=(o===""?(neg?"-":""):(neg?"-":"+"))+t});return o||"0"};
+/* ligne d'un tableau de lignes : pointeur sur la dernière */
+const gaussBoard=(steps,k,aug)=>{return steps.map((s,i)=>TD((aug?matAug(s.M,aug):mat(s.M))+(s.op?"\\quad\\small\\left[\\,"+s.op+"\\,\\right]":""))).slice(0,k+1)};
+const pickNice=(arr)=>arr;
+
+/* aides déterminants */
+const DM=M=>"\\begin{vmatrix}"+M.map(r=>r.map(tf).join("&")).join("\\\\")+"\\end{vmatrix}";
+const minM=(M,i,j)=>M.filter((_,r)=>r!==i).map(r=>r.filter((_,k)=>k!==j));
+const ck=(a,b,msg)=>{if(a.n!==b.n||a.d!==b.d)throw new Error("verif "+msg+" "+tf(a)+" "+tf(b))};
+const sg=c=>c.n<0?"-":"+";
+const absF=c=>F(Math.abs(c.n),c.d);
+/* terme "± a DM" : a=1 omis */
+const termTex=(c,body)=>{const a=absF(c);return (a.n===1&&a.d===1?"":tf(a)+"\\,")+body};
+const sumTex=(parts)=>parts.map((p,i)=>(i===0?(p.c.n<0?"-":""):sg(p.c))+termTex(p.c,p.b)).join(" ");
+
+
+const tn=x=>String(+x.toFixed(4)).replace(".","{,}");
+
+const near=(a,b,msg,tol=1e-3)=>{if(!(Math.abs(a-b)<=tol*Math.max(1,Math.abs(a),Math.abs(b))))throw new Error("verif "+msg+" "+a+" "+b)};
+
+/* courbes paramétrées : g2 + tracés (X(t),Y(t)) */
+const gpar=o=>{const W=o.W||340;let H=o.H||o.W||320;const pl=34,pr=14,pt=12,pb=26;const {xmin,xmax,ymin,ymax}=o;if(o.eq)H=Math.round(38+(W-48)*(ymax-ymin)/(xmax-xmin));
+ const X=x=>pl+(x-xmin)/(xmax-xmin)*(W-pl-pr),Y=y=>pt+(ymax-y)/(ymax-ymin)*(H-pt-pb);let s="";
+ (o.par||[]).forEach(c=>{let d="",pen=false;const N=c.N||1500;for(let i=0;i<=N;i++){const t=c.t0+(c.t1-c.t0)*i/N,x=c.X(t),y=c.Y(t);if(!isFinite(x)||!isFinite(y)||x<xmin-1e-9||x>xmax+1e-9||y<ymin-1e-9||y>ymax+1e-9){pen=false;continue}d+=(pen?"L":"M")+X(x).toFixed(1)+" "+Y(y).toFixed(1)+" ";pen=true}s+=`<path class="${c.cls||"cv"}" d="${d}"/>`});
+ return g2({...o,W,H}).replace("</svg>",s+"</svg>")};
+
+const simp=(f,a,b,n=400)=>{const h=(b-a)/n;let s=f(a)+f(b);for(let i=1;i<n;i++)s+=f(a+i*h)*(i%2?4:2);return s*h/3};
+
+/* comatrice en 4 étapes : (0 déterminant fait avant) 1 signes, 2 cofacteurs, 3 transposée, 4 division, puis vérification */
+function comatSteps(A,st){const n=A.length,d=detF(A);const C=A.map((r,i)=>r.map((_,j)=>mul(F((i+j)%2?-1:1),minorF(A,i,j))));
+ const sg=Array.from({length:n},(_,i)=>Array.from({length:n},(_,j)=>(i+j)%2?"-":"+"));
+ const sgT="\\begin{pmatrix}"+sg.map(r=>r.join("&")).join("\\\\")+"\\end{pmatrix}";
+ st.push({say:`<b>Étape 1 : les signes.</b> Chaque cofacteur porte le signe ${T("(-1)^{i+j}")} : on écrit le <b>damier</b> des ${T("+")} et des ${T("-")}, en commençant par ${T("+")} en haut à gauche.`,board:lines([TD("A="+mat(A)),TD(sgT)],1)});
+ if(n===2){
+  st.push({say:`<b>Étape 2 : les cofacteurs.</b> En taille ${T("2\\times2")}, le sous-déterminant d'un coefficient est le coefficient opposé en diagonale.`,board:lines([0,1].flatMap(i=>[0,1].map(j=>TD("C_{"+(i+1)+","+(j+1)+"}="+sg[i][j]+"\\,"+DM(minM(A,i,j))+"="+tf(C[i][j])))),3)});
+ }else{
+  for(let i=0;i<n;i++)st.push({say:`<b>Étape 2 : les cofacteurs</b>, ligne ${i+1}. On barre la ligne ${T(String(i+1))} et la colonne ${T("j")} de ${T("A")}, on calcule le sous-déterminant ${T("2\\times2")}, et on le multiplie par le signe du damier.`,board:lines(Array.from({length:n},(_,j)=>TD("C_{"+(i+1)+","+(j+1)+"}="+sg[i][j]+"\\,"+DM(minM(A,i,j))+"="+tf(C[i][j]))),n-1)});}
+ st.push({say:`On range les cofacteurs à leur place : c'est la <b>comatrice</b> ${T("\\mathrm{Com}(A)")}.`,board:lines([TD("\\mathrm{Com}(A)="+mat(C))],0)});
+ st.push({say:`<b>Étape 3 : on transpose</b> : les lignes deviennent les colonnes. C'est l'étape qu'on oublie le plus souvent.`,board:lines([TD("\\mathrm{Com}(A)^t="+mat(mT(C)))],0)});
+ const Ct=mT(C),B=msc(Ct,dv(F(1),d));
+ st.push({say:`<b>Étape 4 : on divise par ${T("\\det A="+tf(d))}</b>.`,board:lines([TD("A^{-1}=\\frac{1}{"+tfp(d)+"}"+mat(Ct)),TD("A^{-1}="+mat(B))],1)});
+ const P=mmul(A,B);P.forEach((r,i)=>r.forEach((x,j)=>{if(x.n!==(i===j?1:0)||x.d!==1)throw new Error("comat")}));
+ st.push({say:`<b>Vérification :</b> ${T("AA^{-1}")} doit donner ${T("I_"+n)}.`,board:`<div class="res">${TD("AA^{-1}="+mat(P)+"=I_"+n)}</div>`});
+ return B}
+
+/* ================= H : courbes paramétrées et polaires ================= */
+const vc2=(a,b)=>"\\begin{pmatrix}"+a+"\\\\"+b+"\\end{pmatrix}";
+const nz=v=>v[0]!==0||v[1]!==0;
+/* H1 : points stationnaires */
+const STA=[
+ {n:"Cycloïde x = t − sin t, y = 1 − cos t",X:t=>t-Math.sin(t),Y:t=>1-Math.cos(t),xt:"t-\\sin t",yt:"1-\\cos t",dxt:"1-\\cos t",dyt:"\\sin t",D:[null,[0,0],[0,1],[1,0],[0,-1],[-1,0]],ders:{2:"\\begin{pmatrix}\\sin 0\\\\\\cos 0\\end{pmatrix}",3:"\\begin{pmatrix}\\cos 0\\\\-\\sin 0\\end{pmatrix}"},T:[-2.5,2.5],win:{xmin:-2.2,xmax:2.2,ymin:-0.2,ymax:2.2,eq:1}},
+ {n:"x = t², y = t³",X:t=>t*t,Y:t=>t**3,xt:"t^2",yt:"t^3",dxt:"2t",dyt:"3t^2",D:[null,[0,0],[2,0],[0,6],[0,0],[0,0]],T:[-1.3,1.3],win:{xmin:-0.3,xmax:2,ymin:-2.4,ymax:2.4,H:270}},
+ {n:"x = t³, y = t⁴",X:t=>t**3,Y:t=>t**4,xt:"t^3",yt:"t^4",dxt:"3t^2",dyt:"4t^3",D:[null,[0,0],[0,0],[6,0],[0,24],[0,0]],T:[-1.2,1.2],win:{xmin:-2,xmax:2,ymin:-0.2,ymax:2.2,eq:1}},
+ {n:"x = t³, y = t⁵",X:t=>t**3,Y:t=>t**5,xt:"t^3",yt:"t^5",dxt:"3t^2",dyt:"5t^4",D:[null,[0,0],[0,0],[6,0],[0,0],[0,120]],T:[-1.1,1.1],win:{xmin:-2,xmax:2,ymin:-2,ymax:2,eq:1}},
+ {n:"x = t², y = t⁴ + t⁵",X:t=>t*t,Y:t=>t**4+t**5,xt:"t^2",yt:"t^4+t^5",dxt:"2t",dyt:"4t^3+5t^4",D:[null,[0,0],[2,0],[0,0],[0,24],[0,120]],T:[-1.1,1.1],win:{xmin:-0.2,xmax:1.4,ymin:-0.5,ymax:3.2,H:260}}];
+SC.push({id:"stat",title:"Point stationnaire : tangente et nature",ref:"Cours : on cherche "+T("p")+" (tangente) et "+T("q")+" (non colinéaire), puis on regarde leur parité.",
+ params:[{id:"c",label:"Courbe, au point t = 0",type:"select",options:STA.map((a,i)=>[String(i),a.n])}],
+ build(v){const o=STA[+v.c],st=[];const D=o.D;
+  [0.05,-0.05].forEach(h=>{const sx=D.reduce((s,d,k)=>d?s+d[0]*Math.pow(h,k)/[1,1,2,6,24,120][k]:s,0),sy=D.reduce((s,d,k)=>d?s+d[1]*Math.pow(h,k)/[1,1,2,6,24,120][k]:s,0);near(sx,o.X(h),"stat x",1e-6);near(sy,o.Y(h),"stat y",1e-6)});
+  let p=0,q=0;for(let k=1;k<=5;k++){if(!p&&nz(D[k])){p=k}else if(p&&!q&&D[p][0]*D[k][1]-D[p][1]*D[k][0]!==0){q=k}}
+  const W={...o.win,W:300,par:[{X:o.X,Y:o.Y,t0:o.T[0],t1:o.T[1],cls:"cv"}]};
+  st.push({say:`On étudie la courbe ${T("x="+o.xt+",\\ y="+o.yt)} au point ${T("t_0=0")}. <b>Étape 1</b> : on calcule ${T("x'")} et ${T("y'")}.`,board:gpar(W)+lines([TD("x'(t)="+o.dxt+",\\qquad y'(t)="+o.dyt)],0)});
+  st.push({say:`En ${T("t_0=0")} : ${T("x'(0)=0")} et ${T("y'(0)=0")}. Le point est <b>stationnaire</b>. On ne peut pas parler de la pente ${T("\\frac{y'}{x'}")} (c'est ${T("\\frac00")}) : il faut dériver davantage.`,board:lines([TD("F'(0)="+vc2("0","0")+"=\\vec0")],0)});
+  const rows=[];for(let k=2;k<=q;k++)rows.push(TD("F^{("+k+")}(0)="+vc2(D[k][0],D[k][1])+(k===p?"\\ \\ \\leftarrow\\ p="+p:"")+(k===q?"\\ \\ \\leftarrow\\ q="+q:"")));
+  st.push({say:`<b>Étape 2</b> : on dérive jusqu'à obtenir un vecteur non nul : c'est ${T("p="+p)}, et ${T("F^{("+p+")}(0)")} <b>dirige la tangente</b>. Puis on cherche le premier ordre ${T("q>p")} où ${T("F^{(q)}(0)")} n'est <b>pas colinéaire</b> à ${T("F^{("+p+")}(0)")} : ici ${T("q="+q)} (déterminant non nul).`,board:lines(rows,rows.length-1)});
+  const pp=p%2?"impair":"pair",qq=q%2?"impair":"pair";
+  const concl=(p%2&&!(q%2))?"point ordinaire (la courbe est lisse)":(p%2&&q%2)?"point d'inflexion (la courbe traverse sa tangente)":(!(p%2)&&q%2)?"rebroussement de 1re espèce":"rebroussement de 2e espèce";
+  const dir=D[p],m=dir[0]===0?null:dir[1]/dir[0];
+  const tl=m===null?{p:[0,-1.5],q:[0,1.5],cls:"tg"}:tang(0,0,m,1.6);
+  st.push({say:`<b>Étape 3</b> : ${T("p="+p)} est ${pp} et ${T("q="+q)} est ${qq} : <b>${concl}</b>. La tangente est dirigée par ${T("F^{("+p+")}(0)="+vc2(D[p][0],D[p][1]))}, c'est-à-dire ${m===null?"verticale":"horizontale"}.`,board:gpar({...W,lines:[tl],pts:[{x:0,y:0,cls:"pt"}]})+`<div class="res">${T("p="+p+",\\ q="+q)} : ${concl}</div>`});
+  return st}});
+
+/* H2 : branches infinies */
+const ASY=[
+ {n:"x = eᵗ/(t+1), y = t·eᵗ/(t+1), t → −1",X:t=>Math.exp(t)/(t+1),Y:t=>t*Math.exp(t)/(t+1),xt:"\\frac{e^t}{t+1}",yt:"\\frac{te^t}{t+1}",t0:"-1",ratio:"\\frac yx=t\\to-1",a:-1,at:"-1",diff:"y+x=e^t\\to e^{-1}=\\frac1e",bt:"\\frac1e",b:Math.exp(-1),eq:"y=-x+\\frac1e",tr:[[-8,-1.03],[-0.97,3]],win:{xmin:-6,xmax:6,ymin:-6,ymax:6},ln:[[-5.6,Math.exp(-1)+5.6],[6,Math.exp(-1)-6]]},
+ {n:"x = (2t−1)/(t²−1), y = t²/(t−1), t → 1",X:t=>(2*t-1)/(t*t-1),Y:t=>t*t/(t-1),xt:"\\frac{2t-1}{t^2-1}",yt:"\\frac{t^2}{t-1}",t0:"1",ratio:"\\frac yx=\\frac{t^2(t+1)}{2t-1}\\to2",a:2,at:"2",diff:"y-2x=\\frac{t^2+2t-2}{t+1}\\to\\frac12",bt:"\\frac12",b:0.5,eq:"y=2x+\\frac12",tr:[[-10,-1.03],[-0.97,0.97],[1.03,10]],win:{xmin:-6,xmax:6,ymin:-6,ymax:6},ln:[[-3.25,-6],[2.75,6]]}];
+SC.push({id:"asy",title:"Asymptote d'une courbe paramétrée",ref:"Cours : "+T("x,y\\to\\pm\\infty")+", on regarde "+T("\\lim\\frac yx")+" puis "+T("\\lim(y-ax)")+".",
+ params:[{id:"c",label:"Courbe",type:"select",options:ASY.map((a,i)=>[String(i),a.n])}],
+ build(v){const o=ASY[+v.c],st=[];
+  const t0=+o.t0,d=1e-6;[d,-d].forEach(s=>{const t=t0+s;const x=o.X(t),y=o.Y(t);near(y/x,o.a,"asy a",1e-4);near(y-o.a*x,o.b,"asy b",1e-4)});
+  const W={...o.win,W:300,eq:1,par:o.tr.map(r=>({X:o.X,Y:o.Y,t0:r[0],t1:r[1],cls:"cv"}))};
+  st.push({say:`On étudie ${T("x="+o.xt)}, ${T("y="+o.yt)} quand ${T("t\\to"+o.t0)}. Le dénominateur s'annule : ${T("x")} et ${T("y")} tendent tous les deux vers ${T("\\pm\\infty")}. On regarde donc le rapport ${T("\\frac yx")}.`,board:gpar(W)+lines([T("t\\to"+o.t0+"\\ :\\ x\\to\\pm\\infty,\\ y\\to\\pm\\infty")],0)});
+  st.push({say:`Après simplification, ${T(o.ratio)}. La limite est un réel non nul ${T("a="+o.at)} : on peut chercher une asymptote oblique, et on calcule ${T("\\lim(y-ax)")}.`,board:lines([TD(o.ratio)],0)});
+  st.push({say:`Attention : ${T("y-ax")} est une forme indéterminée ${T("\\infty-\\infty")}. On <b>factorise</b> pour simplifier avant de passer à la limite.`,board:lines([TD(o.diff)],0)});
+  st.push({say:`La limite ${T("b")} est <b>finie</b> : la droite ${T(o.eq)} est <b>asymptote oblique</b> (si la limite avait été infinie, on aurait seulement une branche parabolique).`,board:gpar({...W,lines:[{p:o.ln[0],q:o.ln[1],cls:"dsh"}]})+`<div class="res">${T(o.eq)}</div>`});
+  return st}});
+
+/* H3 : symétries et réduction du domaine d'étude */
+const SYM=[
+ {n:"x = t − 1/t, y = t²",X:t=>t-1/t,Y:t=>t*t,xt:"t-\\frac1t",yt:"t^2",dom:"\\mathbb R^*",ch:[["x(-t)=-t+\\frac1t=-x(t)","y(-t)=t^2=y(t)"]],axe:"(Oy)",red:"]0,+\\infty[",full:[[-3.2,-0.2],[0.2,3.2]],part:[[0.2,3.2]],win:{xmin:-5,xmax:5,ymin:-0.5,ymax:10,H:260}},
+ {n:"x = 2 sin 2t, y = 2 sin 3t",X:t=>2*Math.sin(2*t),Y:t=>2*Math.sin(3*t),xt:"2\\sin2t",yt:"2\\sin3t",dom:"\\mathbb R",per:"2\\pi",ch:[["x(-t)=-x(t)","y(-t)=-y(t)"],["x(\\pi-t)=-x(t)","y(\\pi-t)=y(t)"]],axe:"O,\\ (Oy)",red:"[0,\\tfrac\\pi2]",full:[[0,2*Math.PI]],part:[[0,Math.PI/2]],win:{xmin:-2.4,xmax:2.4,ymin:-2.4,ymax:2.4,eq:1}}];
+SC.push({id:"sym",title:"Symétries et domaine d'étude",ref:"Cours : plan d'étude ; "+T("t\\to-t")+" donne les symétries, et on réduit l'intervalle d'étude.",
+ params:[{id:"c",label:"Courbe",type:"select",options:SYM.map((a,i)=>[String(i),a.n])}],
+ build(v){const k=+v.c,o=SYM[k],st=[];
+  const W={...o.win,W:300,par:o.full.map(r=>({X:o.X,Y:o.Y,t0:r[0],t1:r[1],cls:"cv3"}))};
+  st.push({say:`On étudie ${T("x="+o.xt)}, ${T("y="+o.yt)}. <b>Étape 1</b> : le domaine de définition est ${T(o.dom)}.`+(o.per?` Les deux fonctions sont ${T("2\\pi")}-périodiques : on étudie sur un intervalle de longueur ${T("2\\pi")}.`:""),board:lines([TD("x(t)="+o.xt+",\\quad y(t)="+o.yt)],0)});
+  if(k===0){
+   [0.7,1.9].forEach(t=>{near(o.X(-t),-o.X(t),"sym x");near(o.Y(-t),o.Y(t),"sym y")});
+   st.push({say:`<b>Étape 2</b> : on remplace ${T("t")} par ${T("-t")}. On obtient ${T("(x(-t),y(-t))=(-x(t),\\ y(t))")} : le point d'abscisse ${T("-x")} et de même ordonnée. C'est le <b>symétrique</b> du point de paramètre ${T("t")} par rapport à l'axe ${T("(Oy)")}.`,board:lines([TD("x(-t)=-t+\\frac1t=-x(t)"),TD("y(-t)=t^2=y(t)")],1)});
+   st.push({say:`On étudie donc sur ${T("]0,+\\infty[")} seulement, et on complète par la symétrie d'axe ${T("(Oy)")} : on divise le travail par deux.`,board:gpar({...W,par:[{X:o.X,Y:o.Y,t0:0.2,t1:3.2,cls:"cv"},{X:o.X,Y:o.Y,t0:-3.2,t1:-0.2,cls:"cv3"}]})+`<div class="res">On étudie sur ${T(o.red)}</div>`});
+  }else{
+   [0.4,1.1].forEach(t=>{near(o.X(-t),-o.X(t),"sym1 x");near(o.Y(-t),-o.Y(t),"sym1 y");near(o.X(Math.PI-t),-o.X(t),"sym2 x");near(o.Y(Math.PI-t),o.Y(t),"sym2 y")});
+   st.push({say:`<b>Étape 2</b> : ${T("t\\to-t")} donne ${T("(x,y)\\to(-x,-y)")} : la courbe est symétrique par rapport à l'<b>origine ${T("O")}</b>. On étudie donc sur ${T("[0,\\pi]")}.`,board:lines([TD("x(-t)=-x(t),\\quad y(-t)=-y(t)"),"Centre de symétrie : "+T("O")],1)});
+   st.push({say:`Autre transformation : ${T("t\\to\\pi-t")} donne ${T("(x,y)\\to(-x,y)")} : symétrie d'<b>axe ${T("(Oy)")}</b>. Elle échange ${T("[0,\\frac\\pi2]")} et ${T("[\\frac\\pi2,\\pi]")}.`,board:lines([TD("x(\\pi-t)=2\\sin(2\\pi-2t)=-x(t)"),TD("y(\\pi-t)=2\\sin(3\\pi-3t)=y(t)")],1)});
+   st.push({say:`On étudie finalement sur ${T("[0,\\frac\\pi2]")} (en trait plein) et on complète avec les deux symétries : la courbe entière est en pointillé.`,board:gpar({...W,par:[{X:o.X,Y:o.Y,t0:0,t1:2*Math.PI,cls:"cv3"},{X:o.X,Y:o.Y,t0:0,t1:Math.PI/2,cls:"cv"}]})+`<div class="res">On étudie sur ${T(o.red)}</div>`});}
+  return st}});
+
+/* J1 : polaires, domaine et symétries */
+const PD=[
+ {n:"ρ = sin θ / (1 + 2 cos θ)",r:t=>Math.sin(t)/(1+2*Math.cos(t)),rt:"\\frac{\\sin\\theta}{1+2\\cos\\theta}",dom:"\\mathbb R\\setminus\\left\\{\\pm\\frac{2\\pi}{3}+2k\\pi\\right\\}",per:"2\\pi",sym:"\\rho(-\\theta)=-\\rho(\\theta)",axe:"(Oy)",red:"[0,\\frac{2\\pi}{3}[\\,\\cup\\,]\\frac{2\\pi}{3},\\pi]",why:"\\rho(-\\theta)=\\frac{-\\sin\\theta}{1+2\\cos\\theta}=-\\rho(\\theta)",odd:true,part:[[0,2*Math.PI/3-0.03],[2*Math.PI/3+0.03,Math.PI]],all:[[-Math.PI,-2*Math.PI/3-0.03],[-2*Math.PI/3+0.03,2*Math.PI/3-0.03],[2*Math.PI/3+0.03,Math.PI]],win:{xmin:-3,xmax:3,ymin:-3,ymax:3}},
+ {n:"ρ = 1 / (4 + cos 3θ)",r:t=>1/(4+Math.cos(3*t)),rt:"\\frac{1}{4+\\cos3\\theta}",dom:"\\mathbb R",per:"\\frac{2\\pi}{3}",sym:"\\rho(-\\theta)=\\rho(\\theta)",axe:"(Ox)",red:"[0,\\frac\\pi3]",why:"\\rho(-\\theta)=\\frac{1}{4+\\cos(-3\\theta)}=\\rho(\\theta)",odd:false,part:[[0,Math.PI/3]],all:[[-Math.PI,Math.PI]],win:{xmin:-0.4,xmax:0.4,ymin:-0.4,ymax:0.4}}];
+SC.push({id:"pdom",title:"Courbe polaire : période et symétries",ref:"Cours : "+T("\\rho(-\\theta)=\\rho(\\theta)")+" : axe "+T("(Ox)")+" ; "+T("\\rho(-\\theta)=-\\rho(\\theta)")+" : axe "+T("(Oy)")+".",
+ params:[{id:"c",label:"Courbe",type:"select",options:PD.map((a,i)=>[String(i),a.n])}],
+ build(v){const o=PD[+v.c],st=[];
+  [0.3,1.2,2.5].forEach(t=>near(o.r(-t),o.odd?-o.r(t):o.r(t),"pdom sym"));
+  const X=t=>o.r(t)*Math.cos(t),Y=t=>o.r(t)*Math.sin(t);
+  const W={...o.win,W:300,eq:1};
+  st.push({say:`La courbe est ${T("\\rho=\\rho(\\theta)="+o.rt)}, le point est ${T("M(\\theta)")} tel que ${T("\\overrightarrow{OM}=\\rho(\\theta)\\vec u_\\theta")}. <b>Étape 1</b> : domaine ${T("D="+o.dom)} et période ${T(o.per)}.`,board:lines([TD("\\rho(\\theta)="+o.rt),T("D="+o.dom),"Période : "+T(o.per)],1)});
+  st.push({say:`<b>Étape 2</b> : symétries. On calcule ${T("\\rho(-\\theta)")} : ${T(o.why)}. ${o.odd?`${T("\\rho")} change de signe : <b>symétrie d'axe ${T("(Oy)")}</b>.`:`${T("\\rho")} est paire : <b>symétrie d'axe ${T("(Ox)")}</b>.`}`,board:lines([TD(o.why),"Symétrie d'axe "+T(o.axe)],1)});
+  st.push({say:`On étudie sur ${T(o.red)}${o.odd?"":`, puis on complète par la symétrie d'axe ${T("(Ox)")} et par les rotations de centre ${T("O")} et d'angle ${T("\\frac{2\\pi}{3}")}`}${o.odd?", puis on complète par la symétrie d'axe "+T("(Oy)"):""}. En trait plein : la partie étudiée ; en pointillé : le reste de la courbe.`,board:gpar({...W,par:o.all.map(r=>({X,Y,t0:r[0],t1:r[1],cls:"cv3"})).concat(o.part.map(r=>({X,Y,t0:r[0],t1:r[1],cls:"cv"})))})+`<div class="res">${T("D_e="+o.red)}</div>`});
+  return st}});
+
+/* J2 : tangente en polaires */
+SC.push({id:"ptan",title:"Tangente à une courbe polaire",ref:"Cours : si "+T("\\rho(\\theta_0)\\neq0")+", le vecteur tangent a pour composantes "+T("(\\rho',\\rho)")+" dans le repère mobile.",
+ params:[{id:"c",label:"Point",type:"select",options:[["0","θ = π/2"],["1","θ = 0 (passage par O)"]]}],
+ build(v){const k=+v.c,st=[];const r=t=>Math.sin(t)/(1+2*Math.cos(t)),X=t=>r(t)*Math.cos(t),Y=t=>r(t)*Math.sin(t);
+  const rp=t=>(Math.cos(t)+2)/(1+2*Math.cos(t))**2;near(rp(1.1),(r(1.1+1e-6)-r(1.1-1e-6))/2e-6,"ptan rp");
+  const W={xmin:-3,xmax:3,ymin:-3,ymax:3,W:300,eq:1,par:[{X,Y,t0:-2.05,t1:2.05,cls:"cv"},{X,Y,t0:2.14,t1:Math.PI,cls:"cv"},{X,Y,t0:-Math.PI,t1:-2.14,cls:"cv"}]};
+  st.push({say:`Pour ${T("\\rho=\\frac{\\sin\\theta}{1+2\\cos\\theta}")}, on calcule d'abord ${T("\\rho'")} (quotient : ${T("(u/v)'=\\frac{u'v-uv'}{v^2}")}) : le numérateur vaut ${T("\\cos\\theta(1+2\\cos\\theta)+2\\sin^2\\theta=\\cos\\theta+2")}.`,board:lines([TD("\\rho'(\\theta)=\\frac{\\cos\\theta+2}{(1+2\\cos\\theta)^2}")],0)});
+  if(k===0){
+   st.push({say:`En ${T("\\theta=\\frac\\pi2")} : ${T("\\rho=\\frac{1}{1}=1")} et ${T("\\rho'=\\frac{0+2}{1}=2")}. Le point est ${T("M(0,1)")}.`,board:lines([T("\\rho\\left(\\frac\\pi2\\right)=1,\\qquad \\rho'\\left(\\frac\\pi2\\right)=2")],0)});
+   st.push({say:`Le vecteur tangent vaut ${T("\\rho'\\vec u_\\theta+\\rho\\,\\vec u\\,'_\\theta")}, avec ${T("\\vec u\\,'_\\theta=\\vec u_{\\theta+\\pi/2}")}. Ses composantes dans le <b>repère mobile</b> ${T("(\\vec u_\\theta,\\vec u\\,'_\\theta)")} sont ${T("(\\rho',\\rho)=(2,1)")}. Attention : <b>pas dans le repère fixe</b>.`,board:lines([TD("\\vec T=2\\,\\vec u_{\\pi/2}+1\\,\\vec u\\,'_{\\pi/2}"),T("\\tan V=\\frac{\\rho}{\\rho'}=\\frac12")],1)});
+   st.push({say:`Dans le repère fixe : ${T("\\vec u_{\\pi/2}=(0,1)")} et ${T("\\vec u\\,'_{\\pi/2}=(-1,0)")}, donc ${T("\\vec T=2(0,1)+(-1,0)=(-1,2)")} : pente ${T("-2")}.`,board:gpar({...W,lines:[tang(0,1,-2,1.4)],pts:[{x:0,y:1,cls:"pt",l:"M"}]})+`<div class="res">${T("\\vec T=\\begin{pmatrix}-1\\\\2\\end{pmatrix}")}</div>`});
+  }else{
+   st.push({say:`En ${T("\\theta=0")} : ${T("\\rho(0)=\\frac{0}{3}=0")}. La courbe passe par l'origine ${T("O")}.`,board:lines([T("\\rho(0)=0")],0)});
+   st.push({say:`Quand ${T("\\rho(\\theta_0)=0")}, les points voisins s'écrivent ${T("\\rho(\\theta)\\vec u_\\theta")} avec ${T("\\theta\\approx\\theta_0")} : ils sont presque sur la demi-droite d'angle ${T("\\theta_0")}. La tangente en ${T("O")} est donc la <b>droite d'angle polaire ${T("\\theta_0=0")}</b> : l'axe horizontal.`,board:gpar({...W,lines:[{p:[-1.5,0],q:[1.5,0],cls:"tg"}],pts:[{x:0,y:0,cls:"pt",l:"O"}]})+`<div class="res">${T("\\rho(0)=0")} : tangente en ${T("O")} horizontale</div>`});}
+  return st}});
+
+/* J3 : asymptote d'une courbe polaire */
+const PA=[
+ {n:"ρ = sin θ / (1 + 2 cos θ), θ → 2π/3",r:t=>Math.sin(t)/(1+2*Math.cos(t)),rt:"\\frac{\\sin\\theta}{1+2\\cos\\theta}",t0:2*Math.PI/3,t0t:"\\frac{2\\pi}{3}",Y:-0.5,Yt:"-\\frac12",how:"\\text{avec }h=\\theta-\\tfrac{2\\pi}{3},\\ \\text{un DL de }1+2\\cos\\theta\\text{ donne }\\rho\\sin h\\to-\\tfrac12",win:3},
+ {n:"ρ = sin θ / (sin θ − cos θ), θ → π/4",r:t=>Math.sin(t)/(Math.sin(t)-Math.cos(t)),rt:"\\frac{\\sin\\theta}{\\sin\\theta-\\cos\\theta}",t0:Math.PI/4,t0t:"\\frac\\pi4",Y:0.5,Yt:"\\frac12",how:"\\sin\\theta-\\cos\\theta=\\sqrt2\\sin\\left(\\theta-\\tfrac\\pi4\\right)\\ \\Rightarrow\\ \\rho\\sin\\left(\\theta-\\tfrac\\pi4\\right)=\\frac{\\sin\\theta}{\\sqrt2}\\to\\frac12",win:3}];
+SC.push({id:"pasy",title:"Asymptote d'une courbe polaire",ref:"Cours : "+T("\\rho\\to\\infty")+" quand "+T("\\theta\\to\\theta_0")+", on calcule "+T("\\lim\\rho\\sin(\\theta-\\theta_0)")+".",
+ params:[{id:"c",label:"Courbe",type:"select",options:PA.map((a,i)=>[String(i),a.n])}],
+ build(v){const o=PA[+v.c],st=[];
+  [1e-4,-1e-4].forEach(h=>near(o.r(o.t0+h)*Math.sin(h),o.Y,"pasy",1e-3));
+  const X=t=>o.r(t)*Math.cos(t),Y=t=>o.r(t)*Math.sin(t);
+  const ct=Math.cos(o.t0),sn=Math.sin(o.t0);
+  const base=[-o.Y*sn,o.Y*ct];const L=o.win*0.95;
+  const ln={p:[base[0]-L*ct,base[1]-L*sn],q:[base[0]+L*ct,base[1]+L*sn],cls:"dsh"};
+  const eps=0.03,rng=[[o.t0-1.7,o.t0-eps],[o.t0+eps,o.t0+1.7]];
+  const W={xmin:-o.win,xmax:o.win,ymin:-o.win,ymax:o.win,W:300,eq:1,par:rng.map(r=>({X,Y,t0:r[0],t1:r[1],cls:"cv"}))};
+  st.push({say:`On étudie ${T("\\rho="+o.rt)} quand ${T("\\theta\\to\\theta_0="+o.t0t)} : le dénominateur s'annule et ${T("\\rho\\to\\pm\\infty")}. La courbe a une <b>direction asymptotique</b> ${T("\\theta=\\theta_0")}.`,board:gpar(W)+lines([T("\\rho\\to\\pm\\infty\\ \\text{quand}\\ \\theta\\to"+o.t0t)],0)});
+  st.push({say:`Pour savoir s'il y a une asymptote, on calcule ${T("\\lim\\rho(\\theta)\\sin(\\theta-\\theta_0)")} : c'est la <b>distance</b> (avec signe) du point ${T("M")} à la droite d'angle ${T("\\theta_0")} passant par ${T("O")}.`,board:lines([TD("\\lim_{\\theta\\to\\theta_0}\\rho(\\theta)\\sin(\\theta-\\theta_0)")],0)});
+  st.push({say:`On calcule la limite : ${T(o.how)}.`,board:lines([TD(o.how)],0)});
+  st.push({say:`La limite vaut ${T("Y_0="+o.Yt)}, un réel : la courbe a une <b>asymptote</b>, la droite ${T("Y="+o.Yt)} <b>dans le repère tourné</b> ${T("(O,\\vec u_{\\theta_0},\\vec u\\,'_{\\theta_0})")} (parallèle à la direction ${T("\\theta_0")}, à la distance ${T("|Y_0|")}). Ne la trace pas dans le repère fixe.`,board:gpar({...W,lines:[ln]})+`<div class="res">${T("Y="+o.Yt)} dans le repère ${T("(O,\\vec u_{\\theta_0},\\vec u\\,'_{\\theta_0})")}</div>`});
+  return st}});
+
+/*DOM*/
+/* ===== rendu LaTeX : conversion des notations unicode en TeX (MathJax) ===== */
+const TXE=(()=>{
+const SUP={"⁰":"0","¹":"1","²":"2","³":"3","⁴":"4","⁵":"5","⁶":"6","⁷":"7","⁸":"8","⁹":"9","⁺":"+","⁻":"-","⁽":"(","⁾":")","ⁿ":"n","ᵏ":"k","ˣ":"x","ᵃ":"a","ᵇ":"b","ᶜ":"c","ᵈ":"d","ᵉ":"e","ᶠ":"f","ᵍ":"g","ʰ":"h","ⁱ":"i","ʲ":"j","ˡ":"l","ᵐ":"m","ᵒ":"o","ᵖ":"p","ʳ":"r","ˢ":"s","ᵗ":"t","ᵘ":"u","ᵛ":"v","ʷ":"w","ʸ":"y","ᶻ":"z"};
+const SUB={"₀":"0","₁":"1","₂":"2","₃":"3","₄":"4","₅":"5","₆":"6","₇":"7","₈":"8","₉":"9","₊":"+","₋":"-","ₐ":"a","ₙ":"n","ₖ":"k","ₓ":"x","ₒ":"o","ᵢ":"i","ⱼ":"j","ₘ":"m","ₚ":"p","ₛ":"s","ₜ":"t","ₑ":"e","ₗ":"l","ₕ":"h"};
+const SYM={"−":"-","·":"\\cdot ","×":"\\times ","÷":"\\div ","≤":"\\leq ","≥":"\\geq ","≠":"\\neq ","≈":"\\approx ","∼":"\\sim ","±":"\\pm ","∞":"\\infty ","→":"\\to ","↦":"\\mapsto ","⇒":"\\Rightarrow ","⇔":"\\Leftrightarrow ","⇐":"\\Leftarrow ","∈":"\\in ","∉":"\\notin ","∀":"\\forall ","∃":"\\exists ","∪":"\\cup ","∩":"\\cap ","⊂":"\\subset ","∅":"\\varnothing ","∘":"\\circ ","…":"\\cdots ","∫":"\\int ","∑":"\\sum ","Σ":"\\sum ","ℝ":"\\mathbb{R}","ℂ":"\\mathbb{C}","ℕ":"\\mathbb{N}","ℤ":"\\mathbb{Z}","′":"'","″":"''","‴":"'''","π":"\\pi ","θ":"\\theta ","φ":"\\varphi ","ψ":"\\psi ","λ":"\\lambda ","μ":"\\mu ","ω":"\\omega ","γ":"\\gamma ","α":"\\alpha ","β":"\\beta ","δ":"\\delta ","Δ":"\\Delta ","ε":"\\varepsilon ","ρ":"\\rho ","σ":"\\sigma ","τ":"\\tau ","ξ":"\\xi ","ζ":"\\zeta ","η":"\\eta ","κ":"\\kappa ","ν":"\\nu ","Ω":"\\Omega ","Γ":"\\Gamma ","Φ":"\\Phi ","~":"\\sim ","<":"\\lt ",">":"\\gt ","{":"\\{ ","}":"\\} ","%":"\\% ","&":"\\& ","#":"\\# ","_":"\\_ ","≡":"\\equiv ","∥":"\\parallel ","⟂":"\\perp ","∠":"\\angle ","°":"^{\\circ}","∗":"*","ᵀ":"^{T}","↔":"\\leftrightarrow ","⟹":"\\Longrightarrow ","≃":"\\simeq ","⊥":"\\perp "};
+const FUNS={sin:"\\sin ",cos:"\\cos ",tan:"\\tan ",ln:"\\ln ",exp:"\\exp ",lim:"\\lim ",deg:"\\deg ",max:"\\max ",min:"\\min ",arg:"\\arg ",ch:"\\operatorname{ch}",sh:"\\operatorname{sh}",th:"\\operatorname{th}",arcsin:"\\arcsin ",arccos:"\\arccos ",arctan:"\\arctan ",Re:"\\operatorname{Re}",Im:"\\operatorname{Im}",mod:"\\bmod ",gcd:"\\gcd ",pgcd:"\\gcd ",sup:"\\sup ",inf:"\\inf ",ker:"\\ker ",det:"\\det "};
+const STOP=new Set("peu due qui que ont on si ici une il le la les des par sur ou se ce ci pas est de du en et un ne nu ta te tu me ma ni ce cet ait eu au aux ai an que par car ici une dire ex ent aie eue nue tue dut eut ete tant rien mais cas fait pied peut dont ou où".split(" "));
+const VL=/^[abcdefghikmnpqrtuxyzABCDEFGHIKMNPQRTUXYZ]{1,3}$/;
+const ISW=c=>/[A-Za-zÀ-ÿ]/.test(c);
+/* extraction des racines et fractions -> espaces réservés */
+function extract(s,st){
+ const CL=/[¯0-9A-Za-zπ′″²³⁴⁵⁶⁷⁸⁹⁰¹ᵏⁿ₀-₉ᵃ-ᶻε!\u0001\u0002\u0003]/;
+ const mb=(o,k,d0)=>{let d=0;if(d0>0){for(;k<o.length;k++){if(o[k]==="(")d++;else if(o[k]===")"){d--;if(d===0)return k}}}else{for(;k>=0;k--){if(o[k]===")")d++;else if(o[k]==="("){d--;if(d===0)return k}}}return -1};
+ const ph=(o)=>{st.push(o);return "\u0001"+(st.length-1)+"\u0002"};
+ /* racines */
+ let o=s.replace(/([0-9A-Za-z)⁰-⁹¹²³ⁿ])\s\/\s(?=[0-9A-Za-z(√−])/g,"$1/"),i=0;
+ while((i=o.indexOf("√",i))>=0){let j=i+1,body,end;
+  if(o[j]==="("){const m=mb(o,j,1);if(m>0){body=o.slice(j+1,m);end=m+1}}
+  if(body===undefined){const m=/^(?:\d+[⁰¹²³⁴⁵⁶⁷⁸⁹]*|[A-Za-zπ][⁰¹²³⁴⁵⁶⁷⁸⁹]*|\u0001\d+\u0002)/.exec(o.slice(j));if(m){body=m[0];end=j+m[0].length}}
+  if(body===undefined){i=j;continue}
+  const h=ph({t:"s",b:body});o=o.slice(0,i)+h+o.slice(end);i+=h.length}
+ /* fractions */
+ let pos=0;
+ while(true){const k=o.indexOf("/",pos);if(k<0)break;
+  if(k===0||k===o.length-1||o[k-1]===" "||o[k+1]===" "){pos=k+1;continue}
+  let ls,num;
+  let pp=k-1;while(pp>0&&/[⁰-⁹¹²³ⁿᵏ⁺⁻]/.test(o[pp]))pp--;
+  if(o[pp]===")"){const m=mb(o,pp,-1);if(m<0){pos=k+1;continue}let a=m;while(a>0&&/[A-Za-z′″⁰-⁹¹²³⁽⁾ε]/.test(o[a-1]))a--;if(a>0&&o[a-1]==="^"){a--;while(a>0&&/[A-Za-z]/.test(o[a-1]))a--}
+   num=(a===m&&pp===k-1)?o.slice(m+1,k-1):o.slice(a,k);ls=a}
+  else{let a=k;while(a>0&&CL.test(o[a-1]))a--;if(a===k){pos=k+1;continue}ls=a;num=o.slice(a,k);
+   if(ls>0&&(o[ls-1]==="−"||o[ls-1]==="-")&&(ls===1||" (=,;:".includes(o[ls-2]))){ls--;num=o.slice(ls,k)}}
+  let re,den;
+  if(o[k+1]==="("){const m=mb(o,k+1,1);if(m<0){pos=k+1;continue}re=m+1;den=o.slice(k+2,m);let r2=re;if(o[r2]==="^"){r2++;if(o[r2]==="("){const q=mb(o,r2,1);if(q>0)r2=q+1}else while(r2<o.length&&/[0-9A-Za-z]/.test(o[r2]))r2++}else while(r2<o.length&&/[⁰-⁹¹²³ⁿᵏ⁺⁻]/.test(o[r2]))r2++;if(r2>re){den="("+den+")"+o.slice(re,r2);re=r2}}
+  else{let b=k+1;if(o[b]==="−"||o[b]==="-")b++;if(o[b]==="|"){const q=o.indexOf("|",b+1);if(q>0)b=q+1}while(b<o.length&&CL.test(o[b]))b++;if(b===k+1||b===k+2&&(o[k+1]==="−"||o[k+1]==="-")){pos=k+1;continue}
+   if(o[b]==="("){const m=mb(o,b,1);if(m>0)b=m+1}re=b;den=o.slice(k+1,b)}
+  const h=ph({t:"f",n:num,d:den});o=o.slice(0,ls)+h+o.slice(re);pos=ls+h.length}
+ return o}
+/* conversion caractère par caractère */
+function conv(s,st,disp){
+ let o="",i=0;const n=s.length;
+ const grab=(map,i)=>{let r="";while(i<n&&map[s[i]]!==undefined){r+=map[s[i]];i++}return [r,i]};
+ while(i<n){const c=s[i];
+  if(c==="\u0001"){const m=/^\u0001(\d+)\u0002/.exec(s.slice(i));let e=st[+m[1]];i+=m[0].length;
+   if(e.t==="s"){o+="\\sqrt{"+conv(e.b,st,disp)+"}";continue}
+   let ed=e.d;{const mi=/^\u0001(\d+)\u0002$/.exec(e.n);if(mi&&st[+mi[1]].t==="f"){const inn=st[+mi[1]];const w=/[+−-]/.test(ed)&&!/^\(.*\)[^()]*$/.test(ed);e={t:"f",n:inn.n,d:inn.d+(w?"("+ed+")":ed)};ed=e.d}}
+   let nn=e.n,sg="";if(/^[−-][^−+-]*$/.test(nn)){sg="-";nn=nn.slice(1)}
+   o+=sg+(disp?"\\dfrac{":"\\frac{")+conv(nn,st,disp)+"}{"+conv(e.d,st,disp)+"}";continue}
+  if(SUP[c]!==undefined){const [r,j]=grab(SUP,i);o+="^{"+r+"}";i=j;continue}
+  if(SUB[c]!==undefined){const [r,j]=grab(SUB,i);o+="_{"+r+"}";i=j;continue}
+  if(c==="^"&&s[i+1]==="("){let d=0,k=i+1;for(;k<n;k++){if(s[k]==="(")d++;else if(s[k]===")"){d--;if(d===0)break}}
+   o+="^{"+conv(s.slice(i+2,k),st,disp)+"}";i=k+1;continue}
+  if(/[A-Za-z]/.test(c)){let j=i;while(j<n&&/[A-Za-z]/.test(s[j]))j++;const w=s.slice(i,j);
+   /* fonctions */
+   if(FUNS[w]){o+=FUNS[w];i=j;continue}
+   if(/^d[xtuyz]$/.test(w)){o+=(/[A-Za-z0-9})]$/.test(o)?"\\,":"")+"\\mathrm{d}"+w[1];i=j;continue}
+   /* mots collés : dx, dt, cos... à l'intérieur ? */
+   let r="";let p=0;while(p<w.length){let f=null;for(const k of Object.keys(FUNS).sort((a,b)=>b.length-a.length)){if(w.startsWith(k,p)&&k.length>=3){f=k;break}}if(f){r+=FUNS[f];p+=f.length}else{r+=w[p];p++}}
+   o+=r;i=j;continue}
+  if(c===","&&/\d/.test(s[i-1]||"")&&/\d/.test(s[i+1]||"")){o+="{,}";i++;continue}
+  if(c===" "){let k=i;while(s[k]===" ")k++;const pv=o[o.length-1]||"",nx=s[k]||"";if(/[A-Za-z0-9}]/.test(pv)&&/[A-Za-z0-9\u0001]/.test(nx))o+="\\,";i=k;continue}
+  if(c==="¯"){o=o.replace(/([A-Za-z]|\\[a-z]+ |\))$/,m=>"\\overline{"+m+"}");i++;continue}
+  if(SYM[c]!==undefined){o+=SYM[c];i++;continue}
+  o+=c;i++}
+ return o}
+const m2t=(raw,disp)=>{const st=[];const s=extract(raw,st);let t=conv(s,st,disp);return (disp&&/\\dfrac|\\int|\\sum|\\sqrt/.test(t)?"\\displaystyle ":"")+t};
+/* segmentation texte / maths */
+const IV=/[\[\]][0-9A-Za-zπ∞+−\-\s,.√/²·()]{1,36}?;[0-9A-Za-zπ∞+−\-\s,.√/²·()]{1,36}?[\[\]]|\((?![^;)]*[A-Za-zÀ-ÿ]{4})[0-9A-Za-zα-ωπ∞+−\-,.√/²]{1,16}\s;\s[0-9A-Za-zα-ωπ∞+−\-,.√/²]{1,16}\)/g;
+function node(text,disp,blk){
+ if(text.indexOf("\u27E6")>=0){return text.split(/(\u27E6\u27E6[\s\S]*?\u27E7\u27E7|\u27E6[\s\S]*?\u27E7)/).map((p,i)=>{if(i%2===0)return p.replace(/&lt;/g,"<").replace(/&gt;/g,">").replace(/&amp;/g,"&").replace(/&nbsp;/g," ").replace(/&/g,"&amp;").replace(/</g,"&lt;");const dbl=p.startsWith("\u27E6\u27E6");const raw=p.slice(dbl?2:1,dbl?-2:-1);const esc=raw.replace(/&/g,"&amp;").replace(/</g,"&lt;");return dbl?"\\["+esc+"\\]":"\\("+esc+"\\)"}).join("")}
+ if(!node._iv&&new RegExp(IV.source).test(text.replace(/&lt;/g,"<"))){const IV2=new RegExp(IV.source,"g");node._iv=1;const t0=text.replace(/&lt;/g,"<").replace(/&gt;/g,">").replace(/&amp;/g,"&");let out="",last=0,m;
+  while((m=IV2.exec(t0))){out+=node(t0.slice(last,m.index),disp,blk);out+="\\("+m2t(m[0].replace(/\s*;\s*/g,"§;§"),false).replace(/§/g,"\\,")+"\\)";last=m.index+m[0].length}
+  out+=node(t0.slice(last),disp,blk);node._iv=0;return out}
+ text=text.replace(/([A-Za-z])\u0304/g,"$1¯").replace(/&lt;/g,"<").replace(/&gt;/g,">").replace(/&amp;/g,"&").replace(/&nbsp;/g," ");
+ const re=/([A-Za-zÀ-ÿ]+)|(\d+(?:,\d+)?)|(\s+)|([\s\S])/g;const T=[];let m;
+ while((m=re.exec(text))){if(m[1])T.push({k:"w",s:m[1]});else if(m[2])T.push({k:"n",s:m[2]});else if(m[3])T.push({k:"s",s:m[3]});else T.push({k:"o",s:m[4]})}
+ const STRONG=new Set("¯=≠≤≥<>+×÷∼≈±∈∉⇒⇔→↦∞∫∑Σ√π∀∃∪∩⊂∘≡^²³⁴⁵⁶⁷⁸⁹⁰¹ⁿᵏˣ₀₁₂₃₄₅₆₇₈₉⁺⁻ᵃᵇᵈᵉ".split("").concat(Object.keys(SUP),Object.keys(SUB)));
+ const GREEK=/[α-ωΑ-Ωℝℂℕℤ′″‴∅]/;
+ T.forEach((t,i)=>{t.m=null;
+  if(t.k==="w"){const w=t.s;
+   if(FUNS[w]||w==="dx")t.m=true;
+   else if(["dt","du","dy","dz"].includes(w)){const pv=T.slice(0,i).reverse().find(q=>q.k!=="s");t.m=!!pv&&(pv.k==="w"&&!STOP.has(pv.s)&&(VL.test(pv.s)||FUNS[pv.s])||pv.k==="n"||(pv.k==="o"&&/[)}\]'′∞∫+\-−=·×]/.test(pv.s)))}
+   else if(/[À-ÿ]/.test(w))t.m=false;
+   else if(w.length===1){t.m=(w==="a"||w==="A")?(((T[i+1]&&T[i+1].k==="s"&&T[i+2]&&T[i+2].k==="w"&&FUNS[T[i+2].s]))?true:"?"):true;if(i+1<T.length&&(T[i+1].s==="'"||T[i+1].s==="’")&&T[i+2]&&T[i+2].k==="w")t.m=false}
+   else t.m=(VL.test(w)&&!STOP.has(w.toLowerCase()))?true:false}
+  else if(t.k==="n")t.m=true;
+  else if(t.k==="s")t.m="s";
+  else{const c=t.s;if(STRONG.has(c)||GREEK.test(c))t.m=true;else if("(){}[]|/,;:.!?'’-−·…*«»“”\"".includes(c))t.m="?";else t.m=false}});
+ const near=(i,d)=>{let j=i+d;while(T[j]&&T[j].k==="s")j+=d;return T[j]};
+ for(let pass=0;pass<4;pass++)T.forEach((t,i)=>{if(t.m!=="?")return;const c=t.s,P=T[i-1],N=T[i+1],Pm=P&&P.m===true,Nm=N&&N.m===true;
+  const Ps=near(i,-1),Ns=near(i,1),Pms=Ps&&Ps.m===true,Nms=Ns&&Ns.m===true;
+  let r=null;
+  if(c==="a"||c==="A"){const OPS="=+−-×·/^≤≥<>≠≈(),;|";const op=x=>x&&((x.k==="o"&&OPS.includes(x.s))||x.k==="n");
+   const ww=(x,d)=>{let j=T.indexOf(x);return null};
+   const nw=Ns&&Ns.k==="w"?Ns.s:"",pw=Ps&&Ps.k==="w"?Ps.s:"";
+   const afterEt=(nw==="et"||nw==="ou")&&(()=>{let j=T.indexOf(Ns)+1;while(T[j]&&T[j].k==="s")j++;return T[j]&&T[j].k==="w"&&T[j].s.length===1})();
+   const beforeEt=(pw==="et"||pw==="ou")&&(()=>{let j=T.indexOf(Ps)-1;while(T[j]&&T[j].k==="s")j--;return T[j]&&T[j].k==="w"&&T[j].s.length===1})();
+   r=(op(Ps)||op(Ns)||afterEt||beforeEt)?true:null}
+  else if("([{".includes(c))r=Nm?true:null;
+  else if(")]}".includes(c))r=Pm?true:null;
+  else if(c==="|")r=(Nm||Pm)?true:null;
+  else if(c==="/"||c==="·"||c==="*")r=(Pms&&Nms)?true:null;
+  else if(c==="-"||c==="−")r=Nms&&(Pms||!Ps||/[=(,;:]/.test(Ps.s)||Ps.m===true)?true:null;
+  else if(c===","||c===";"||c===":")r=(Pm&&Nms)?true:null;
+  else if(c==="!")r=(Pm&&!(N&&N.k==="w"))?true:null;
+  else if(c==="'"||c==="’")r=(Pm&&!(N&&N.k==="w"))?true:null;
+  else if(c==="…")r=(Pms||Nms)?true:null;
+  else r=null;
+  if(r===true)t.m=true});
+ T.forEach(t=>{if(t.m==="?"||t.m===null)t.m=false});
+ let out="",i=0;
+ while(i<T.length){if(T[i].m===true){let j=i,last=i;while(j<T.length){if(T[j].m===true)last=j;else if(!(T[j].m==="s"&&T[j+1]&&(T[j+1].m===true)))break;j++}
+   const raw=T.slice(i,last+1).map(t=>t.s).join("");
+   if(/^\d+(?:,\d+)?$/.test(raw))out+=raw;else{const tex=m2t(raw,disp||(blk&&raw.length>=16&&/[=⇒⇔]/.test(raw)&&/[=]/.test(raw)&&!/^[^=]{0,3}=[^=]{0,5}$/.test(raw)));
+    if(blk&&raw.length>=16&&/[=⇒⇔]/.test(raw)&&!/^[^=]{0,3}=[^=]{0,5}$/.test(raw))out+="\\["+m2t(raw,true)+"\\]";else out+="\\("+tex+"\\)"}i=last+1}
+  else{out+=T[i].s;i++}}
+ return out.replace(/&/g,"&amp;").replace(/\\\(/g,"\\(").replace(/</g,"&lt;")}
+const html=(h,disp,say)=>h.split(/(<svg[\s\S]*?<\/svg>)/).map((p,i)=>{if(i%2)return p;let last="";return p.replace(/(<[^>]*>)|([^<]+)/g,(m,tag,txt)=>{if(tag){last=tag;return tag}
+  const ok=say&&!/^<(mark|b|i|sub|sup)\b/.test(last);let x=txt.replace(/-(?=\d)/g,"−");
+  if(ok)x=x.replace(/([.!?])\s+(?=[A-ZÉÈÀÂÎÔÛ])/g,"$1<br class=sp>");
+  return x.split("<br class=sp>").map(y=>(TXE.explicit&&y.indexOf("\u27E6")<0)?y.replace(/&lt;/g,"<").replace(/&gt;/g,">").replace(/&amp;/g,"&").replace(/&/g,"&amp;").replace(/</g,"&lt;"):node(y,disp,ok)).join("<br class=sp>")}).replace(/&amp;lt;/g,"&lt;")}).join("").replace(/\\\]([ \u00a0]?)([.,;])(?![0-9])/g,(m,sp,p)=>"\\,"+p+"\\]");
+return{node,html,m2t,tx1:s=>node(s,false),explicit:false}})();
+
+
+const mjt=els=>{const f=()=>{MathJax.startup.promise=MathJax.startup.promise.then(()=>MathJax.typesetPromise(els)).then(()=>document.querySelectorAll("mjx-assistive-mml").forEach(e=>e.remove())).catch(()=>{})};if(window.__mjr)f();else(window.__mjq=window.__mjq||[]).push(f)};
+
+if(typeof document!=="undefined"){
+TXE.explicit=true;
+const host=document.getElementById("scenes"),nav=document.getElementById("nav");
+SC.forEach((sc,ix)=>{const CODE="H"+(ix+1);
+ const sec=document.createElement("section");sec.id="s-"+sc.id;
+ const ps=(sc.params||[]).map(p=>p.type==="select"?`<label for="${sc.id}_${p.id}">${p.label}</label><select id="${sc.id}_${p.id}">${p.options.map(o=>`<option value="${o[0]}"${(p.value||p.options[0][0])===o[0]?" selected":""}>${o[1]}</option>`).join("")}</select>`:`<label for="${sc.id}_${p.id}">${p.label}</label><input type="text" id="${sc.id}_${p.id}" value="${p.value}">`).join("");
+ sec.innerHTML=`<div><h2><span class="cd">${CODE}</span> ${TXE.tx1(sc.title)}</h2><p>${TXE.tx1(sc.ref)}</p></div>${ps?`<div class="row">${ps}${(sc.params||[]).some(p=>p.type==="text")?`<button id="${sc.id}_go">Poser</button>`:""}</div>`:""}
+ <div class="row"><button class="p" id="${sc.id}_play">Lecture</button><button id="${sc.id}_prev">◀ Précédent</button><button id="${sc.id}_next">Suivant ▶</button><label for="${sc.id}_sp">Lent</label><input type="range" id="${sc.id}_sp" min="800" max="4000" step="200" value="2600" style="direction:rtl;max-width:110px"><label for="${sc.id}_sp">Rapide</label></div>
+ <div class="bubble" id="${sc.id}_say" aria-live="polite"></div><div class="stage" id="${sc.id}_board"></div>`;
+ host.appendChild(sec);mjt([sec]);
+ const a=document.createElement("a");a.href="#s-"+sc.id;a.textContent=CODE+" · "+sc.title;nav.appendChild(a);
+ const $=s=>document.getElementById(sc.id+"_"+s);
+ let steps=[],t=0,timer=null,speed=2600;
+ const stop=()=>{if(timer){clearInterval(timer);timer=null}$("play").textContent="Lecture"};
+ 
+const mn=h=>TXE.html(h,true,false);
+
+ const accum=(steps,t)=>{const seen=new Set();let lines="";let stage="";let res="";
+  const cur=document.createElement("template");cur.innerHTML=steps[t].board;if([...cur.content.children].some(e=>!/lines|res|stage/.test(e.className)))return steps[t].board;
+  for(let i=0;i<=t;i++){const tp=document.createElement("template");tp.innerHTML=steps[i].board;const c=tp.content;if([...c.children].some(e=>!/lines|res|stage/.test(e.className)))continue;
+   if(i===t){const g=c.querySelector(".stage");if(g)stage=g.outerHTML}
+   c.querySelectorAll(".lines > div, .res").forEach(el=>{const key=el.innerHTML.trim().replace(/&amp;/g,"&").replace(/&lt;/g,"<").replace(/&gt;/g,">");if(seen.has(key))return;seen.add(key);
+    if(el.classList.contains("res")){if(i===t)res=`<div class="res">${key}</div>`;else lines+=`<div>${key}</div>`}
+    else lines+=`<div class="${i===t?"new":""}">${key}</div>`})}
+  return stage+(lines?`<div class="lines">${lines}</div>`:"")+res};
+const draw=()=>{const s=steps[t];$("say").innerHTML=TXE.html(s.say,false,true);$("board").innerHTML=TXE.html(accum(steps,t),true,false);mjt([$("say"),$("board")]);$("prev").disabled=t===0;$("next").disabled=t===steps.length-1};
+ const vals=()=>{const v={};(sc.params||[]).forEach(p=>{v[p.id]=$(p.id).value});return v};
+ const rebuild=()=>{stop();steps=sc.build(vals());t=0;draw()};
+ $("next").onclick=()=>{stop();if(t<steps.length-1){t++;draw()}};
+ $("prev").onclick=()=>{stop();if(t>0){t--;draw()}};
+ const tick=()=>{if(t<steps.length-1){t++;draw()}else stop()};
+ $("play").onclick=()=>{if(timer){stop();return}if(t===steps.length-1){t=0;draw()}$("play").textContent="Pause";timer=setInterval(tick,speed)};
+ $("sp").oninput=e=>{speed=+e.target.value;if(timer){clearInterval(timer);timer=setInterval(tick,speed)}};
+ (sc.params||[]).forEach(p=>{if(p.type==="select")$(p.id).onchange=rebuild});
+ if($("go"))$("go").onclick=rebuild;
+ rebuild();
+});}
+</script>
+
+<script>
+/* mode intégré dans le site : ?s=<scène>&embed=1 n'affiche que cette scène et signale sa hauteur à la page parente */
+(function(){var q=new URLSearchParams(location.search),s=q.get("s");if(!s||q.get("embed")!=="1")return;
+var id=CSS.escape(s);var css="main>h1,main>p,nav,.cd{display:none!important}section{display:none!important}"
++"#s-"+id+",section#"+id+"{display:block!important}body,main{margin:0!important;padding:0!important;background:transparent!important}"
++"main{max-width:none!important}section{margin:0!important;border:0!important;box-shadow:none!important}";
+var st=document.createElement("style");st.textContent=css;document.head.appendChild(st);
+document.documentElement.classList.add("embed");
+function post(){parent.postMessage({anim:1,h:Math.ceil(document.documentElement.scrollHeight)},"*")}
+if(window.ResizeObserver)new ResizeObserver(post).observe(document.documentElement);
+window.addEventListener("load",post);setInterval(post,1500);
+})();
+</script>

@@ -554,7 +554,15 @@ SC.forEach((sc,ix)=>{const CODE="C"+(ix+1);
  
 const mn=h=>TXE.html(h,true,false);
 
- const draw=()=>{const s=steps[t];$("say").innerHTML=TXE.html(s.say,false,true);$("board").innerHTML=TXE.html(s.board,true,false);mjt([$("say"),$("board")]);$("prev").disabled=t===0;$("next").disabled=t===steps.length-1};
+ const accum=(steps,t)=>{const seen=new Set();let lines="";let stage="";let res="";
+  const cur=document.createElement("template");cur.innerHTML=steps[t].board;if([...cur.content.children].some(e=>!/lines|res|stage/.test(e.className)))return steps[t].board;
+  for(let i=0;i<=t;i++){const tp=document.createElement("template");tp.innerHTML=steps[i].board;const c=tp.content;if([...c.children].some(e=>!/lines|res|stage/.test(e.className)))continue;
+   if(i===t){const g=c.querySelector(".stage");if(g)stage=g.outerHTML}
+   c.querySelectorAll(".lines > div, .res").forEach(el=>{const key=el.innerHTML.trim().replace(/&amp;/g,"&").replace(/&lt;/g,"<").replace(/&gt;/g,">");if(seen.has(key))return;seen.add(key);
+    if(el.classList.contains("res")){if(i===t)res=`<div class="res">${key}</div>`;else lines+=`<div>${key}</div>`}
+    else lines+=`<div class="${i===t?"new":""}">${key}</div>`})}
+  return stage+(lines?`<div class="lines">${lines}</div>`:"")+res};
+const draw=()=>{const s=steps[t];$("say").innerHTML=TXE.html(s.say,false,true);$("board").innerHTML=TXE.html(accum(steps,t),true,false);mjt([$("say"),$("board")]);$("prev").disabled=t===0;$("next").disabled=t===steps.length-1};
  const vals=()=>{const v={};(sc.params||[]).forEach(p=>{v[p.id]=$(p.id).value});return v};
  const rebuild=()=>{stop();steps=sc.build(vals());t=0;draw()};
  $("next").onclick=()=>{stop();if(t<steps.length-1){t++;draw()}};
