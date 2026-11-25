@@ -8,7 +8,7 @@
 <style>html{color-scheme:light}body{margin:0}[hidden]{display:none!important}img{max-width:100%}</style>
 <title>Maths GMP, site compagnon</title>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700&display=swap">
-<script>window.MathJax={loader:{load:['[tex]/color']},tex:{packages:{'[+]':['color']},inlineMath:[['\\(','\\)']],displayMath:[['\\[','\\]']]},svg:{fontCache:'global'},options:{enableMenu:false},startup:{typeset:false}};</script>
+<script>window.MathJax={loader:{load:['[tex]/color']},tex:{packages:{'[+]':['color']},inlineMath:[['\\(','\\)']],displayMath:[['\\[','\\]']]},svg:{fontCache:'global'},options:{enableMenu:false},startup:{typeset:false,ready:function(){MathJax.startup.defaultReady();var re=/\\begin\{pmatrix\}((?:(?!\\begin\{pmatrix\})[\s\S])*?)\\end\{pmatrix\}/;MathJax.startup.input[0].preFilters.add(function(o){var s=o.math.math,m;while((m=re.exec(s))){var row=m[1].split('\\\\')[0],n=1+(row.match(/&/g)||[]).length;s=s.replace(re,function(_,b){return'\\left(\\,\\begin{array}{'+'r'.repeat(n)+'}'+b+'\\end{array}\\,\\right)'})}o.math.math=s})}}};</script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-svg.min.js"></script>
 <style>
 /* Concept : un manuel de poche. Menu des chapitres à gauche, fiche au centre, plan de la page à droite.
