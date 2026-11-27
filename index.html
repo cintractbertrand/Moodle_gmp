@@ -686,44 +686,6 @@ function route(){
 window.addEventListener("popstate",()=>{route();document.body.classList.remove("menu");scrollTo(0,0)});
 route();
 document.querySelector(".top h1").onclick=()=>{home();scrollTo(0,0)};
-/* ---------- suivi anonyme du temps passé (aucun identifiant, aucune donnée personnelle) ---------- */
-(function(){
-  const URL_SUIVI="https://bebert69740.synology.me:5051/api/suivi";                       /* adresse de réception (vide = suivi désactivé) */
-  if(!URL_SUIVI)return;
-  const KEY="gmp_suivi",day=()=>new Date().toISOString().slice(0,10);
-  let st={d:day(),sent:"",b:{}};try{st=Object.assign(st,JSON.parse(localStorage.getItem(KEY)||"{}"))}catch(e){}
-  const buf=st.b;let last=Date.now();
-  const save=()=>{try{localStorage.setItem(KEY,JSON.stringify(st))}catch(e){}};
-  const act=()=>{last=Date.now()};
-  ["pointerdown","pointermove","keydown","scroll","touchstart"].forEach(e=>addEventListener(e,act,{passive:true}));
-  const add=(k,s)=>{buf[k]=(buf[k]||0)+s};
-  function tick(){
-    if(document.hidden||Date.now()-last>60000||cc<0)return;
-    const ch=CHAPTERS[cc],tb=document.querySelector('#tabbar button[aria-selected="true"]');if(!ch||!tb)return;
-    const k=tb.dataset.k,c="c"+ch.n,t=c+".t"+(ct+1);
-    add(c,1);add(t,1);add(t+"."+k,1);
-    if(k!=="f"){
-      const L=qlist(ch.themes[ct],k),mid=innerHeight/2;let best=null,bd=1e9;
-      document.querySelectorAll("#pane section.q").forEach(s=>{const r=s.getBoundingClientRect();
-        if(r.bottom<0||r.top>innerHeight)return;const d=Math.abs((r.top+r.bottom)/2-mid);if(d<bd){bd=d;best=s}});
-      const q=best&&L[+best.id.slice(1)];if(q&&q.type!=="description")add(t+"."+k+"."+q.name.replace(/[^A-Za-z0-9\u00C0-\u017F_ .-]/g,"").slice(0,60),1);
-    }
-  }
-  /* un seul envoi par jour et par navigateur : au premier départ de la page du jour, ou à la visite suivante */
-  function flush(){
-    const keys=Object.keys(buf);if(!keys.length||st.sent===day())return;
-    const body=JSON.stringify(buf);
-    try{if(!(navigator.sendBeacon&&navigator.sendBeacon(URL_SUIVI,body)))fetch(URL_SUIVI,{method:"POST",body,keepalive:true,mode:"no-cors"})}catch(e){}
-    keys.forEach(k=>delete buf[k]);st.sent=day();save();
-  }
-  setInterval(tick,1000);setInterval(save,15000);
-  if(st.d!==day()){st.sent="";st.d=day();setTimeout(flush,3000)}
-  addEventListener("pagehide",()=>{save();if(Date.now()-last<120000||Object.keys(buf).length)flush()});
-  document.addEventListener("visibilitychange",()=>{if(document.hidden)save()});
-  const p=document.createElement("p");p.style.cssText="font-size:12px;opacity:.6;text-align:center;margin:30px 16px 16px";
-  p.textContent="Ce site mesure de façon anonyme le temps passé par chapitre, fiche et exercice (aucun nom, aucun identifiant) afin d'améliorer le cours.";
-  document.body.appendChild(p);
-})();
 </script>
 
 </body>
