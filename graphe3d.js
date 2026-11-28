@@ -125,21 +125,50 @@ async function construire() {
   const c = ctr(); c.autoRotate = true; c.autoRotateSpeed = .3; c.enableDamping = true; c.dampingFactor = .08; c.minDistance = 40; c.maxDistance = 1400; c.zoomSpeed = .35; c.rotateSpeed = .6; c.panSpeed = .6;
   c.addEventListener('start', () => { c.autoRotate = false; });
 
+  { const sun = new THREE.DirectionalLight(0xfff1dd, 2.1); sun.position.set(-1, .8, 1.2); G.lights([sun, new THREE.AmbientLight(0x7080b0, .5)]); } // remplace l'éclairage par défaut (trop fort)
   // champ d'étoiles + poussière lumineuse
   { const mk = (n, rMin, rMax, size, col, op) => { const p = new Float32Array(n * 3); for (let i = 0; i < n; i++) { const v = new THREE.Vector3().randomDirection().multiplyScalar(rMin + Math.random() * (rMax - rMin)); p.set([v.x, v.y * .7, v.z], i * 3); }
       const g = new THREE.BufferGeometry(); g.setAttribute('position', new THREE.BufferAttribute(p, 3)); return new THREE.Points(g, new THREE.PointsMaterial({ color: col, size, sizeAttenuation: true, transparent: true, opacity: op, depthWrite: false })); };
     G.scene().add(mk(mob ? 900 : 1800, 700, 2200, 2.2, 0x9fb6ff, .55)); G.scene().add(mk(mob ? 160 : 320, 60, 330, 1.1, 0x7df9ff, .35)); }
 
   // ---------- objets 3D des nœuds ----------
-  const geo = { s: new THREE.SphereGeometry(1, 28, 20), r: new THREE.TorusGeometry(1, .018, 8, 96) };
+  const geo = { s: new THREE.SphereGeometry(1, 24, 16), p: new THREE.SphereGeometry(1, 48, 32), ring: new THREE.RingGeometry(1.45, 2.35, 96, 1) };
+  { const a = geo.ring.attributes, uv = a.uv, ps = a.position; for (let i = 0; i < uv.count; i++) { const x = ps.getX(i), y = ps.getY(i); uv.setXY(i, (Math.hypot(x, y) - 1.45) / .9, .5); } }
+  const rnd = (sd) => () => ((sd = (sd * 1103515245 + 12345) & 0x7fffffff) / 0x7fffffff);
+  function texPlanete(col, seed, gaz) { // bandes nuageuses (géante gazeuse) ou cratères (lune)
+    const W = gaz ? 256 : 128, H = W / 2, cv = document.createElement('canvas'); cv.width = W; cv.height = H; const x = cv.getContext('2d'); const R0 = rnd(seed);
+    const c = col.clone(), hsl = {}; c.getHSL(hsl); const tint = (dl, ds = 0) => { const k = new THREE.Color().setHSL((hsl.h + ds + 1) % 1, Math.min(1, hsl.s * .85), Math.max(.05, Math.min(.92, hsl.l + dl))); return '#' + k.getHexString(); };
+    x.fillStyle = tint(gaz ? -.12 : -.25); x.fillRect(0, 0, W, H);
+    if (gaz) { let y = 0; while (y < H) { const h = 2 + R0() * 10; x.fillStyle = tint((R0() - .45) * .45, (R0() - .5) * .05); x.globalAlpha = .55 + R0() * .45; x.fillRect(0, y, W, h); y += h; }
+      x.globalAlpha = .25; for (let k = 0; k < 40; k++) { x.fillStyle = tint(R0() * .3); x.beginPath(); x.ellipse(R0() * W, R0() * H, 6 + R0() * 26, 1 + R0() * 3, 0, 0, 7); x.fill(); }
+      x.globalAlpha = .9; x.fillStyle = tint(.18, .03); x.beginPath(); x.ellipse(R0() * W, H * (.3 + R0() * .4), 9, 5, 0, 0, 7); x.fill(); }
+    else { x.globalAlpha = .5; for (let k = 0; k < 26; k++) { const rr = 2 + R0() * 9, px = R0() * W, py = R0() * H; x.fillStyle = tint(-.32); x.beginPath(); x.arc(px, py, rr, 0, 7); x.fill(); x.fillStyle = tint(.12); x.beginPath(); x.arc(px - rr * .25, py - rr * .25, rr * .6, 0, 7); x.fill(); } }
+    x.globalAlpha = 1; const t = new THREE.CanvasTexture(cv); t.wrapS = THREE.RepeatWrapping; return t;
+  }
+  function texAnneau(col, seed) {
+    const cv = document.createElement('canvas'); cv.width = 256; cv.height = 4; const x = cv.getContext('2d'); const R0 = rnd(seed + 99);
+    for (let i = 0; i < 256; i++) { const a = (.25 + R0() * .6) * Math.sin(Math.PI * i / 256) * (R0() < .08 ? .2 : 1); const k = col.clone().lerp(new THREE.Color('#ffffff'), .3 + R0() * .3);
+      x.fillStyle = `rgba(${k.r * 255 | 0},${k.g * 255 | 0},${k.b * 255 | 0},${a.toFixed(3)})`; x.fillRect(i, 0, 1, 4); }
+    return new THREE.CanvasTexture(cv);
+  }
+  function atmosphere(col, force) { return new THREE.ShaderMaterial({ uniforms: { c: { value: col.clone() }, o: { value: force } }, transparent: true, depthWrite: false, blending: THREE.AdditiveBlending,
+    vertexShader: 'varying vec3 vN; varying vec3 vV; void main(){ vN = normalize(normalMatrix * normal); vec4 mv = modelViewMatrix * vec4(position, 1.0); vV = normalize(-mv.xyz); gl_Position = projectionMatrix * mv; }',
+    fragmentShader: 'uniform vec3 c; uniform float o; varying vec3 vN; varying vec3 vV; void main(){ float f = pow(1.0 - max(dot(vN, vV), 0.0), 2.4); gl_FragColor = vec4(c * 1.2, f * o); }' }); }
   const rings = [];
   function nodeObj(n) {
     const col = new THREE.Color(SEMC[n.sem] || '#ffffff'); const g = new THREE.Group(); const r = R[n.type];
-    const core = new THREE.Mesh(geo.s, new THREE.MeshBasicMaterial({ color: n.type === 'notion' ? col.clone().lerp(new THREE.Color('#ffffff'), .35) : col, transparent: true }));
-    core.scale.setScalar(r); g.add(core); n.__mats = [core.material];
-    if (n.type === 'chapitre') { // noyau atomique : orbites électroniques
-      for (let k = 0; k < 2; k++) { const ring = new THREE.Mesh(geo.r, new THREE.MeshBasicMaterial({ color: col, transparent: true, opacity: .55 })); ring.scale.setScalar(r * 2.4 + k * 3); ring.rotation.set(Math.PI / 2 + k * 1.05, k * .7, 0); g.add(ring); n.__mats.push(ring.material);
-        const el = new THREE.Mesh(geo.s, new THREE.MeshBasicMaterial({ color: '#ffffff' })); el.scale.setScalar(1.1); ring.add(el); el.position.set(1, 0, 0); el.scale.setScalar(1.1 / (r * 2.4 + k * 3)); rings.push({ ring, sp: .22 + k * .1 }); }
+    const seed = [...n.id].reduce((a, ch) => a * 31 + ch.charCodeAt(0) | 0, 7);
+    const isCh = n.type === 'chapitre';
+    // planète (chapitre) ou lune (notion) : texture procédurale, éclairée, qui tourne sur elle-même
+    const core = new THREE.Mesh(isCh ? geo.p : geo.s, new THREE.MeshStandardMaterial({ map: texPlanete(col, seed, isCh), roughness: .9, metalness: 0,
+      emissive: col, emissiveIntensity: isCh ? .2 : .4, transparent: true }));
+    core.scale.setScalar(r); core.rotation.z = .25 + (seed % 7) * .06; g.add(core); n.__mats = [core.material]; n.__spin = { m: core, v: .08 + (seed % 5) * .03 };
+    if (isCh) { // atmosphère lumineuse sur le pourtour
+      const atm = new THREE.Mesh(geo.p, atmosphere(col, .55)); atm.scale.setScalar(r * 1.22); g.add(atm); n.__mats.push(atm.material);
+      if (seed % 3 !== 1) { // un anneau pour deux planètes sur trois
+        const ring = new THREE.Mesh(geo.ring, new THREE.MeshBasicMaterial({ map: texAnneau(col, seed), side: THREE.DoubleSide, transparent: true, opacity: .75, depthWrite: false }));
+        ring.scale.setScalar(r); ring.rotation.set(Math.PI / 2 - .35 - (seed % 4) * .12, (seed % 5) * .2, 0); g.add(ring); n.__mats.push(ring.material);
+      }
     }
     if (n.type === 'chapitre') {
       const t = new SpriteText(n.label, 7.5, 'rgba(178,198,232,.9)'); t.fontWeight = '600'; t.fontFace = 'system-ui, Segoe UI, sans-serif'; t.material.depthWrite = false; t.position.y = r + 12; g.add(t); n.__mats.push(t.material);
@@ -149,14 +178,14 @@ async function construire() {
       const t = new SpriteText(txt, 5, 'rgba(200,215,240,.95)'); t.fontFace = 'system-ui, Segoe UI, sans-serif'; t.backgroundColor = 'rgba(5,8,17,.6)'; t.padding = [1.6, .8]; t.borderRadius = 1.5;
       t.material.depthWrite = false; t.material.depthTest = false; t.renderOrder = 10; t.position.y = r + 5; t.visible = false; g.add(t); n.__lab = t;
     }
-    n.__base = n.__mats.map((m) => m.opacity ?? 1); return g;
+    n.__base = n.__mats.map((m) => m.uniforms ? m.uniforms.o.value : (m.opacity ?? 1)); return g;
   }
   // animation légère : électrons, halos, respiration de la sélection
   let t0 = performance.now(); let fpsN = 0, fpsT = performance.now() + 4000, allege = false; // mesure après le démarrage
   (function anim() {
     requestAnimationFrame(anim); if (!root.classList.contains('on')) return;
     const t = (performance.now() - t0) / 1000;
-    for (const { ring, sp } of rings) ring.rotation.z = t * sp;
+    for (const n of data.nodes) if (n.__spin) n.__spin.m.rotation.y = t * n.__spin.v;
     for (const n of data.nodes) if (n.__halo) { n.__halo.lookAt(G.camera().position); n.__halo.scale.setScalar(R.chapitre * (1.9 + .12 * Math.sin(t * 2 + n.id.length))); }
     if (sel && sel.__threeObj) sel.__threeObj.scale.setScalar(1 + .08 * Math.sin(t * 2));
     fpsN++; const now = performance.now(); if (now < fpsT) fpsN = 0; else if (now - fpsT > 2000) { const fps = fpsN * 1000 / (now - fpsT); fpsN = 0; fpsT = now; if (fps < 40 && !allege) { allege = true; G.renderer().setPixelRatio(1); bloom.strength *= .9; } }
@@ -177,7 +206,7 @@ async function construire() {
   function majSurbrillance() {
     voisinage(hov || sel); const any = hiN.size > 0;
     for (const n of data.nodes) if (n.__lab) n.__lab.visible = any && hiN.has(n);
-    for (const n of data.nodes) if (n.__mats) n.__mats.forEach((m, i) => { m.opacity = !any || hiN.has(n) ? n.__base[i] : n.__base[i] * .12; });
+    for (const n of data.nodes) if (n.__mats) n.__mats.forEach((m, i) => { const v = !any || hiN.has(n) ? n.__base[i] : n.__base[i] * .12; if (m.uniforms) m.uniforms.o.value = v; else m.opacity = v; });
     G.linkColor(linkColor).linkWidth(linkWidth).linkDirectionalParticles(partN).linkDirectionalParticleSpeed(partV).linkDirectionalParticleWidth(partW);
   }
 
@@ -186,6 +215,7 @@ async function construire() {
     const bb = G.getGraphBbox(); if (!bb) return; const cx = (bb.x[0] + bb.x[1]) / 2, cy = (bb.y[0] + bb.y[1]) / 2, cz = (bb.z[0] + bb.z[1]) / 2;
     const cam = G.camera(), vh = cam.fov * Math.PI / 360, hf = Math.atan(Math.tan(vh) * innerWidth / innerHeight);
     const d = Math.max((bb.x[1] - bb.x[0]) / 2 / Math.tan(hf), (bb.y[1] - bb.y[0]) / 2 / Math.tan(vh) * 1.15) * .86 + (bb.z[1] - bb.z[0]) / 4;
+    if (!isFinite(d) || d < 150) return;
     G.cameraPosition({ x: cx, y: cy + d * .18, z: cz + d }, { x: cx, y: cy, z: cz }, ms); c.target.set(cx, cy, cz);
   }
   function voler(n) { // cadrer l'élément ET toutes ses dépendances, en gardant l'angle de vue
@@ -250,6 +280,7 @@ async function construire() {
   const fit = () => { G.width(innerWidth).height(innerHeight); bloom.setSize(innerWidth, innerHeight); };
   addEventListener('resize', fit); fit();
   setTimeout(() => $('.cst-load').classList.add('off'), 250);
-  setTimeout(() => { if (!fitDone && !sel) { fitDone = true; cadrerTout(1600); } }, 2600);
+  const essaiCadre = () => { if (fitDone || sel) return; if (document.visibilityState !== 'visible' || !root.clientWidth) { setTimeout(essaiCadre, 500); return; } fitDone = true; cadrerTout(1600); };
+  setTimeout(essaiCadre, 2600);
   return { show };
 }
