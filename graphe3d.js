@@ -135,7 +135,7 @@ async function construire() {
     .nodeId('id').nodeVal((n) => rOf(n) ** 2 / 4)
     .nodeLabel((n) => `<b>${esc(n.label)}</b>${n.type === 'notion' ? '<br><span style="opacity:.7">' + esc(n.chapLabel) + '</span>' : n.type === 'semestre' ? '<br><span style="opacity:.7">' + esc(n.sub) + '</span>' : ''}`)
     .nodeThreeObject(nodeObj).nodeThreeObjectExtend(false)
-    .linkCurvature((l) => l.type === 'hierarchie' || l.type === 'constellation' ? 0 : .25).linkCurveRotation((l) => l.type === 'hierarchie' || l.type === 'constellation' ? 0 : (l.why || '').length % 6)
+    .linkCurvature((l) => l.type === 'hierarchie' ? .15 : l.type === 'constellation' ? .2 : .3).linkCurveRotation((l) => ((l.why || '').length + String(l.source.id ?? l.source).length * 7) % 6.28)
     .linkOpacity(1).linkResolution(mob ? 4 : 6)
     .linkColor(linkColor).linkWidth(linkWidth)
     .linkDirectionalParticles(partN).linkDirectionalParticleSpeed(partV).linkDirectionalParticleWidth(partW).linkDirectionalParticleColor((l) => `rgb(${l.type === 'outil' ? PAL.out : PAL.pre})`).linkDirectionalParticleResolution(6)
@@ -252,7 +252,7 @@ async function construire() {
     if (l.type === 'prerequis') return `rgba(${PAL.pre},${on ? .75 : any ? .08 : .4})`;
     if (l.type === 'outil') return `rgba(${PAL.out},${on ? .7 : any ? .05 : .22})`;
     const c = SEMC[(l.source.sem || byId.get(l.source)?.sem)] || '#8fa8ff'; if (l.niveau === 'semestre') return any ? 'rgba(255,255,255,.04)' : 'rgba(220,230,255,.16)'; return on ? c : any ? 'rgba(120,140,190,.05)' : hexA(c, .22); }
-  function linkWidth(l) { if (l.type === 'constellation') return 1.8; return hiL.has(l) ? (l.type === 'hierarchie' ? .5 : .8) : (l.type === 'prerequis' ? .45 : l.type === 'outil' ? .35 : .25); }
+  function linkWidth() { return 0; } // filaments fins (lignes), pas de tubes
   function partN(l) { return l.type === 'hierarchie' || l.type === 'constellation' ? 0 : hiL.has(l) ? (l.type === 'prerequis' ? 3 : 2) : hiN.size ? 0 : (l.type === 'prerequis' ? 1 : 0); }
   function partV(l) { return hiL.has(l) ? .006 : .0025; }
   function partW(l) { return hiL.has(l) ? 1.5 : 1.1; }
