@@ -96,6 +96,8 @@ async function construire() {
   const byId = new Map(data.nodes.map((n) => [n.id, n]));
   const out = new Map(), inc = new Map();
   for (const l of data.links) { (out.get(l.source) || out.set(l.source, []).get(l.source)).push(l); (inc.get(l.target) || inc.set(l.target, []).get(l.target)).push(l); }
+  { const chs = data.nodes.filter((n) => n.type === 'chapitre').sort((a, b) => a.id.localeCompare(b.id));
+    for (let k = 1; k < chs.length; k++) if (chs[k].sem === chs[k - 1].sem) data.links.push({ source: chs[k - 1].id, target: chs[k].id, type: 'constellation' }); }
   // chaque semestre = une constellation, à distance des autres (parcours en arc S1 -> S6)
   const ANC = { S1: [-235, 20, 0], S2: [-85, -40, 75], S3: [70, 35, -45], S4: [195, -35, 65], S6: [280, 55, -35] };
   const ancre = (k) => { let ns = []; const f = (al) => { for (const n of ns) { const a = ANC[n.sem]; if (!a) continue; const kk = (n.type === 'chapitre' ? k : k * .45) * al; n.vx += (a[0] - n.x) * kk; n.vy += (a[1] - n.y) * kk; n.vz += (a[2] - n.z) * kk; } }; f.initialize = (x) => { ns = x; }; return f; };
@@ -109,7 +111,7 @@ async function construire() {
     .nodeId('id').nodeVal((n) => R[n.type] ** 2 / 4)
     .nodeLabel((n) => `<b>${esc(n.label)}</b>${n.type === 'notion' ? '<br><span style="opacity:.7">' + esc(n.chapLabel) + '</span>' : n.type === 'semestre' ? '<br><span style="opacity:.7">' + esc(n.sub) + '</span>' : ''}`)
     .nodeThreeObject(nodeObj).nodeThreeObjectExtend(false)
-    .linkCurvature((l) => l.type === 'hierarchie' ? 0 : .25).linkCurveRotation((l) => l.type === 'hierarchie' ? 0 : (l.why || '').length % 6)
+    .linkCurvature((l) => l.type === 'hierarchie' || l.type === 'constellation' ? 0 : .25).linkCurveRotation((l) => l.type === 'hierarchie' || l.type === 'constellation' ? 0 : (l.why || '').length % 6)
     .linkOpacity(1).linkResolution(mob ? 4 : 6)
     .linkColor(linkColor).linkWidth(linkWidth)
     .linkDirectionalParticles(partN).linkDirectionalParticleSpeed(partV).linkDirectionalParticleWidth(partW).linkDirectionalParticleColor((l) => l.type === 'outil' ? '#ffbe78' : PRE).linkDirectionalParticleResolution(6)
@@ -120,10 +122,10 @@ async function construire() {
     .onBackgroundClick(() => { if (sel) { sel = null; panneau(); majSurbrillance(); } });
   const ctr = () => G.controls();
   G.d3Force('charge').strength((n) => n.type === 'notion' ? -22 : -75);
-  G.d3Force('link').distance((l) => l.type === 'hierarchie' ? 18 : 120).strength((l) => l.type === 'hierarchie' ? .9 : l.type === 'prerequis' ? .012 : .006);
+  G.d3Force('link').distance((l) => l.type === 'hierarchie' ? 18 : l.type === 'constellation' ? 70 : 120).strength((l) => l.type === 'hierarchie' ? .9 : l.type === 'constellation' ? .05 : l.type === 'prerequis' ? .012 : .006);
   G.d3Force('ancre', ancre(.09));
   G.renderer().setPixelRatio(Math.min(devicePixelRatio || 1, mob ? 1.5 : 2));
-  const bloom = new UnrealBloomPass(new THREE.Vector2(innerWidth, innerHeight), mob ? .75 : .9, .32, .45);
+  const bloom = new UnrealBloomPass(new THREE.Vector2(innerWidth, innerHeight), mob ? .9 : 1.1, .38, .4);
   G.postProcessingComposer().addPass(bloom);
   G.renderer().outputColorSpace = THREE.LinearSRGBColorSpace; // évite le double encodage sRGB du composer (fond gris)
   const portrait = innerHeight > innerWidth; G.cameraPosition({ x: 0, y: portrait ? 260 : 140, z: Math.max(640, Math.min(1500, 400 / (.364 * innerWidth / innerHeight))) });
@@ -166,10 +168,10 @@ async function construire() {
     const isCh = n.type === 'chapitre';
     // planète (chapitre) ou lune (notion) : texture procédurale, éclairée, qui tourne sur elle-même
     const core = new THREE.Mesh(isCh ? geo.p : geo.s, new THREE.MeshStandardMaterial({ map: texPlanete(col, seed, isCh), roughness: .9, metalness: 0,
-      emissive: col, emissiveIntensity: isCh ? .2 : .4, transparent: true }));
+      emissive: col, emissiveIntensity: isCh ? .45 : .6, transparent: true }));
     core.scale.setScalar(r); core.rotation.z = .25 + (seed % 7) * .06; g.add(core); n.__mats = [core.material]; n.__spin = { m: core, v: .08 + (seed % 5) * .03 };
     if (isCh) { // atmosphère lumineuse sur le pourtour
-      const atm = new THREE.Mesh(geo.p, atmosphere(col, .55)); atm.scale.setScalar(r * 1.22); g.add(atm); n.__mats.push(atm.material);
+      const atm = new THREE.Mesh(geo.p, atmosphere(col, .9)); atm.scale.setScalar(r * 1.22); g.add(atm); n.__mats.push(atm.material);
       if (seed % 3 !== 1) { // un anneau pour deux planètes sur trois
         const ring = new THREE.Mesh(geo.ring, new THREE.MeshBasicMaterial({ map: texAnneau(col, seed), side: THREE.DoubleSide, transparent: true, opacity: .75, depthWrite: false }));
         ring.scale.setScalar(r); ring.rotation.set(Math.PI / 2 - .35 - (seed % 4) * .12, (seed % 5) * .2, 0); g.add(ring); n.__mats.push(ring.material);
@@ -210,16 +212,17 @@ async function construire() {
 
   // ---------- surbrillance ----------
   function voisinage(n) { hiN.clear(); hiL.clear(); if (!n) return; hiN.add(n);
-    for (const l of data.links) { const s = l.source.id ?? l.source, t = l.target.id ?? l.target; if (s === n.id || t === n.id) { hiL.add(l); hiN.add(byId.get(s)); hiN.add(byId.get(t)); } } }
+    for (const l of data.links) { const s = l.source.id ?? l.source, t = l.target.id ?? l.target; if (l.type !== 'constellation' && (s === n.id || t === n.id)) { hiL.add(l); hiN.add(byId.get(s)); hiN.add(byId.get(t)); } } }
   function linkColor(l) { const on = hiL.has(l), any = hiN.size > 0;
-    if (l.type === 'prerequis') return on ? 'rgba(125,249,255,.75)' : any ? 'rgba(125,249,255,.06)' : 'rgba(125,249,255,.3)';
+    if (l.type === 'constellation') return hexA(SEMC[l.source.sem || byId.get(l.source)?.sem] || '#8fa8ff', any ? .3 : .95);
+    if (l.type === 'prerequis') return on ? 'rgba(125,249,255,.75)' : any ? 'rgba(125,249,255,.08)' : 'rgba(125,249,255,.4)';
     if (l.type === 'outil') return on ? 'rgba(255,190,120,.7)' : any ? 'rgba(255,190,120,.05)' : 'rgba(255,190,120,.22)';
     const c = SEMC[(l.source.sem || byId.get(l.source)?.sem)] || '#8fa8ff'; if (l.niveau === 'semestre') return any ? 'rgba(255,255,255,.04)' : 'rgba(220,230,255,.16)'; return on ? c : any ? 'rgba(120,140,190,.05)' : hexA(c, .22); }
-  function linkWidth(l) { return hiL.has(l) ? (l.type === 'hierarchie' ? .5 : .8) : (l.type === 'prerequis' ? .45 : l.type === 'outil' ? .35 : .25); }
-  function partN(l) { return l.type === 'hierarchie' ? 0 : hiL.has(l) ? (l.type === 'prerequis' ? 3 : 2) : hiN.size ? 0 : (l.type === 'prerequis' ? 1 : 0); }
+  function linkWidth(l) { if (l.type === 'constellation') return 1.8; return hiL.has(l) ? (l.type === 'hierarchie' ? .5 : .8) : (l.type === 'prerequis' ? .45 : l.type === 'outil' ? .35 : .25); }
+  function partN(l) { return l.type === 'hierarchie' || l.type === 'constellation' ? 0 : hiL.has(l) ? (l.type === 'prerequis' ? 3 : 2) : hiN.size ? 0 : (l.type === 'prerequis' ? 1 : 0); }
   function partV(l) { return hiL.has(l) ? .006 : .0025; }
   function partW(l) { return hiL.has(l) ? 1.5 : 1.1; }
-  function hexA(h, a) { const c = new THREE.Color(h); return `rgba(${c.r * 255 | 0},${c.g * 255 | 0},${c.b * 255 | 0},${a})`; }
+  function hexA(h, a) { const x = parseInt(String(h).slice(1), 16); return `rgba(${x >> 16 & 255},${x >> 8 & 255},${x & 255},${a})`; }
   function majSurbrillance() {
     voisinage(hov || sel); const any = hiN.size > 0;
     for (const n of data.nodes) if (n.__mats) n.__mats.forEach((m, i) => { const v = !any || hiN.has(n) ? n.__base[i] : n.__base[i] * .3; if (m.uniforms) m.uniforms.o.value = v; else m.opacity = v; });
@@ -236,7 +239,7 @@ async function construire() {
   }
   function voler(n) { // cadrer l'élément ET toutes ses dépendances, en gardant l'angle de vue
     const pts = [n];
-    for (const l of data.links) { const s = l.source.id ?? l.source, t = l.target.id ?? l.target; if (s === n.id) pts.push(byId.get(t)); else if (t === n.id) pts.push(byId.get(s)); }
+    for (const l of data.links) { if (l.type === 'constellation') continue; const s = l.source.id ?? l.source, t = l.target.id ?? l.target; if (s === n.id) pts.push(byId.get(t)); else if (t === n.id) pts.push(byId.get(s)); }
     let mn = [1e9, 1e9, 1e9], mx = [-1e9, -1e9, -1e9]; for (const p of pts) ['x', 'y', 'z'].forEach((k, i) => { mn[i] = Math.min(mn[i], p[k]); mx[i] = Math.max(mx[i], p[k]); });
     const ctrP = new THREE.Vector3((mn[0] + mx[0]) / 2, (mn[1] + mx[1]) / 2, (mn[2] + mx[2]) / 2);
     let rad = 40; for (const p of pts) rad = Math.max(rad, ctrP.distanceTo(new THREE.Vector3(p.x, p.y, p.z)) + 12);
