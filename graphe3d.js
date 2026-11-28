@@ -209,9 +209,14 @@ async function construire(cfg) {
     const seed = [...n.id].reduce((a, ch) => a * 31 + ch.charCodeAt(0) | 0, 7);
     const isCh = n.type === 'chapitre';
     // planète (chapitre) ou lune (notion) : texture procédurale, éclairée, qui tourne sur elle-même
-    const core = new THREE.Mesh(isCh ? geo.p : geo.s, new THREE.MeshStandardMaterial({ map: texPlanete(col, seed, isCh), roughness: .9, metalness: 0,
-      emissive: col, emissiveIntensity: isCh ? .3 : .45, transparent: true }));
+    if (!isCh) { // notion : petit point lumineux néon (non éclairé, fixe), que le halo fait briller
+      const pt = new THREE.Mesh(geo.s, new THREE.MeshBasicMaterial({ color: col.clone().lerp(new THREE.Color('#ffffff'), .45), transparent: true }));
+      pt.scale.setScalar(r * .55); g.add(pt); n.__mats = [pt.material]; n.__point = pt;
+    } else {
+    const core = new THREE.Mesh(geo.p, new THREE.MeshStandardMaterial({ map: texPlanete(col, seed, isCh), roughness: .9, metalness: 0,
+      emissive: col, emissiveIntensity: .3, transparent: true }));
     core.scale.setScalar(r); core.rotation.z = .25 + (seed % 7) * .06; g.add(core); n.__mats = [core.material]; n.__spin = { m: core, v: .08 + (seed % 5) * .03 }; n.__core = core; planetes.push(n);
+    }
     if (isCh) { // atmosphère lumineuse sur le pourtour
       const atm = new THREE.Mesh(geo.p, atmosphere(col, .65)); atm.scale.setScalar(r * 1.22); g.add(atm); n.__atm = atm; n.__mats.push(atm.material);
       if (seed % 3 !== 1) { // un anneau pour deux planètes sur trois
