@@ -5,7 +5,10 @@ const V3 = '0.187.0';
 const LIBS = () => Promise.all([
   import(`https://esm.sh/3d-force-graph@1.80.3?deps=three@${V3}`),
   import(`https://esm.sh/three@${V3}`),
-  import(`https://esm.sh/three@${V3}/examples/jsm/postprocessing/UnrealBloomPass.js`)
+  import(`https://esm.sh/three@${V3}/examples/jsm/postprocessing/UnrealBloomPass.js`),
+  import(`https://esm.sh/three@${V3}/examples/jsm/lines/Line2.js`),
+  import(`https://esm.sh/three@${V3}/examples/jsm/lines/LineMaterial.js`),
+  import(`https://esm.sh/three@${V3}/examples/jsm/lines/LineGeometry.js`)
 ]);
 const STYLES = [['neon', 'Néon'], ['nebuleuse', 'Nébuleuse'], ['holo', 'Hologramme'], ['papier', 'Papier'], ['sobre', 'Sobre']];
 const SEMC = { S1: '#4cc9ff', S2: '#3dffb5', S3: '#ffcf4d', S4: '#ff5fa2', S6: '#b18cff' };
@@ -109,11 +112,14 @@ async function construire() {
   let data, libs;
   try { [data, libs] = await Promise.all([fetch('graphe.json?v=3').then((r) => r.json()), LIBS()]); }
   catch (e) { $('.cst-load').textContent = 'Connexion nécessaire pour la vue 3D.'; return { show }; }
-  const [{ default: ForceGraph3D }, THREE, { UnrealBloomPass }] = libs;
+  const [{ default: ForceGraph3D }, THREE, { UnrealBloomPass }, { Line2 }, { LineMaterial }, { LineGeometry }] = libs;
 
   // ---------- données ----------
   pv = new THREE.Vector3();
   const byId = new Map(data.nodes.map((n) => [n.id, n]));
+  const EP = { constellation: 3.4, hierarchie: 1.9 }; const rubans = [];
+  const tmpA = new THREE.Vector3(), tmpB = new THREE.Vector3(), tmpN = new THREE.Vector3(), tmpM = new THREE.Vector3();
+
   const out = new Map(), inc = new Map();
   for (const l of data.links) { (out.get(l.source) || out.set(l.source, []).get(l.source)).push(l); (inc.get(l.target) || inc.set(l.target, []).get(l.target)).push(l); }
   { const chs = data.nodes.filter((n) => n.type === 'chapitre').sort((a, b) => a.id.localeCompare(b.id));
@@ -135,6 +141,7 @@ async function construire() {
     .nodeId('id').nodeVal((n) => rOf(n) ** 2 / 4)
     .nodeLabel((n) => `<b>${esc(n.label)}</b>${n.type === 'notion' ? '<br><span style="opacity:.7">' + esc(n.chapLabel) + '</span>' : n.type === 'semestre' ? '<br><span style="opacity:.7">' + esc(n.sub) + '</span>' : ''}`)
     .nodeThreeObject(nodeObj).nodeThreeObjectExtend(false)
+    .linkThreeObject(linkObj).linkThreeObjectExtend(false).linkPositionUpdate(linkPos)
     .linkCurvature((l) => l.type === 'hierarchie' ? .15 : l.type === 'constellation' ? .2 : .3).linkCurveRotation((l) => ((l.why || '').length + String(l.source.id ?? l.source).length * 7) % 6.28)
     .linkOpacity(1).linkResolution(mob ? 5 : 8)
     .linkColor(linkColor).linkWidth(linkWidth)
@@ -252,8 +259,25 @@ async function construire() {
     if (l.type === 'prerequis') return `rgba(${PAL.pre},${on ? .75 : any ? .08 : .4})`;
     if (l.type === 'outil') return `rgba(${PAL.out},${on ? .7 : any ? .05 : .22})`;
     const c = SEMC[(l.source.sem || byId.get(l.source)?.sem)] || '#8fa8ff'; if (l.niveau === 'semestre') return any ? 'rgba(255,255,255,.04)' : 'rgba(220,230,255,.16)'; return on ? c : any ? 'rgba(120,140,190,.05)' : hexA(c, .22); }
-  function linkWidth(l) { // liens entre notions plus épais (fins tubes courbes) ; structure en simples filaments
-    if (l.type === 'prerequis' || l.type === 'outil') return hiL.has(l) ? 1.5 : (l.type === 'prerequis' ? 1.1 : .75); return 0; }
+  function linkWidth() { return 0; } // liens entre notions : filaments fins
+  // liens de structure : rubans plats d'épaisseur constante à l'écran (pas de tubes), plus épais entre chapitres
+  function linkObj(l) {
+    if (!EP[l.type]) return null;
+    const geo = new LineGeometry(); geo.setPositions(new Array(13 * 3).fill(0));
+    const mat = new LineMaterial({ color: new THREE.Color(SEMC[byId.get(l.source.id ?? l.source)?.sem] || '#8fa8ff'), linewidth: EP[l.type] * (mob ? .8 : 1), transparent: true, opacity: opRuban(l), depthWrite: false });
+    mat.resolution.set(innerWidth, innerHeight); const o = new Line2(geo, mat); o.frustumCulled = false; l.__lm = mat; rubans.push(mat); return o;
+  }
+  function linkPos(o, { start, end }, l) {
+    if (!l.__lm) return false; // laisser 3d-force-graph placer les autres liens
+    tmpA.set(start.x, start.y, start.z); tmpB.set(end.x, end.y, end.z); tmpM.addVectors(tmpA, tmpB).multiplyScalar(.5);
+    tmpN.subVectors(tmpB, tmpA); const L = tmpN.length(); tmpN.cross(new THREE.Vector3(0, 1, 0)).normalize().multiplyScalar(L * (l.type === 'constellation' ? .16 : .1));
+    tmpM.add(tmpN); const P = [];
+    for (let i = 0; i <= 12; i++) { const t = i / 12, u = 1 - t; P.push(u * u * tmpA.x + 2 * u * t * tmpM.x + t * t * tmpB.x, u * u * tmpA.y + 2 * u * t * tmpM.y + t * t * tmpB.y, u * u * tmpA.z + 2 * u * t * tmpM.z + t * t * tmpB.z); }
+    o.geometry.setPositions(P); return true;
+  }
+  function opRuban(l) { const any = hiN.size > 0; const on = l.type === 'hierarchie' ? hiL.has(l) : (hiN.has(byId.get(l.source.id ?? l.source)) && hiN.has(byId.get(l.target.id ?? l.target)));
+    return any ? (on ? .85 : .08) : (l.type === 'constellation' ? .75 : .45); }
+  function majRubans() { for (const l of data.links) if (l.__lm) l.__lm.opacity = opRuban(l); }
   function partN(l) { return l.type === 'hierarchie' || l.type === 'constellation' ? 0 : hiL.has(l) ? (l.type === 'prerequis' ? 3 : 2) : hiN.size ? 0 : (l.type === 'prerequis' ? 1 : 0); }
   function partV(l) { return hiL.has(l) ? .006 : .0025; }
   function partW(l) { return hiL.has(l) ? 1.5 : 1.1; }
@@ -261,7 +285,7 @@ async function construire() {
   function majSurbrillance() {
     voisinage(hov || sel); const any = hiN.size > 0;
     for (const n of data.nodes) if (n.__mats) n.__mats.forEach((m, i) => { const v = !any || hiN.has(n) ? n.__base[i] : n.__base[i] * .3; if (m.uniforms) m.uniforms.o.value = v; else m.opacity = v; });
-    G.linkColor(linkColor).linkWidth(linkWidth).linkDirectionalParticles(partN).linkDirectionalParticleSpeed(partV).linkDirectionalParticleWidth(partW);
+    G.linkColor(linkColor).linkWidth(linkWidth).linkDirectionalParticles(partN).linkDirectionalParticleSpeed(partV).linkDirectionalParticleWidth(partW); majRubans();
   }
 
   // ---------- caméra cinématique ----------
@@ -287,7 +311,10 @@ async function construire() {
     const uW = mobil ? 1 : Math.max(.5, (w - 390) / w), uH = mobil ? .42 : 1; // zone libre à côté du panneau
     const half = Math.min(Math.atan(Math.tan(vh) * uH), Math.atan(Math.tan(hf) * uW));
     const d = rad / Math.sin(half) * 1.02;
-    const dir = cam.position.clone().sub(ctrP).normalize();
+    // regarder depuis l'extérieur de la spirale (les autres constellations restent derrière), en gardant un peu l'angle actuel
+    const gc = new THREE.Vector3(); let nb = 0; for (const x of data.nodes) if (x.x !== undefined) { gc.x += x.x; gc.y += x.y; gc.z += x.z; nb++; } gc.divideScalar(Math.max(1, nb));
+    const ext = ctrP.clone().sub(gc); ext.y = 0; const dir = ext.lengthSq() > 1 ? ext.normalize().multiplyScalar(.75).add(cam.position.clone().sub(ctrP).normalize().multiplyScalar(.25)) : cam.position.clone().sub(ctrP).normalize();
+    dir.y += .3; dir.normalize();
     const q = cam.quaternion; const right = new THREE.Vector3(1, 0, 0).applyQuaternion(q), up = new THREE.Vector3(0, 1, 0).applyQuaternion(q);
     // décaler la visée pour que le groupe tombe au centre de la zone libre
     const tgt = ctrP.clone(); if (mobil) tgt.addScaledVector(up, -(1 - uH) * d * Math.tan(vh)); else tgt.addScaledVector(right, (1 - uW) * d * Math.tan(hf));
@@ -363,7 +390,7 @@ async function construire() {
   root.tabIndex = -1; root.focus({ preventScroll: true });
 
   // ---------- taille ----------
-  const fit = () => { G.width(innerWidth).height(innerHeight); bloom.setSize(innerWidth, innerHeight); };
+  const fit = () => { G.width(innerWidth).height(innerHeight); bloom.setSize(innerWidth, innerHeight); rubans.forEach((m) => m.resolution.set(innerWidth, innerHeight)); };
   addEventListener('resize', fit); fit();
   setTimeout(() => $('.cst-load').classList.add('off'), 250);
   const essaiCadre = () => { if (fitDone || sel) return; if (document.visibilityState !== 'visible' || !root.clientWidth) { setTimeout(essaiCadre, 500); return; } fitDone = true; cadrerTout(1600); };
