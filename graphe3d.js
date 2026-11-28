@@ -148,8 +148,8 @@ async function construire(cfg) {
     .linkCurvature((l) => l.type === 'hierarchie' ? .15 : l.type === 'constellation' ? .2 : .3).linkCurveRotation((l) => ((l.why || '').length + String(l.source.id ?? l.source).length * 7) % 6.28)
     .linkOpacity(1).linkResolution(mob ? 5 : 8)
     .linkColor(linkColor).linkWidth(linkWidth)
-    .linkDirectionalParticles(partN).linkDirectionalParticleSpeed(partV).linkDirectionalParticleWidth(partW).linkDirectionalParticleColor((l) => `rgb(${l.type === 'outil' ? PAL.out : PAL.pre})`).linkDirectionalParticleResolution(6)
-    .linkDirectionalArrowLength((l) => l.type === 'prerequis' ? 2.4 : 0).linkDirectionalArrowRelPos(.92).linkDirectionalArrowColor(() => `rgba(${PAL.pre},.75)`)
+    .linkDirectionalParticleThreeObject(pointNeon).linkDirectionalParticles(partN).linkDirectionalParticleSpeed(partV).linkDirectionalParticleWidth(partW).linkDirectionalParticleColor((l) => `rgb(${l.type === 'outil' ? PAL.out : PAL.pre})`).linkDirectionalParticleResolution(6)
+    .linkDirectionalArrowLength(0).linkDirectionalArrowRelPos(.92).linkDirectionalArrowColor(() => `rgba(${PAL.pre},.75)`)
     .enableNodeDrag(false).warmupTicks(120).cooldownTicks(160).onEngineStop(() => { if (!fitDone && !sel) { fitDone = true; cadrerTout(1400); } })
     .onNodeHover((n) => { hov = n || null; $('.cst-stage').style.cursor = n ? 'pointer' : ''; majSurbrillance(); })
     .onNodeClick((n) => choisir(n, true))
@@ -284,6 +284,12 @@ async function construire(cfg) {
   function partN(l) { return l.type === 'hierarchie' || l.type === 'constellation' ? 0 : hiL.has(l) ? (l.type === 'prerequis' ? 3 : 2) : hiN.size ? 0 : (l.type === 'prerequis' ? 1 : 0); }
   function partV(l) { return hiL.has(l) ? .006 : .0025; }
   function partW(l) { return hiL.has(l) ? 1.5 : 1.1; }
+  // particules : petits points lumineux (sprite à halo, mélange additif) au lieu de boules
+  const geoPoint = new THREE.SphereGeometry(1, 10, 8);
+  function pointNeon(l) { // petite étincelle non éclairée : le halo (bloom) la fait briller comme un point néon
+    const m = new THREE.Mesh(geoPoint, new THREE.MeshBasicMaterial({ color: new THREE.Color(`rgb(${l.type === 'outil' ? PAL.out : PAL.pre})`), transparent: true, opacity: .95, depthWrite: false, blending: style === 'papier' ? THREE.NormalBlending : THREE.AdditiveBlending }));
+    m.scale.setScalar(hiL.has(l) ? .75 : .55); return m;
+  }
   function hexA(h, a) { const x = parseInt(String(h).slice(1), 16); return `rgba(${x >> 16 & 255},${x >> 8 & 255},${x & 255},${a})`; }
   function majSurbrillance() {
     voisinage(hov || sel); const any = hiN.size > 0;
