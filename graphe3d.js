@@ -386,7 +386,7 @@ async function construire() {
     root.querySelectorAll('[data-sty]').forEach((b) => b.classList.toggle('on', b.dataset.sty === style));
   }
   root.querySelectorAll('[data-sty]').forEach((b) => b.onclick = () => appliquerStyle(b.dataset.sty));
-  appliquerStyle((() => { try { return localStorage.getItem('cst_style') || 'neon'; } catch (e) { return 'neon'; } })());
+  appliquerStyle((() => { try { return localStorage.getItem('cst_style') || 'nebuleuse'; } catch (e) { return 'nebuleuse'; } })()); // ambiance par défaut : Nébuleuse
   root.tabIndex = -1; root.focus({ preventScroll: true });
 
   // ---------- taille ----------
