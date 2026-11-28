@@ -35,6 +35,7 @@ const CSS = `
 .cst-hint{position:absolute;right:14px;bottom:14px;font-size:12px;opacity:.55;text-align:right;pointer-events:none}
 .cst-load{position:absolute;inset:0;display:grid;place-items:center;font-size:14px;letter-spacing:.2em;text-transform:uppercase;color:#7df9ff;text-shadow:0 0 12px #7df9ff}
 .cst-load.off{display:none}
+.cst-lb.ch.pt{font-size:12.5px;opacity:.85}
 .cst-lbs{position:absolute;inset:0;pointer-events:none;overflow:hidden}
 .cst-lb{position:absolute;left:0;top:0;white-space:nowrap;transform-origin:50% 100%;will-change:transform;font-weight:600;letter-spacing:.01em;text-shadow:0 0 3px #050811,0 0 8px #050811,0 1px 2px #000;transition:opacity .25s}
 .cst-lb.ch{font-size:15px;color:#e8f2ff;border-bottom:1px solid color-mix(in srgb,var(--c) 70%,transparent);padding-bottom:1px}
@@ -100,16 +101,18 @@ async function construire() {
     for (let k = 1; k < chs.length; k++) if (chs[k].sem === chs[k - 1].sem) data.links.push({ source: chs[k - 1].id, target: chs[k].id, type: 'constellation' }); }
   // chaque semestre = une constellation, à distance des autres (parcours en arc S1 -> S6)
   // spirale en 3D : chaque semestre tourne de 75° et monte d'un étage (S1 en bas, S6 en haut)
-  const ANC = {}; ['S1', 'S2', 'S3', 'S4', 'S6'].forEach((k, i) => { const a = i * 1.3 - .4; ANC[k] = [Math.cos(a) * 215, -170 + i * 85, Math.sin(a) * 215]; });
+  // S1, S2, S3 (le gros du volume horaire) au cœur de la spirale ; S4 et S6, plus courts, en périphérie et en petit
+  const POIDS = { S1: 1, S2: 1, S3: 1, S4: .62, S6: .55 };
+  const ANC = { S1: [-150, -110, 60], S2: [70, -30, 150], S3: [130, 70, -80], S4: [-20, 160, -150], S6: [-190, 175, -30] };
   const ancre = (k) => { let ns = []; const f = (al) => { for (const n of ns) { const a = ANC[n.sem]; if (!a) continue; const kk = (n.type === 'chapitre' ? k : k * .45) * al; n.vx += (a[0] - n.x) * kk; n.vy += (a[1] - n.y) * kk; n.vz += (a[2] - n.z) * kk; } }; f.initialize = (x) => { ns = x; }; return f; };
-  const R = { semestre: 9, chapitre: 8.5, notion: 3.6 };
+  const R0 = { semestre: 9, chapitre: 8.5, notion: 3.6 }; const rOf = (n) => R0[n.type] * (POIDS[n.sem] || 1);
 
   // ---------- scène ----------
   const mob = mobile();
   G = ForceGraph3D({ controlType: 'orbit', rendererConfig: { antialias: !mob, alpha: false, powerPreference: 'high-performance' } })($('.cst-stage'))
     .backgroundColor(BG).showNavInfo(false)
     .graphData(data)
-    .nodeId('id').nodeVal((n) => R[n.type] ** 2 / 4)
+    .nodeId('id').nodeVal((n) => rOf(n) ** 2 / 4)
     .nodeLabel((n) => `<b>${esc(n.label)}</b>${n.type === 'notion' ? '<br><span style="opacity:.7">' + esc(n.chapLabel) + '</span>' : n.type === 'semestre' ? '<br><span style="opacity:.7">' + esc(n.sub) + '</span>' : ''}`)
     .nodeThreeObject(nodeObj).nodeThreeObjectExtend(false)
     .linkCurvature((l) => l.type === 'hierarchie' || l.type === 'constellation' ? 0 : .25).linkCurveRotation((l) => l.type === 'hierarchie' || l.type === 'constellation' ? 0 : (l.why || '').length % 6)
@@ -164,7 +167,7 @@ async function construire() {
     fragmentShader: 'uniform vec3 c; uniform float o; varying vec3 vN; varying vec3 vV; void main(){ float f = pow(1.0 - max(dot(vN, vV), 0.0), 2.4); gl_FragColor = vec4(c * 1.2, f * o); }' }); }
   const rings = [];
   function nodeObj(n) {
-    const col = new THREE.Color(SEMC[n.sem] || '#ffffff'); const g = new THREE.Group(); const r = R[n.type];
+    const col = new THREE.Color(SEMC[n.sem] || '#ffffff'); const g = new THREE.Group(); const r = rOf(n);
     const seed = [...n.id].reduce((a, ch) => a * 31 + ch.charCodeAt(0) | 0, 7);
     const isCh = n.type === 'chapitre';
     // planète (chapitre) ou lune (notion) : texture procédurale, éclairée, qui tourne sur elle-même
@@ -179,7 +182,7 @@ async function construire() {
       }
     }
     { // étiquette HTML nette (hors 3D, donc pas floutée par le halo)
-      const el = document.createElement('div'); el.className = 'cst-lb ' + (isCh ? 'ch' : 'no'); el.style.setProperty('--c', SEMC[n.sem] || '#7df9ff');
+      const el = document.createElement('div'); el.className = 'cst-lb ' + (isCh ? 'ch' : 'no') + ((POIDS[n.sem] || 1) < 1 ? ' pt' : ''); el.style.setProperty('--c', SEMC[n.sem] || '#7df9ff');
       el.textContent = isCh ? n.label : (n.label.length > 46 ? n.label.slice(0, 44) + '…' : n.label); labs.appendChild(el); n.__el = el; n.__r = r;
     }
     n.__base = n.__mats.map((m) => m.uniforms ? m.uniforms.o.value : (m.opacity ?? 1)); return g;
@@ -232,8 +235,10 @@ async function construire() {
 
   // ---------- caméra cinématique ----------
   function cadrerTout(ms) { // vue en biais, en surplomb, qui contient toute la spirale
-    const bb = G.getGraphBbox(); if (!bb) return; const cx = (bb.x[0] + bb.x[1]) / 2, cy = (bb.y[0] + bb.y[1]) / 2, cz = (bb.z[0] + bb.z[1]) / 2;
-    let rad = 0; for (const n of data.nodes) if (n.x !== undefined) rad = Math.max(rad, Math.hypot(n.x - cx, n.y - cy, n.z - cz));
+    const cœur = data.nodes.filter((n) => n.x !== undefined && (POIDS[n.sem] || 1) === 1); if (!cœur.length) return;
+    const mn = [1e9, 1e9, 1e9], mx = [-1e9, -1e9, -1e9]; for (const n of cœur) ['x', 'y', 'z'].forEach((k, i) => { mn[i] = Math.min(mn[i], n[k]); mx[i] = Math.max(mx[i], n[k]); });
+    const cx = (mn[0] + mx[0]) / 2, cy = (mn[1] + mx[1]) / 2 + 30, cz = (mn[2] + mx[2]) / 2;
+    let rad = 0; for (const n of data.nodes) if (n.x !== undefined) rad = Math.max(rad, Math.hypot(n.x - cx, n.y - cy, n.z - cz) * ((POIDS[n.sem] || 1) < 1 ? .9 : 1));
     const cam = G.camera(), vh = cam.fov * Math.PI / 360, hf = Math.atan(Math.tan(vh) * innerWidth / innerHeight);
     const d = rad / Math.sin(Math.min(vh, hf)) * .82;
     if (!isFinite(d) || d < 150) return;
