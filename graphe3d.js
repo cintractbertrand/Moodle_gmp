@@ -290,10 +290,12 @@ async function construire(cfg) {
   function partV(l) { return hiL.has(l) ? .006 : .0025; }
   function partW(l) { return hiL.has(l) ? 1.5 : 1.1; }
   // particules : petits points lumineux (sprite à halo, mélange additif) au lieu de boules
-  const geoPoint = new THREE.SphereGeometry(1, 10, 8);
-  function pointNeon(l) { // petite étincelle non éclairée : le halo (bloom) la fait briller comme un point néon
-    const m = new THREE.Mesh(geoPoint, new THREE.MeshBasicMaterial({ color: new THREE.Color(`rgb(${l.type === 'outil' ? PAL.out : PAL.pre})`), transparent: true, opacity: .95, depthWrite: false, blending: style === 'papier' ? THREE.NormalBlending : THREE.AdditiveBlending }));
-    m.scale.setScalar(hiL.has(l) ? .75 : .55); return m;
+  // étincelles : minuscule noyau très lumineux (non éclairé) ; c'est le halo qui dessine le point néon, pas une boule
+  const geoEtin = new THREE.SphereGeometry(1, 8, 6);
+  function pointNeon(l) {
+    const c = new THREE.Color(`rgb(${l.type === 'outil' ? PAL.out : PAL.pre})`).lerp(new THREE.Color('#ffffff'), .35);
+    const m = new THREE.Mesh(geoEtin, new THREE.MeshBasicMaterial({ color: c, transparent: true, opacity: 1, depthWrite: false, blending: style === 'papier' ? THREE.NormalBlending : THREE.AdditiveBlending }));
+    m.scale.setScalar(hiL.has(l) ? .38 : .28); return m;
   }
   function hexA(h, a) { const x = parseInt(String(h).slice(1), 16); return `rgba(${x >> 16 & 255},${x >> 8 & 255},${x & 255},${a})`; }
   function majSurbrillance() {
