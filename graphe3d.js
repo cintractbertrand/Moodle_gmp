@@ -122,7 +122,7 @@ async function construire() {
   G.postProcessingComposer().addPass(bloom);
   G.renderer().outputColorSpace = THREE.LinearSRGBColorSpace; // évite le double encodage sRGB du composer (fond gris)
   const portrait = innerHeight > innerWidth; G.cameraPosition({ x: 0, y: portrait ? 260 : 140, z: Math.max(640, Math.min(1500, 400 / (.364 * innerWidth / innerHeight))) });
-  const c = ctr(); c.autoRotate = true; c.autoRotateSpeed = .55; c.enableDamping = true; c.dampingFactor = .08; c.minDistance = 25; c.maxDistance = 1400;
+  const c = ctr(); c.autoRotate = true; c.autoRotateSpeed = .3; c.enableDamping = true; c.dampingFactor = .08; c.minDistance = 25; c.maxDistance = 1400;
   c.addEventListener('start', () => { c.autoRotate = false; });
 
   // champ d'étoiles + poussière lumineuse
@@ -139,7 +139,7 @@ async function construire() {
     core.scale.setScalar(r); g.add(core); n.__mats = [core.material];
     if (n.type === 'chapitre') { // noyau atomique : orbites électroniques
       for (let k = 0; k < 2; k++) { const ring = new THREE.Mesh(geo.r, new THREE.MeshBasicMaterial({ color: col, transparent: true, opacity: .55 })); ring.scale.setScalar(r * 2.4 + k * 3); ring.rotation.set(Math.PI / 2 + k * 1.05, k * .7, 0); g.add(ring); n.__mats.push(ring.material);
-        const el = new THREE.Mesh(geo.s, new THREE.MeshBasicMaterial({ color: '#ffffff' })); el.scale.setScalar(1.1); ring.add(el); el.position.set(1, 0, 0); el.scale.setScalar(1.1 / (r * 2.4 + k * 3)); rings.push({ ring, sp: .6 + k * .35 }); }
+        const el = new THREE.Mesh(geo.s, new THREE.MeshBasicMaterial({ color: '#ffffff' })); el.scale.setScalar(1.1); ring.add(el); el.position.set(1, 0, 0); el.scale.setScalar(1.1 / (r * 2.4 + k * 3)); rings.push({ ring, sp: .22 + k * .1 }); }
     }
     if (n.type === 'chapitre') {
       const t = new SpriteText(n.label, 7.5, 'rgba(178,198,232,.9)'); t.fontWeight = '600'; t.fontFace = 'system-ui, Segoe UI, sans-serif'; t.material.depthWrite = false; t.position.y = r + 12; g.add(t); n.__mats.push(t.material);
@@ -158,7 +158,7 @@ async function construire() {
     const t = (performance.now() - t0) / 1000;
     for (const { ring, sp } of rings) ring.rotation.z = t * sp;
     for (const n of data.nodes) if (n.__halo) { n.__halo.lookAt(G.camera().position); n.__halo.scale.setScalar(R.chapitre * (1.9 + .12 * Math.sin(t * 2 + n.id.length))); }
-    if (sel && sel.__threeObj) sel.__threeObj.scale.setScalar(1 + .12 * Math.sin(t * 4));
+    if (sel && sel.__threeObj) sel.__threeObj.scale.setScalar(1 + .08 * Math.sin(t * 2));
     fpsN++; const now = performance.now(); if (now < fpsT) fpsN = 0; else if (now - fpsT > 2000) { const fps = fpsN * 1000 / (now - fpsT); fpsN = 0; fpsT = now; if (fps < 40 && !allege) { allege = true; G.renderer().setPixelRatio(1); bloom.strength *= .85; } }
   })();
 
@@ -171,7 +171,7 @@ async function construire() {
     const c = SEMC[(l.source.sem || byId.get(l.source)?.sem)] || '#8fa8ff'; if (l.niveau === 'semestre') return any ? 'rgba(255,255,255,.04)' : 'rgba(220,230,255,.16)'; return on ? c : any ? 'rgba(120,140,190,.05)' : hexA(c, .22); }
   function linkWidth(l) { return hiL.has(l) ? (l.type === 'hierarchie' ? .5 : .65) : (l.type === 'prerequis' ? .45 : l.type === 'outil' ? .35 : .25); }
   function partN(l) { return l.type === 'hierarchie' ? 0 : hiL.has(l) ? (l.type === 'prerequis' ? 3 : 2) : hiN.size ? 0 : (l.type === 'prerequis' ? 1 : 0); }
-  function partV(l) { return hiL.has(l) ? .011 : .0045; }
+  function partV(l) { return hiL.has(l) ? .006 : .0025; }
   function partW(l) { return hiL.has(l) ? 1.5 : 1.1; }
   function hexA(h, a) { const c = new THREE.Color(h); return `rgba(${c.r * 255 | 0},${c.g * 255 | 0},${c.b * 255 | 0},${a})`; }
   function majSurbrillance() {
@@ -198,7 +198,7 @@ async function construire() {
     // décaler la visée pour que le groupe tombe au centre de la zone libre
     const tgt = ctrP.clone(); if (mobil) tgt.addScaledVector(up, -(1 - uH) * d * Math.tan(vh)); else tgt.addScaledVector(right, (1 - uW) * d * Math.tan(hf));
     const p = tgt.clone().addScaledVector(dir, d);
-    c.autoRotate = false; G.cameraPosition({ x: p.x, y: p.y, z: p.z }, { x: tgt.x, y: tgt.y, z: tgt.z }, 1700);
+    c.autoRotate = false; G.cameraPosition({ x: p.x, y: p.y, z: p.z }, { x: tgt.x, y: tgt.y, z: tgt.z }, 2600);
   }
   function choisir(n, fly) { if (!n) return; sel = n; panneau(); majSurbrillance(); if (fly) voler(n); }
 
