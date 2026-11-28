@@ -103,7 +103,8 @@ async function construire() {
   // spirale en 3D : chaque semestre tourne de 75° et monte d'un étage (S1 en bas, S6 en haut)
   // S1, S2, S3 (le gros du volume horaire) au cœur de la spirale ; S4 et S6, plus courts, en périphérie et en petit
   const POIDS = { S1: 1, S2: 1, S3: 1, S4: .62, S6: .55 };
-  const ANC = { S1: [-150, -110, 60], S2: [70, -30, 150], S3: [130, 70, -80], S4: [-20, 160, -150], S6: [-190, 175, -30] };
+  const ANC0 = { S1: [-150, -110, 60], S2: [70, -30, 150], S3: [130, 70, -80], S4: [-20, 160, -150], S6: [-190, 175, -30] };
+  const ANC = Object.fromEntries(Object.entries(ANC0).map(([k, v]) => [k, v.map((x) => x * .82)])); // rapprochées de 18 %
   const ancre = (k) => { let ns = []; const f = (al) => { for (const n of ns) { const a = ANC[n.sem]; if (!a) continue; const kk = (n.type === 'chapitre' ? k : k * .45) * al; n.vx += (a[0] - n.x) * kk; n.vy += (a[1] - n.y) * kk; n.vz += (a[2] - n.z) * kk; } }; f.initialize = (x) => { ns = x; }; return f; };
   const R0 = { semestre: 9, chapitre: 8.5, notion: 3.6 }; const rOf = (n) => R0[n.type] * (POIDS[n.sem] || 1);
 
