@@ -286,7 +286,7 @@ async function construire(cfg) {
   function opRuban(l) { const any = hiN.size > 0; const on = l.type === 'hierarchie' ? hiL.has(l) : (hiN.has(byId.get(l.source.id ?? l.source)) && hiN.has(byId.get(l.target.id ?? l.target)));
     return any ? (on ? .85 : .08) : (l.type === 'constellation' ? .75 : .45); }
   function majRubans() { for (const l of data.links) if (l.__lm) l.__lm.opacity = opRuban(l); }
-  function partN(l) { return l.type === 'hierarchie' || l.type === 'constellation' ? 0 : hiL.has(l) ? (l.type === 'prerequis' ? 3 : 2) : hiN.size ? 0 : (l.type === 'prerequis' ? 1 : 0); }
+  function partN(l) { return l.type === 'hierarchie' || l.type === 'constellation' ? 0 : hiL.has(l) ? (l.type === 'prerequis' ? 3 : 2) : 0; } // au repos : aucune étincelle
   function partV(l) { return hiL.has(l) ? .006 : .0025; }
   function partW(l) { return hiL.has(l) ? 1.5 : 1.1; }
   // particules : petits points lumineux (sprite à halo, mélange additif) au lieu de boules
