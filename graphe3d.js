@@ -99,7 +99,8 @@ async function construire() {
   { const chs = data.nodes.filter((n) => n.type === 'chapitre').sort((a, b) => a.id.localeCompare(b.id));
     for (let k = 1; k < chs.length; k++) if (chs[k].sem === chs[k - 1].sem) data.links.push({ source: chs[k - 1].id, target: chs[k].id, type: 'constellation' }); }
   // chaque semestre = une constellation, à distance des autres (parcours en arc S1 -> S6)
-  const ANC = { S1: [-235, 20, 0], S2: [-85, -40, 75], S3: [70, 35, -45], S4: [195, -35, 65], S6: [280, 55, -35] };
+  // spirale en 3D : chaque semestre tourne de 75° et monte d'un étage (S1 en bas, S6 en haut)
+  const ANC = {}; ['S1', 'S2', 'S3', 'S4', 'S6'].forEach((k, i) => { const a = i * 1.3 - .4; ANC[k] = [Math.cos(a) * 215, -170 + i * 85, Math.sin(a) * 215]; });
   const ancre = (k) => { let ns = []; const f = (al) => { for (const n of ns) { const a = ANC[n.sem]; if (!a) continue; const kk = (n.type === 'chapitre' ? k : k * .45) * al; n.vx += (a[0] - n.x) * kk; n.vy += (a[1] - n.y) * kk; n.vz += (a[2] - n.z) * kk; } }; f.initialize = (x) => { ns = x; }; return f; };
   const R = { semestre: 9, chapitre: 8.5, notion: 3.6 };
 
@@ -230,12 +231,14 @@ async function construire() {
   }
 
   // ---------- caméra cinématique ----------
-  function cadrerTout(ms) { // vue de face qui remplit l'écran avec toutes les constellations
+  function cadrerTout(ms) { // vue en biais, en surplomb, qui contient toute la spirale
     const bb = G.getGraphBbox(); if (!bb) return; const cx = (bb.x[0] + bb.x[1]) / 2, cy = (bb.y[0] + bb.y[1]) / 2, cz = (bb.z[0] + bb.z[1]) / 2;
+    let rad = 0; for (const n of data.nodes) if (n.x !== undefined) rad = Math.max(rad, Math.hypot(n.x - cx, n.y - cy, n.z - cz));
     const cam = G.camera(), vh = cam.fov * Math.PI / 360, hf = Math.atan(Math.tan(vh) * innerWidth / innerHeight);
-    const d = Math.max((bb.x[1] - bb.x[0]) / 2 / Math.tan(hf), (bb.y[1] - bb.y[0]) / 2 / Math.tan(vh) * 1.15) * .86 + (bb.z[1] - bb.z[0]) / 4;
+    const d = rad / Math.sin(Math.min(vh, hf)) * .82;
     if (!isFinite(d) || d < 150) return;
-    G.cameraPosition({ x: cx, y: cy + d * .18, z: cz + d }, { x: cx, y: cy, z: cz }, ms); c.target.set(cx, cy, cz);
+    const az = .6, el = .38; // azimut et élévation de la caméra
+    G.cameraPosition({ x: cx + d * Math.cos(el) * Math.sin(az), y: cy + d * Math.sin(el), z: cz + d * Math.cos(el) * Math.cos(az) }, { x: cx, y: cy, z: cz }, ms); c.target.set(cx, cy, cz);
   }
   function voler(n) { // cadrer l'élément ET toutes ses dépendances, en gardant l'angle de vue
     const pts = [n];
