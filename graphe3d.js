@@ -118,11 +118,11 @@ async function construire() {
   G.d3Force('link').distance((l) => l.type === 'hierarchie' ? 18 : 120).strength((l) => l.type === 'hierarchie' ? .9 : l.type === 'prerequis' ? .012 : .006);
   G.d3Force('ancre', ancre(.09));
   G.renderer().setPixelRatio(Math.min(devicePixelRatio || 1, mob ? 1.5 : 2));
-  const bloom = new UnrealBloomPass(new THREE.Vector2(innerWidth, innerHeight), mob ? 1.35 : 1.65, .5, .42);
+  const bloom = new UnrealBloomPass(new THREE.Vector2(innerWidth, innerHeight), mob ? .75 : .9, .32, .45);
   G.postProcessingComposer().addPass(bloom);
   G.renderer().outputColorSpace = THREE.LinearSRGBColorSpace; // évite le double encodage sRGB du composer (fond gris)
   const portrait = innerHeight > innerWidth; G.cameraPosition({ x: 0, y: portrait ? 260 : 140, z: Math.max(640, Math.min(1500, 400 / (.364 * innerWidth / innerHeight))) });
-  const c = ctr(); c.autoRotate = true; c.autoRotateSpeed = .3; c.enableDamping = true; c.dampingFactor = .08; c.minDistance = 25; c.maxDistance = 1400;
+  const c = ctr(); c.autoRotate = true; c.autoRotateSpeed = .3; c.enableDamping = true; c.dampingFactor = .08; c.minDistance = 40; c.maxDistance = 1400; c.zoomSpeed = .35; c.rotateSpeed = .6; c.panSpeed = .6;
   c.addEventListener('start', () => { c.autoRotate = false; });
 
   // champ d'étoiles + poussière lumineuse
@@ -159,7 +159,7 @@ async function construire() {
     for (const { ring, sp } of rings) ring.rotation.z = t * sp;
     for (const n of data.nodes) if (n.__halo) { n.__halo.lookAt(G.camera().position); n.__halo.scale.setScalar(R.chapitre * (1.9 + .12 * Math.sin(t * 2 + n.id.length))); }
     if (sel && sel.__threeObj) sel.__threeObj.scale.setScalar(1 + .08 * Math.sin(t * 2));
-    fpsN++; const now = performance.now(); if (now < fpsT) fpsN = 0; else if (now - fpsT > 2000) { const fps = fpsN * 1000 / (now - fpsT); fpsN = 0; fpsT = now; if (fps < 40 && !allege) { allege = true; G.renderer().setPixelRatio(1); bloom.strength *= .85; } }
+    fpsN++; const now = performance.now(); if (now < fpsT) fpsN = 0; else if (now - fpsT > 2000) { const fps = fpsN * 1000 / (now - fpsT); fpsN = 0; fpsT = now; if (fps < 40 && !allege) { allege = true; G.renderer().setPixelRatio(1); bloom.strength *= .9; } }
   })();
 
   // ---------- surbrillance ----------
@@ -198,7 +198,7 @@ async function construire() {
     const vh = (cam.fov * Math.PI / 180) / 2, hf = Math.atan(Math.tan(vh) * w / h);
     const uW = mobil ? 1 : Math.max(.5, (w - 390) / w), uH = mobil ? .42 : 1; // zone libre à côté du panneau
     const half = Math.min(Math.atan(Math.tan(vh) * uH), Math.atan(Math.tan(hf) * uW));
-    const d = rad / Math.sin(half) * 1.04;
+    const d = rad / Math.sin(half) * 1.3;
     const dir = cam.position.clone().sub(ctrP).normalize();
     const q = cam.quaternion; const right = new THREE.Vector3(1, 0, 0).applyQuaternion(q), up = new THREE.Vector3(0, 1, 0).applyQuaternion(q);
     // décaler la visée pour que le groupe tombe au centre de la zone libre
