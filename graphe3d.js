@@ -126,7 +126,7 @@ async function construire() {
   G.d3Force('link').distance((l) => l.type === 'hierarchie' ? 18 : l.type === 'constellation' ? 70 : 120).strength((l) => l.type === 'hierarchie' ? .9 : l.type === 'constellation' ? .05 : l.type === 'prerequis' ? .012 : .006);
   G.d3Force('ancre', ancre(.09));
   G.renderer().setPixelRatio(Math.min(devicePixelRatio || 1, mob ? 1.5 : 2));
-  const bloom = new UnrealBloomPass(new THREE.Vector2(innerWidth, innerHeight), mob ? .9 : 1.1, .38, .4);
+  const bloom = new UnrealBloomPass(new THREE.Vector2(innerWidth, innerHeight), mob ? .65 : .8, .35, .45);
   G.postProcessingComposer().addPass(bloom);
   G.renderer().outputColorSpace = THREE.LinearSRGBColorSpace; // évite le double encodage sRGB du composer (fond gris)
   const portrait = innerHeight > innerWidth; G.cameraPosition({ x: 0, y: portrait ? 260 : 140, z: Math.max(640, Math.min(1500, 400 / (.364 * innerWidth / innerHeight))) });
@@ -169,10 +169,10 @@ async function construire() {
     const isCh = n.type === 'chapitre';
     // planète (chapitre) ou lune (notion) : texture procédurale, éclairée, qui tourne sur elle-même
     const core = new THREE.Mesh(isCh ? geo.p : geo.s, new THREE.MeshStandardMaterial({ map: texPlanete(col, seed, isCh), roughness: .9, metalness: 0,
-      emissive: col, emissiveIntensity: isCh ? .45 : .6, transparent: true }));
+      emissive: col, emissiveIntensity: isCh ? .3 : .45, transparent: true }));
     core.scale.setScalar(r); core.rotation.z = .25 + (seed % 7) * .06; g.add(core); n.__mats = [core.material]; n.__spin = { m: core, v: .08 + (seed % 5) * .03 };
     if (isCh) { // atmosphère lumineuse sur le pourtour
-      const atm = new THREE.Mesh(geo.p, atmosphere(col, .9)); atm.scale.setScalar(r * 1.22); g.add(atm); n.__mats.push(atm.material);
+      const atm = new THREE.Mesh(geo.p, atmosphere(col, .65)); atm.scale.setScalar(r * 1.22); g.add(atm); n.__mats.push(atm.material);
       if (seed % 3 !== 1) { // un anneau pour deux planètes sur trois
         const ring = new THREE.Mesh(geo.ring, new THREE.MeshBasicMaterial({ map: texAnneau(col, seed), side: THREE.DoubleSide, transparent: true, opacity: .75, depthWrite: false }));
         ring.scale.setScalar(r); ring.rotation.set(Math.PI / 2 - .35 - (seed % 4) * .12, (seed % 5) * .2, 0); g.add(ring); n.__mats.push(ring.material);
@@ -215,7 +215,7 @@ async function construire() {
   function voisinage(n) { hiN.clear(); hiL.clear(); if (!n) return; hiN.add(n);
     for (const l of data.links) { const s = l.source.id ?? l.source, t = l.target.id ?? l.target; if (l.type !== 'constellation' && (s === n.id || t === n.id)) { hiL.add(l); hiN.add(byId.get(s)); hiN.add(byId.get(t)); } } }
   function linkColor(l) { const on = hiL.has(l), any = hiN.size > 0;
-    if (l.type === 'constellation') return hexA(SEMC[l.source.sem || byId.get(l.source)?.sem] || '#8fa8ff', any ? .3 : .95);
+    if (l.type === 'constellation') return hexA(SEMC[l.source.sem || byId.get(l.source)?.sem] || '#8fa8ff', any ? .25 : .7);
     if (l.type === 'prerequis') return on ? 'rgba(125,249,255,.75)' : any ? 'rgba(125,249,255,.08)' : 'rgba(125,249,255,.4)';
     if (l.type === 'outil') return on ? 'rgba(255,190,120,.7)' : any ? 'rgba(255,190,120,.05)' : 'rgba(255,190,120,.22)';
     const c = SEMC[(l.source.sem || byId.get(l.source)?.sem)] || '#8fa8ff'; if (l.niveau === 'semestre') return any ? 'rgba(255,255,255,.04)' : 'rgba(220,230,255,.16)'; return on ? c : any ? 'rgba(120,140,190,.05)' : hexA(c, .22); }
