@@ -7,6 +7,7 @@ const LIBS = () => Promise.all([
   import(`https://esm.sh/three@${V3}`),
   import(`https://esm.sh/three@${V3}/examples/jsm/postprocessing/UnrealBloomPass.js`)
 ]);
+const STYLES = [['neon', 'Néon'], ['nebuleuse', 'Nébuleuse'], ['holo', 'Hologramme'], ['papier', 'Papier'], ['sobre', 'Sobre']];
 const SEMC = { S1: '#4cc9ff', S2: '#3dffb5', S3: '#ffcf4d', S4: '#ff5fa2', S6: '#b18cff' };
 const PRE = '#7df9ff';
 const BG = '#050811';
@@ -35,6 +36,22 @@ const CSS = `
 .cst-hint{position:absolute;right:14px;bottom:14px;font-size:12px;opacity:.55;text-align:right;pointer-events:none}
 .cst-load{position:absolute;inset:0;display:grid;place-items:center;font-size:14px;letter-spacing:.2em;text-transform:uppercase;color:#7df9ff;text-shadow:0 0 12px #7df9ff}
 .cst-load.off{display:none}
+.cst-sty{position:absolute;right:12px;bottom:40px;display:flex;gap:2px;padding:4px;font-size:12.5px}
+.cst-sty button{background:none;border:0;color:#cfe0f5;padding:5px 9px;border-radius:9px;cursor:pointer;font:inherit}
+.cst-sty button.on{background:rgba(125,249,255,.18);color:#fff;box-shadow:inset 0 0 0 1px rgba(125,249,255,.45)}
+.cst.clair{color:#1f2a3a}
+.cst.clair .glass{background:rgba(255,253,248,.8);border-color:rgba(60,70,90,.18);box-shadow:0 6px 24px rgba(60,50,30,.15)}
+.cst.clair .cst-top h2{background:linear-gradient(90deg,#1d4ed8,#7c3aed);-webkit-background-clip:text;background-clip:text}
+.cst.clair .cst-q input{background:#fff;color:#1f2a3a;border-color:rgba(60,70,90,.25)}
+.cst.clair .cst-x,.cst.clair .cst-pn .px{color:#1f2a3a;background:#fff}
+.cst.clair .cst-lb.ch{color:#1f2a3a;text-shadow:0 0 3px #f3ede1,0 0 8px #f3ede1}
+.cst.clair .cst-lb.no{color:#1f2a3a;background:rgba(255,253,248,.92)}
+.cst.clair .cst-leg span span,.cst.clair .cst-rel button{color:#1f2a3a!important}
+.cst.clair .cst-sty button{color:#334155}.cst.clair .cst-sty button.on{background:rgba(29,78,216,.12);color:#1d4ed8;box-shadow:inset 0 0 0 1px rgba(29,78,216,.35)}
+.cst.clair .cst-cnt div{background:#fff}.cst.clair .cst-cnt b{color:#1d4ed8;text-shadow:none}.cst.clair .cst-btn{color:#1f2a3a;text-shadow:none;background:#fff}
+.cst.clair .cst-hint{color:#334155}
+.cst.holo .cst-lb.ch{color:#a5f3fc;font-family:ui-monospace,Consolas,monospace;letter-spacing:.06em;text-transform:uppercase;font-size:12.5px}
+@media (max-width:720px){.cst-sty{bottom:auto;top:100px;right:10px;font-size:11.5px}}
 .cst-lb.ch.pt{font-size:12.5px;opacity:.85}
 .cst-lbs{position:absolute;inset:0;pointer-events:none;overflow:hidden}
 .cst-lb{position:absolute;left:0;top:0;white-space:nowrap;transform-origin:50% 100%;will-change:transform;font-weight:600;letter-spacing:.01em;text-shadow:0 0 3px #050811,0 0 8px #050811,0 1px 2px #000;transition:opacity .25s}
@@ -77,10 +94,12 @@ async function construire() {
   <div class="cst-load">Allumage des étoiles…</div>
   <div class="cst-top glass"><h2>✦ Constellation</h2><div class="cst-q"><input type="search" placeholder="Rechercher une notion, un chapitre…" aria-label="Rechercher" autocomplete="off"><ul class="cst-ac glass" role="listbox"></ul></div><button class="cst-x" title="Revenir au site (Échap)" aria-label="Fermer">✕</button></div>
   <div class="cst-leg glass">${Object.entries(SEMC).map(([s, c]) => `<span style="color:${c}"><i></i><span style="color:#e6f1ff">${s}</span></span>`).join('')}<span><b></b>prérequis</span><span><b style="background:#ffbe78;box-shadow:0 0 6px #ffbe78"></b>outil commun</span></div>
+  <div class="cst-sty glass" role="radiogroup" aria-label="Ambiance">${STYLES.map(([k, t]) => `<button data-sty="${k}" title="Ambiance ${t}">${t}</button>`).join('')}</div>
   <div class="cst-hint">Glisser : tourner · molette / pincer : zoom · clic : explorer</div>
   <div class="cst-lbs"></div><aside class="cst-pn glass" aria-live="polite"></aside>`;
   document.body.appendChild(root);
   const $ = (s) => root.querySelector(s);
+  const planetes = [], etoiles = []; let style = 'neon', PAL = { pre: '125,249,255', out: '255,190,120' };
   let G = null, hov = null, sel = null, fitDone = false, labs = root.querySelector('.cst-lbs'), pv = null; const hiN = new Set(), hiL = new Set(); const prevOverflow = document.body.style.overflow;
   const show = () => { root.style.display = ''; document.body.style.overflow = 'hidden'; requestAnimationFrame(() => root.classList.add('on')); if (G) { G.resumeAnimation(); ctr().autoRotate = !sel; } };
   const hide = () => { root.classList.remove('on'); document.body.style.overflow = prevOverflow; setTimeout(() => { if (!root.classList.contains('on')) { root.style.display = 'none'; G && G.pauseAnimation(); } }, 450); };
@@ -119,8 +138,8 @@ async function construire() {
     .linkCurvature((l) => l.type === 'hierarchie' || l.type === 'constellation' ? 0 : .25).linkCurveRotation((l) => l.type === 'hierarchie' || l.type === 'constellation' ? 0 : (l.why || '').length % 6)
     .linkOpacity(1).linkResolution(mob ? 4 : 6)
     .linkColor(linkColor).linkWidth(linkWidth)
-    .linkDirectionalParticles(partN).linkDirectionalParticleSpeed(partV).linkDirectionalParticleWidth(partW).linkDirectionalParticleColor((l) => l.type === 'outil' ? '#ffbe78' : PRE).linkDirectionalParticleResolution(6)
-    .linkDirectionalArrowLength((l) => l.type === 'prerequis' ? 2.4 : 0).linkDirectionalArrowRelPos(.92).linkDirectionalArrowColor(() => 'rgba(125,249,255,.75)')
+    .linkDirectionalParticles(partN).linkDirectionalParticleSpeed(partV).linkDirectionalParticleWidth(partW).linkDirectionalParticleColor((l) => `rgb(${l.type === 'outil' ? PAL.out : PAL.pre})`).linkDirectionalParticleResolution(6)
+    .linkDirectionalArrowLength((l) => l.type === 'prerequis' ? 2.4 : 0).linkDirectionalArrowRelPos(.92).linkDirectionalArrowColor(() => `rgba(${PAL.pre},.75)`)
     .enableNodeDrag(false).warmupTicks(120).cooldownTicks(160).onEngineStop(() => { if (!fitDone && !sel) { fitDone = true; cadrerTout(1400); } })
     .onNodeHover((n) => { hov = n || null; $('.cst-stage').style.cursor = n ? 'pointer' : ''; majSurbrillance(); })
     .onNodeClick((n) => choisir(n, true))
@@ -137,11 +156,19 @@ async function construire() {
   const c = ctr(); c.autoRotate = true; c.autoRotateSpeed = .3; c.enableDamping = true; c.dampingFactor = .08; c.minDistance = 40; c.maxDistance = 1400; c.zoomSpeed = .35; c.rotateSpeed = .6; c.panSpeed = .6;
   c.addEventListener('start', () => { c.autoRotate = false; });
 
-  { const sun = new THREE.DirectionalLight(0xfff1dd, 2.1); sun.position.set(-1, .8, 1.2); G.lights([sun, new THREE.AmbientLight(0x7080b0, .5)]); } // remplace l'éclairage par défaut (trop fort)
+  const soleil = new THREE.DirectionalLight(0xfff1dd, 2.1), ambiante = new THREE.AmbientLight(0x7080b0, .5); soleil.position.set(-1, .8, 1.2); G.lights([soleil, ambiante]); // remplace l'éclairage par défaut (trop fort)
   // champ d'étoiles + poussière lumineuse
   { const mk = (n, rMin, rMax, size, col, op) => { const p = new Float32Array(n * 3); for (let i = 0; i < n; i++) { const v = new THREE.Vector3().randomDirection().multiplyScalar(rMin + Math.random() * (rMax - rMin)); p.set([v.x, v.y * .7, v.z], i * 3); }
       const g = new THREE.BufferGeometry(); g.setAttribute('position', new THREE.BufferAttribute(p, 3)); return new THREE.Points(g, new THREE.PointsMaterial({ color: col, size, sizeAttenuation: true, transparent: true, opacity: op, depthWrite: false })); };
-    G.scene().add(mk(mob ? 900 : 1800, 700, 2200, 2.2, 0x9fb6ff, .55)); G.scene().add(mk(mob ? 160 : 320, 60, 330, 1.1, 0x7df9ff, .35)); }
+    etoiles.push(mk(mob ? 900 : 1800, 700, 2200, 2.2, 0x9fb6ff, .55), mk(mob ? 160 : 320, 60, 330, 1.1, 0x7df9ff, .35)); etoiles.forEach((o) => G.scene().add(o)); }
+  // nuages de nébuleuse (style « Nébuleuse ») et grille holographique (style « Hologramme »)
+  const nebuleuses = [], grille = new THREE.GridHelper(1400, 56, 0x22d3ee, 0x0e4a5a);
+  { const cv = document.createElement('canvas'); cv.width = cv.height = 128; const x = cv.getContext('2d'); const gr = x.createRadialGradient(64, 64, 0, 64, 64, 64);
+    gr.addColorStop(0, 'rgba(255,255,255,.9)'); gr.addColorStop(.35, 'rgba(255,255,255,.35)'); gr.addColorStop(1, 'rgba(255,255,255,0)'); x.fillStyle = gr; x.fillRect(0, 0, 128, 128);
+    const tx = new THREE.CanvasTexture(cv);
+    for (const [k, a] of Object.entries(ANC)) for (let j = 0; j < 3; j++) { const sp = new THREE.Sprite(new THREE.SpriteMaterial({ map: tx, color: SEMC[k], transparent: true, opacity: .3, depthWrite: false, blending: THREE.AdditiveBlending }));
+      const sc = ((POIDS[k] || 1) * 290) * (1 - j * .2); sp.scale.set(sc, sc * .8, 1); sp.position.set(a[0] + (j - 1) * 35, a[1] + (j % 2 ? 20 : -15), a[2] + (j - 1) * 25); sp.visible = false; G.scene().add(sp); nebuleuses.push(sp); } }
+  grille.position.y = -150; grille.material.transparent = true; grille.material.opacity = .55; grille.visible = false; G.scene().add(grille);
 
   // ---------- objets 3D des nœuds ----------
   const geo = { s: new THREE.SphereGeometry(1, 24, 16), p: new THREE.SphereGeometry(1, 48, 32), ring: new THREE.RingGeometry(1.45, 2.35, 96, 1) };
@@ -174,9 +201,9 @@ async function construire() {
     // planète (chapitre) ou lune (notion) : texture procédurale, éclairée, qui tourne sur elle-même
     const core = new THREE.Mesh(isCh ? geo.p : geo.s, new THREE.MeshStandardMaterial({ map: texPlanete(col, seed, isCh), roughness: .9, metalness: 0,
       emissive: col, emissiveIntensity: isCh ? .3 : .45, transparent: true }));
-    core.scale.setScalar(r); core.rotation.z = .25 + (seed % 7) * .06; g.add(core); n.__mats = [core.material]; n.__spin = { m: core, v: .08 + (seed % 5) * .03 };
+    core.scale.setScalar(r); core.rotation.z = .25 + (seed % 7) * .06; g.add(core); n.__mats = [core.material]; n.__spin = { m: core, v: .08 + (seed % 5) * .03 }; n.__core = core; planetes.push(n);
     if (isCh) { // atmosphère lumineuse sur le pourtour
-      const atm = new THREE.Mesh(geo.p, atmosphere(col, .65)); atm.scale.setScalar(r * 1.22); g.add(atm); n.__mats.push(atm.material);
+      const atm = new THREE.Mesh(geo.p, atmosphere(col, .65)); atm.scale.setScalar(r * 1.22); g.add(atm); n.__atm = atm; n.__mats.push(atm.material);
       if (seed % 3 !== 1) { // un anneau pour deux planètes sur trois
         const ring = new THREE.Mesh(geo.ring, new THREE.MeshBasicMaterial({ map: texAnneau(col, seed), side: THREE.DoubleSide, transparent: true, opacity: .75, depthWrite: false }));
         ring.scale.setScalar(r); ring.rotation.set(Math.PI / 2 - .35 - (seed % 4) * .12, (seed % 5) * .2, 0); g.add(ring); n.__mats.push(ring.material);
@@ -220,8 +247,8 @@ async function construire() {
     for (const l of data.links) { const s = l.source.id ?? l.source, t = l.target.id ?? l.target; if (l.type !== 'constellation' && (s === n.id || t === n.id)) { hiL.add(l); hiN.add(byId.get(s)); hiN.add(byId.get(t)); } } }
   function linkColor(l) { const on = hiL.has(l), any = hiN.size > 0;
     if (l.type === 'constellation') return hexA(SEMC[l.source.sem || byId.get(l.source)?.sem] || '#8fa8ff', any ? .25 : .7);
-    if (l.type === 'prerequis') return on ? 'rgba(125,249,255,.75)' : any ? 'rgba(125,249,255,.08)' : 'rgba(125,249,255,.4)';
-    if (l.type === 'outil') return on ? 'rgba(255,190,120,.7)' : any ? 'rgba(255,190,120,.05)' : 'rgba(255,190,120,.22)';
+    if (l.type === 'prerequis') return `rgba(${PAL.pre},${on ? .75 : any ? .08 : .4})`;
+    if (l.type === 'outil') return `rgba(${PAL.out},${on ? .7 : any ? .05 : .22})`;
     const c = SEMC[(l.source.sem || byId.get(l.source)?.sem)] || '#8fa8ff'; if (l.niveau === 'semestre') return any ? 'rgba(255,255,255,.04)' : 'rgba(220,230,255,.16)'; return on ? c : any ? 'rgba(120,140,190,.05)' : hexA(c, .22); }
   function linkWidth(l) { if (l.type === 'constellation') return 1.8; return hiL.has(l) ? (l.type === 'hierarchie' ? .5 : .8) : (l.type === 'prerequis' ? .45 : l.type === 'outil' ? .35 : .25); }
   function partN(l) { return l.type === 'hierarchie' || l.type === 'constellation' ? 0 : hiL.has(l) ? (l.type === 'prerequis' ? 3 : 2) : hiN.size ? 0 : (l.type === 'prerequis' ? 1 : 0); }
@@ -302,6 +329,27 @@ async function construire() {
     else if (e.key === 'Enter') { e.preventDefault(); valider(cur); }
   });
   root.addEventListener('keydown', (e) => { if (e.key === 'Escape') { if (ac.classList.contains('on')) ac.classList.remove('on'); else if (sel) { sel = null; panneau(); majSurbrillance(); } else hide(); } });
+  function appliquerStyle(k) {
+    style = STYLES.some((x) => x[0] === k) ? k : 'neon'; try { localStorage.setItem('cst_style', style); } catch (e) { }
+    const S = { // fond, halo (bloom), lumière propre des planètes, atmosphère, étoiles, nébuleuses, grille, fil de fer, palette des liens
+      neon: { bg: '#050811', bl: [.8, .35, .45], em: [.3, .45], atm: true, st: true, neb: false, gr: false, fil: false, pal: ['125,249,255', '255,190,120'] },
+      nebuleuse: { bg: '#07050f', bl: [.7, .6, .5], em: [.25, .35], atm: true, st: true, neb: true, gr: false, fil: false, pal: ['190,170,255', '255,170,200'] },
+      holo: { bg: '#010b12', bl: [.55, .3, .35], em: [.45, .5], lu: [1.2, .3], atm: true, st: false, neb: false, gr: true, fil: true, pal: ['103,232,249', '94,234,212'] },
+      papier: { bg: '#fbf8f1', bl: null, em: [.12, .18], lu: [2.8, 1.6], atm: false, st: false, neb: false, gr: false, fil: false, pal: ['30,80,150', '180,95,20'] },
+      sobre: { bg: '#0b1020', bl: null, em: [.15, .25], atm: false, st: true, neb: false, gr: false, fil: false, pal: ['148,180,230', '220,180,140'] },
+    }[style];
+    const lu = S.lu || [2.1, .5]; soleil.intensity = lu[0]; ambiante.intensity = lu[1];
+    G.backgroundColor(S.bg); root.style.background = S.bg; root.classList.toggle('clair', style === 'papier'); root.classList.toggle('holo', style === 'holo');
+    bloom.enabled = !!S.bl; if (S.bl) { bloom.strength = S.bl[0] * (mob ? .85 : 1); bloom.radius = S.bl[1]; bloom.threshold = S.bl[2]; }
+    for (const n of planetes) { const m = n.__core.material; m.wireframe = S.fil; m.emissiveIntensity = n.type === 'chapitre' ? S.em[0] : S.em[1];
+      if (S.fil) { m.emissive = new THREE.Color('#22d3ee'); m.color = new THREE.Color('#0e7490'); } else { m.emissive = new THREE.Color(SEMC[n.sem]); m.color = new THREE.Color('#ffffff'); }
+      m.needsUpdate = true; if (n.__atm) n.__atm.visible = S.atm; }
+    etoiles.forEach((o) => { o.visible = S.st; }); nebuleuses.forEach((o) => { o.visible = S.neb; }); grille.visible = S.gr;
+    PAL = { pre: S.pal[0], out: S.pal[1] }; majSurbrillance();
+    root.querySelectorAll('[data-sty]').forEach((b) => b.classList.toggle('on', b.dataset.sty === style));
+  }
+  root.querySelectorAll('[data-sty]').forEach((b) => b.onclick = () => appliquerStyle(b.dataset.sty));
+  appliquerStyle((() => { try { return localStorage.getItem('cst_style') || 'neon'; } catch (e) { return 'neon'; } })());
   root.tabIndex = -1; root.focus({ preventScroll: true });
 
   // ---------- taille ----------
