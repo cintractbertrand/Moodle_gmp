@@ -691,7 +691,7 @@ document.querySelector(".top h1").onclick=()=>{home();scrollTo(0,0)};
 </script>
 <script>
 /* Constellation 3D : module graphe3d.js chargé à la demande */
-(function(){const b=document.getElementById("cstbtn");const go=()=>import("./graphe3d.js?v=8").then(m=>m.ouvrir()).catch(e=>alert("Vue 3D indisponible : "+e.message));
+(function(){const b=document.getElementById("cstbtn");const go=()=>import("./graphe3d.js?v=9").then(m=>m.ouvrir()).catch(e=>alert("Vue 3D indisponible : "+e.message));
 if(b)b.onclick=go;if(window.__cst)go();})();
 </script>
 

@@ -37,9 +37,9 @@ const CSS = `
 .cst-load.off{display:none}
 .cst-lbs{position:absolute;inset:0;pointer-events:none;overflow:hidden}
 .cst-lb{position:absolute;left:0;top:0;white-space:nowrap;transform-origin:50% 100%;will-change:transform;font-weight:600;letter-spacing:.01em;text-shadow:0 0 3px #050811,0 0 8px #050811,0 1px 2px #000;transition:opacity .25s}
-.cst-lb.ch{font-size:13px;color:#e8f2ff;border-bottom:1px solid color-mix(in srgb,var(--c) 70%,transparent);padding-bottom:1px}
-.cst-lb.no{font-size:11.5px;font-weight:500;color:#d6e4fa;background:rgba(5,8,17,.72);border:1px solid color-mix(in srgb,var(--c) 45%,transparent);border-radius:6px;padding:1px 6px;display:none}
-@media (max-width:720px){.cst-lb.ch{font-size:11.5px}.cst-lb.no{font-size:10.5px}}
+.cst-lb.ch{font-size:15px;color:#e8f2ff;border-bottom:1px solid color-mix(in srgb,var(--c) 70%,transparent);padding-bottom:1px}
+.cst-lb.no{font-size:13.5px;font-weight:500;color:#d6e4fa;background:rgba(5,8,17,.72);border:1px solid color-mix(in srgb,var(--c) 45%,transparent);border-radius:6px;padding:1px 6px;display:none}
+@media (max-width:720px){.cst-lb.ch{font-size:12.5px}.cst-lb.no{font-size:11.5px}}
 .cst-pn{position:absolute;top:76px;right:12px;width:min(360px,calc(100% - 24px));padding:16px 16px 14px;transform:translateX(calc(100% + 30px));transition:transform .5s cubic-bezier(.2,.8,.2,1);max-height:calc(100% - 140px);overflow:auto}
 .cst-pn.on{transform:none}
 .cst-pn h3{margin:6px 0 2px;font-size:18px;line-height:1.25}.cst-pn .sub{opacity:.7;font-size:13px}
@@ -99,7 +99,7 @@ async function construire() {
   // chaque semestre = une constellation, à distance des autres (parcours en arc S1 -> S6)
   const ANC = { S1: [-235, 20, 0], S2: [-85, -40, 75], S3: [70, 35, -45], S4: [195, -35, 65], S6: [280, 55, -35] };
   const ancre = (k) => { let ns = []; const f = (al) => { for (const n of ns) { const a = ANC[n.sem]; if (!a) continue; const kk = (n.type === 'chapitre' ? k : k * .45) * al; n.vx += (a[0] - n.x) * kk; n.vy += (a[1] - n.y) * kk; n.vz += (a[2] - n.z) * kk; } }; f.initialize = (x) => { ns = x; }; return f; };
-  const R = { semestre: 9, chapitre: 5.2, notion: 2.3 };
+  const R = { semestre: 9, chapitre: 8.5, notion: 3.6 };
 
   // ---------- scène ----------
   const mob = mobile();
@@ -201,7 +201,7 @@ async function construire() {
         for (let k = 1; !ok && k <= 4 && o.pr < 3; k++) for (const dy of [-k * h, k * h]) if (!ok && !hit(x, y + dy, w, h)) { y += dy; ok = true; }
         if (!ok) { o.el.style.opacity = 0; continue; } placed.push([x, y, x + w, y + h]);
         o.el.style.transform = `translate(${(x + 2).toFixed(1)}px,${(y + 1).toFixed(1)}px)`;
-        o.el.style.opacity = any ? (hiN.has(o.n) ? 1 : .12) : (o.n.type === 'chapitre' ? Math.max(.45, Math.min(1, 900 / o.dist)) : 1); } }
+        o.el.style.opacity = any ? (hiN.has(o.n) ? 1 : .3) : (o.n.type === 'chapitre' ? Math.max(.45, Math.min(1, 900 / o.dist)) : 1); } }
     for (const n of data.nodes) if (n.__spin) n.__spin.m.rotation.y = t * n.__spin.v;
     for (const n of data.nodes) if (n.__halo) { n.__halo.lookAt(G.camera().position); n.__halo.scale.setScalar(R.chapitre * (1.9 + .12 * Math.sin(t * 2 + n.id.length))); }
     if (sel && sel.__threeObj) sel.__threeObj.scale.setScalar(1 + .08 * Math.sin(t * 2));
@@ -222,7 +222,7 @@ async function construire() {
   function hexA(h, a) { const c = new THREE.Color(h); return `rgba(${c.r * 255 | 0},${c.g * 255 | 0},${c.b * 255 | 0},${a})`; }
   function majSurbrillance() {
     voisinage(hov || sel); const any = hiN.size > 0;
-    for (const n of data.nodes) if (n.__mats) n.__mats.forEach((m, i) => { const v = !any || hiN.has(n) ? n.__base[i] : n.__base[i] * .12; if (m.uniforms) m.uniforms.o.value = v; else m.opacity = v; });
+    for (const n of data.nodes) if (n.__mats) n.__mats.forEach((m, i) => { const v = !any || hiN.has(n) ? n.__base[i] : n.__base[i] * .3; if (m.uniforms) m.uniforms.o.value = v; else m.opacity = v; });
     G.linkColor(linkColor).linkWidth(linkWidth).linkDirectionalParticles(partN).linkDirectionalParticleSpeed(partV).linkDirectionalParticleWidth(partW);
   }
 
@@ -244,7 +244,7 @@ async function construire() {
     const vh = (cam.fov * Math.PI / 180) / 2, hf = Math.atan(Math.tan(vh) * w / h);
     const uW = mobil ? 1 : Math.max(.5, (w - 390) / w), uH = mobil ? .42 : 1; // zone libre à côté du panneau
     const half = Math.min(Math.atan(Math.tan(vh) * uH), Math.atan(Math.tan(hf) * uW));
-    const d = rad / Math.sin(half) * 1.3;
+    const d = rad / Math.sin(half) * 1.02;
     const dir = cam.position.clone().sub(ctrP).normalize();
     const q = cam.quaternion; const right = new THREE.Vector3(1, 0, 0).applyQuaternion(q), up = new THREE.Vector3(0, 1, 0).applyQuaternion(q);
     // décaler la visée pour que le groupe tombe au centre de la zone libre
