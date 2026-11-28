@@ -85,12 +85,15 @@ const CSS = `
 
 let ui = null; // instance unique
 
-export async function ouvrir() {
+/* Options (toutes facultatives) — le même module sert au site étudiants et à l'atelier GMP :
+   data : { nodes, links } déjà prêts (sinon graphe.json est chargé)
+   compteurs(n) -> [[valeur, libellé], ...]   boutons(n) -> [[libellé, action], ...]   (action reçoit n, la vue est refermée avant) */
+export async function ouvrir(cfg = {}) {
   if (ui) { ui.show(); return; }
-  ui = await construire();
+  ui = await construire(cfg);
 }
 
-async function construire() {
+async function construire(cfg) {
   if (!document.getElementById('cst-css')) { const st = document.createElement('style'); st.id = 'cst-css'; st.textContent = CSS; document.head.appendChild(st); }
   const root = document.createElement('div'); root.className = 'cst'; root.setAttribute('role', 'dialog'); root.setAttribute('aria-label', 'Constellation des notions');
   root.innerHTML = `<div class="cst-stage"></div>
@@ -110,7 +113,7 @@ async function construire() {
   $('.cst-x').onclick = hide;
 
   let data, libs;
-  try { [data, libs] = await Promise.all([fetch('graphe.json?v=3').then((r) => r.json()), LIBS()]); }
+  try { [data, libs] = await Promise.all([cfg.data ? Promise.resolve(cfg.data) : fetch('graphe.json?v=3').then((r) => r.json()), LIBS()]); }
   catch (e) { $('.cst-load').textContent = 'Connexion nécessaire pour la vue 3D.'; return { show }; }
   const [{ default: ForceGraph3D }, THREE, { UnrealBloomPass }, { Line2 }, { LineMaterial }, { LineGeometry }] = libs;
 
@@ -328,7 +331,8 @@ async function construire() {
     const pn = $('.cst-pn'); if (!sel) { pn.classList.remove('on'); return; }
     const n = sel, col = SEMC[n.sem] || '#7df9ff'; const nb = n.nb || {};
     const T = { semestre: 'Semestre', chapitre: 'Chapitre', notion: 'Notion' }[n.type];
-    const cnt = n.type === 'semestre' ? [[nb.chap, 'chapitres'], [nb.notions, 'notions']] : [[nb.n1 ?? 0, 'questions N1'], [nb.n2 ?? 0, 'automatismes N2 · nombres variables'], [nb.n3 ?? 0, 'exercices N3']];
+    const cnt = cfg.compteurs ? cfg.compteurs(n) : n.type === 'semestre' ? [[nb.chap, 'chapitres'], [nb.notions, 'notions']] : [[nb.n1 ?? 0, 'questions N1'], [nb.n2 ?? 0, 'automatismes N2 · nombres variables'], [nb.n3 ?? 0, 'exercices N3']];
+    const btns = cfg.boutons ? cfg.boutons(n) : [['Ouvrir le cours', () => allerA(n.cours)], ['Lancer les exercices', () => allerA(n.exos)]];
     const relChap = (c) => { // liens des notions du chapitre vers d'autres chapitres, regroupés
       const G0 = groupe(c); const av = [], ap = [];
       for (const l of data.links) { if (l.type === 'constellation' || l.type === 'hierarchie') continue; const s = byId.get(l.source.id ?? l.source), t = byId.get(l.target.id ?? l.target);
@@ -341,12 +345,12 @@ async function construire() {
     pn.innerHTML = `<button class="px" aria-label="Fermer le panneau">✕</button><span class="cst-badge" style="color:${col}">${esc(n.semLabel || n.sem)}</span><span class="cst-type">${T}</span>
       <h3>${esc(n.label)}</h3><div class="sub">${esc(n.type === 'notion' ? n.chapLabel : n.type === 'semestre' ? n.sub : (nb.notions || 0) + ' notions')}</div>
       <div class="cst-cnt" style="grid-template-columns:repeat(${cnt.length},1fr)">${cnt.map(([v, t]) => `<div><b>${v ?? 0}</b><span>${t}</span></div>`).join('')}</div>
-      <div class="cst-act"><button class="cst-btn" data-h="${esc(n.cours)}" style="--c:${col}">Ouvrir le cours</button><button class="cst-btn b2" data-h="${esc(n.exos)}">Lancer les exercices</button></div>
+      <div class="cst-act">${btns.map(([t], i) => `<button class="cst-btn${i ? ' b2' : ''}" data-b="${i}"${i ? '' : ` style="--c:${col}"`}>${esc(t)}</button>`).join('')}</div>
       <div class="cst-rel">${n.type === 'chapitre' ? relChap(n) : rel(inc.get(n.id), 's', "S'appuie sur") + rel(out.get(n.id), 't', 'Sert pour')}${kids.length ? '<h4>' + (n.type === 'semestre' ? 'Chapitres' : 'Notions') + '</h4>' + kids.map((o) => `<button data-go="${esc(o.id)}">${esc(o.label)}</button>`).join('') : ''}</div>`;
     pn.classList.add('on');
     pn.querySelector('.px').onclick = () => { sel = null; panneau(); majSurbrillance(); };
     pn.querySelectorAll('[data-go]').forEach((b) => b.onclick = () => choisir(byId.get(b.dataset.go), true));
-    pn.querySelectorAll('[data-h]').forEach((b) => b.onclick = () => allerA(b.dataset.h));
+    pn.querySelectorAll('[data-b]').forEach((b) => b.onclick = () => { const f = btns[+b.dataset.b][1]; if (cfg.boutons) { hide(); f(n); } else f(); });
   }
   function allerA(h) { hide(); try { history.pushState(null, '', h); } catch (e) { location.hash = h; } if (typeof window.route === 'function') window.route(); scrollTo(0, 0); }
 
