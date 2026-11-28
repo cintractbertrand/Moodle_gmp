@@ -76,7 +76,7 @@ async function construire() {
   <aside class="cst-pn glass" aria-live="polite"></aside>`;
   document.body.appendChild(root);
   const $ = (s) => root.querySelector(s);
-  let G = null, hov = null, sel = null; const hiN = new Set(), hiL = new Set(); const prevOverflow = document.body.style.overflow;
+  let G = null, hov = null, sel = null, fitDone = false; const hiN = new Set(), hiL = new Set(); const prevOverflow = document.body.style.overflow;
   const show = () => { root.style.display = ''; document.body.style.overflow = 'hidden'; requestAnimationFrame(() => root.classList.add('on')); if (G) { G.resumeAnimation(); ctr().autoRotate = !sel; } };
   const hide = () => { root.classList.remove('on'); document.body.style.overflow = prevOverflow; setTimeout(() => { if (!root.classList.contains('on')) { root.style.display = 'none'; G && G.pauseAnimation(); } }, 450); };
   show();
@@ -92,7 +92,7 @@ async function construire() {
   const out = new Map(), inc = new Map();
   for (const l of data.links) { (out.get(l.source) || out.set(l.source, []).get(l.source)).push(l); (inc.get(l.target) || inc.set(l.target, []).get(l.target)).push(l); }
   // chaque semestre = une constellation, à distance des autres (parcours en arc S1 -> S6)
-  const ANC = { S1: [-400, 30, 0], S2: [-150, -60, 130], S3: [110, 50, -70], S4: [330, -50, 110], S6: [480, 80, -60] };
+  const ANC = { S1: [-235, 20, 0], S2: [-85, -40, 75], S3: [70, 35, -45], S4: [195, -35, 65], S6: [280, 55, -35] };
   const ancre = (k) => { let ns = []; const f = (al) => { for (const n of ns) { const a = ANC[n.sem]; if (!a) continue; const kk = (n.type === 'chapitre' ? k : k * .45) * al; n.vx += (a[0] - n.x) * kk; n.vy += (a[1] - n.y) * kk; n.vz += (a[2] - n.z) * kk; } }; f.initialize = (x) => { ns = x; }; return f; };
   const R = { semestre: 9, chapitre: 5.2, notion: 2.3 };
 
@@ -109,14 +109,14 @@ async function construire() {
     .linkColor(linkColor).linkWidth(linkWidth)
     .linkDirectionalParticles(partN).linkDirectionalParticleSpeed(partV).linkDirectionalParticleWidth(partW).linkDirectionalParticleColor((l) => l.type === 'outil' ? '#ffbe78' : PRE).linkDirectionalParticleResolution(6)
     .linkDirectionalArrowLength((l) => l.type === 'prerequis' ? 2.4 : 0).linkDirectionalArrowRelPos(.92).linkDirectionalArrowColor(() => 'rgba(125,249,255,.75)')
-    .enableNodeDrag(false).warmupTicks(120).cooldownTicks(160)
+    .enableNodeDrag(false).warmupTicks(120).cooldownTicks(160).onEngineStop(() => { if (!fitDone && !sel) { fitDone = true; cadrerTout(1400); } })
     .onNodeHover((n) => { hov = n || null; $('.cst-stage').style.cursor = n ? 'pointer' : ''; majSurbrillance(); })
     .onNodeClick((n) => choisir(n, true))
     .onBackgroundClick(() => { if (sel) { sel = null; panneau(); majSurbrillance(); } });
   const ctr = () => G.controls();
-  G.d3Force('charge').strength((n) => n.type === 'notion' ? -30 : -130);
+  G.d3Force('charge').strength((n) => n.type === 'notion' ? -22 : -75);
   G.d3Force('link').distance((l) => l.type === 'hierarchie' ? 18 : 120).strength((l) => l.type === 'hierarchie' ? .9 : l.type === 'prerequis' ? .012 : .006);
-  G.d3Force('ancre', ancre(.05));
+  G.d3Force('ancre', ancre(.09));
   G.renderer().setPixelRatio(Math.min(devicePixelRatio || 1, mob ? 1.5 : 2));
   const bloom = new UnrealBloomPass(new THREE.Vector2(innerWidth, innerHeight), mob ? 1.35 : 1.65, .5, .42);
   G.postProcessingComposer().addPass(bloom);
@@ -182,6 +182,12 @@ async function construire() {
   }
 
   // ---------- caméra cinématique ----------
+  function cadrerTout(ms) { // vue de face qui remplit l'écran avec toutes les constellations
+    const bb = G.getGraphBbox(); if (!bb) return; const cx = (bb.x[0] + bb.x[1]) / 2, cy = (bb.y[0] + bb.y[1]) / 2, cz = (bb.z[0] + bb.z[1]) / 2;
+    const cam = G.camera(), vh = cam.fov * Math.PI / 360, hf = Math.atan(Math.tan(vh) * innerWidth / innerHeight);
+    const d = Math.max((bb.x[1] - bb.x[0]) / 2 / Math.tan(hf), (bb.y[1] - bb.y[0]) / 2 / Math.tan(vh) * 1.15) * .86 + (bb.z[1] - bb.z[0]) / 4;
+    G.cameraPosition({ x: cx, y: cy + d * .18, z: cz + d }, { x: cx, y: cy, z: cz }, ms); c.target.set(cx, cy, cz);
+  }
   function voler(n) { // cadrer l'élément ET toutes ses dépendances, en gardant l'angle de vue
     const pts = [n];
     for (const l of data.links) { const s = l.source.id ?? l.source, t = l.target.id ?? l.target; if (s === n.id) pts.push(byId.get(t)); else if (t === n.id) pts.push(byId.get(s)); }
@@ -244,5 +250,6 @@ async function construire() {
   const fit = () => { G.width(innerWidth).height(innerHeight); bloom.setSize(innerWidth, innerHeight); };
   addEventListener('resize', fit); fit();
   setTimeout(() => $('.cst-load').classList.add('off'), 250);
+  setTimeout(() => { if (!fitDone && !sel) { fitDone = true; cadrerTout(1600); } }, 2600);
   return { show };
 }
