@@ -5,8 +5,7 @@ const V3 = '0.187.0';
 const LIBS = () => Promise.all([
   import(`https://esm.sh/3d-force-graph@1.80.3?deps=three@${V3}`),
   import(`https://esm.sh/three@${V3}`),
-  import(`https://esm.sh/three@${V3}/examples/jsm/postprocessing/UnrealBloomPass.js`),
-  import(`https://esm.sh/three-spritetext@1.10.0?deps=three@${V3}`)
+  import(`https://esm.sh/three@${V3}/examples/jsm/postprocessing/UnrealBloomPass.js`)
 ]);
 const SEMC = { S1: '#4cc9ff', S2: '#3dffb5', S3: '#ffcf4d', S4: '#ff5fa2', S6: '#b18cff' };
 const PRE = '#7df9ff';
@@ -36,6 +35,11 @@ const CSS = `
 .cst-hint{position:absolute;right:14px;bottom:14px;font-size:12px;opacity:.55;text-align:right;pointer-events:none}
 .cst-load{position:absolute;inset:0;display:grid;place-items:center;font-size:14px;letter-spacing:.2em;text-transform:uppercase;color:#7df9ff;text-shadow:0 0 12px #7df9ff}
 .cst-load.off{display:none}
+.cst-lbs{position:absolute;inset:0;pointer-events:none;overflow:hidden}
+.cst-lb{position:absolute;left:0;top:0;white-space:nowrap;transform-origin:50% 100%;will-change:transform;font-weight:600;letter-spacing:.01em;text-shadow:0 0 3px #050811,0 0 8px #050811,0 1px 2px #000;transition:opacity .25s}
+.cst-lb.ch{font-size:13px;color:#e8f2ff;border-bottom:1px solid color-mix(in srgb,var(--c) 70%,transparent);padding-bottom:1px}
+.cst-lb.no{font-size:11.5px;font-weight:500;color:#d6e4fa;background:rgba(5,8,17,.72);border:1px solid color-mix(in srgb,var(--c) 45%,transparent);border-radius:6px;padding:1px 6px;display:none}
+@media (max-width:720px){.cst-lb.ch{font-size:11.5px}.cst-lb.no{font-size:10.5px}}
 .cst-pn{position:absolute;top:76px;right:12px;width:min(360px,calc(100% - 24px));padding:16px 16px 14px;transform:translateX(calc(100% + 30px));transition:transform .5s cubic-bezier(.2,.8,.2,1);max-height:calc(100% - 140px);overflow:auto}
 .cst-pn.on{transform:none}
 .cst-pn h3{margin:6px 0 2px;font-size:18px;line-height:1.25}.cst-pn .sub{opacity:.7;font-size:13px}
@@ -73,10 +77,10 @@ async function construire() {
   <div class="cst-top glass"><h2>✦ Constellation</h2><div class="cst-q"><input type="search" placeholder="Rechercher une notion, un chapitre…" aria-label="Rechercher" autocomplete="off"><ul class="cst-ac glass" role="listbox"></ul></div><button class="cst-x" title="Revenir au site (Échap)" aria-label="Fermer">✕</button></div>
   <div class="cst-leg glass">${Object.entries(SEMC).map(([s, c]) => `<span style="color:${c}"><i></i><span style="color:#e6f1ff">${s}</span></span>`).join('')}<span><b></b>prérequis</span><span><b style="background:#ffbe78;box-shadow:0 0 6px #ffbe78"></b>outil commun</span></div>
   <div class="cst-hint">Glisser : tourner · molette / pincer : zoom · clic : explorer</div>
-  <aside class="cst-pn glass" aria-live="polite"></aside>`;
+  <div class="cst-lbs"></div><aside class="cst-pn glass" aria-live="polite"></aside>`;
   document.body.appendChild(root);
   const $ = (s) => root.querySelector(s);
-  let G = null, hov = null, sel = null, fitDone = false; const hiN = new Set(), hiL = new Set(); const prevOverflow = document.body.style.overflow;
+  let G = null, hov = null, sel = null, fitDone = false, labs = root.querySelector('.cst-lbs'), pv = null; const hiN = new Set(), hiL = new Set(); const prevOverflow = document.body.style.overflow;
   const show = () => { root.style.display = ''; document.body.style.overflow = 'hidden'; requestAnimationFrame(() => root.classList.add('on')); if (G) { G.resumeAnimation(); ctr().autoRotate = !sel; } };
   const hide = () => { root.classList.remove('on'); document.body.style.overflow = prevOverflow; setTimeout(() => { if (!root.classList.contains('on')) { root.style.display = 'none'; G && G.pauseAnimation(); } }, 450); };
   show();
@@ -85,9 +89,10 @@ async function construire() {
   let data, libs;
   try { [data, libs] = await Promise.all([fetch('graphe.json?v=2').then((r) => r.json()), LIBS()]); }
   catch (e) { $('.cst-load').textContent = 'Connexion nécessaire pour la vue 3D.'; return { show }; }
-  const [{ default: ForceGraph3D }, THREE, { UnrealBloomPass }, { default: SpriteText }] = libs;
+  const [{ default: ForceGraph3D }, THREE, { UnrealBloomPass }] = libs;
 
   // ---------- données ----------
+  pv = new THREE.Vector3();
   const byId = new Map(data.nodes.map((n) => [n.id, n]));
   const out = new Map(), inc = new Map();
   for (const l of data.links) { (out.get(l.source) || out.set(l.source, []).get(l.source)).push(l); (inc.get(l.target) || inc.set(l.target, []).get(l.target)).push(l); }
@@ -170,13 +175,9 @@ async function construire() {
         ring.scale.setScalar(r); ring.rotation.set(Math.PI / 2 - .35 - (seed % 4) * .12, (seed % 5) * .2, 0); g.add(ring); n.__mats.push(ring.material);
       }
     }
-    if (n.type === 'chapitre') {
-      const t = new SpriteText(n.label, 7.5, 'rgba(178,198,232,.9)'); t.fontWeight = '600'; t.fontFace = 'system-ui, Segoe UI, sans-serif'; t.material.depthWrite = false; t.position.y = r + 12; g.add(t); n.__mats.push(t.material);
-    }
-    if (n.type === 'notion') { // intitulé affiché seulement quand la notion est liée à l'élément choisi
-      const txt = n.label.length > 42 ? n.label.slice(0, 40) + '…' : n.label;
-      const t = new SpriteText(txt, 5, 'rgba(200,215,240,.95)'); t.fontFace = 'system-ui, Segoe UI, sans-serif'; t.backgroundColor = 'rgba(5,8,17,.6)'; t.padding = [1.6, .8]; t.borderRadius = 1.5;
-      t.material.depthWrite = false; t.material.depthTest = false; t.renderOrder = 10; t.position.y = r + 5; t.visible = false; g.add(t); n.__lab = t;
+    { // étiquette HTML nette (hors 3D, donc pas floutée par le halo)
+      const el = document.createElement('div'); el.className = 'cst-lb ' + (isCh ? 'ch' : 'no'); el.style.setProperty('--c', SEMC[n.sem] || '#7df9ff');
+      el.textContent = isCh ? n.label : (n.label.length > 46 ? n.label.slice(0, 44) + '…' : n.label); labs.appendChild(el); n.__el = el; n.__r = r;
     }
     n.__base = n.__mats.map((m) => m.uniforms ? m.uniforms.o.value : (m.opacity ?? 1)); return g;
   }
@@ -185,6 +186,22 @@ async function construire() {
   (function anim() {
     requestAnimationFrame(anim); if (!root.classList.contains('on')) return;
     const t = (performance.now() - t0) / 1000;
+    { // étiquettes : projection puis placement sans chevauchement (élément choisi d'abord, puis ses liens)
+      const cam = G.camera(), W = innerWidth, H = innerHeight, any = hiN.size > 0, cp = cam.position; const fy = H / 2 / Math.tan(cam.fov * Math.PI / 360); const L = [];
+      for (const n of data.nodes) { const el = n.__el; if (!el || n.x === undefined) continue;
+        const show = n.type === 'chapitre' || (any && hiN.has(n)); pv.set(n.x, n.y, n.z); const dist = pv.distanceTo(cp); pv.project(cam);
+        if (!show || pv.z > 1 || dist < 8) { if (el.style.display !== 'none') el.style.display = 'none'; continue; }
+        if (el.style.display !== 'block') { el.style.display = 'block'; n.__w = 0; }
+        if (!n.__w) { n.__w = el.offsetWidth; n.__h = el.offsetHeight; }
+        const pr = n === (hov || sel) ? 0 : any && hiN.has(n) ? (n.type === 'notion' ? 1 : 2) : 3;
+        L.push({ n, el, pr, dist, x: (pv.x + 1) / 2 * W, y: (1 - pv.y) / 2 * H - (n.__r * 1.9 * fy / dist) - 4 }); }
+      L.sort((a, b) => a.pr - b.pr || a.dist - b.dist); const placed = [];
+      const hit = (x, y, w, h) => placed.some((r) => x < r[2] && x + w > r[0] && y < r[3] && y + h > r[1]);
+      for (const o of L) { const w = o.n.__w + 4, h = o.n.__h + 2; let x = o.x - w / 2, y = o.y - h, ok = !hit(x, y, w, h);
+        for (let k = 1; !ok && k <= 4 && o.pr < 3; k++) for (const dy of [-k * h, k * h]) if (!ok && !hit(x, y + dy, w, h)) { y += dy; ok = true; }
+        if (!ok) { o.el.style.opacity = 0; continue; } placed.push([x, y, x + w, y + h]);
+        o.el.style.transform = `translate(${(x + 2).toFixed(1)}px,${(y + 1).toFixed(1)}px)`;
+        o.el.style.opacity = any ? (hiN.has(o.n) ? 1 : .12) : (o.n.type === 'chapitre' ? Math.max(.45, Math.min(1, 900 / o.dist)) : 1); } }
     for (const n of data.nodes) if (n.__spin) n.__spin.m.rotation.y = t * n.__spin.v;
     for (const n of data.nodes) if (n.__halo) { n.__halo.lookAt(G.camera().position); n.__halo.scale.setScalar(R.chapitre * (1.9 + .12 * Math.sin(t * 2 + n.id.length))); }
     if (sel && sel.__threeObj) sel.__threeObj.scale.setScalar(1 + .08 * Math.sin(t * 2));
@@ -195,17 +212,16 @@ async function construire() {
   function voisinage(n) { hiN.clear(); hiL.clear(); if (!n) return; hiN.add(n);
     for (const l of data.links) { const s = l.source.id ?? l.source, t = l.target.id ?? l.target; if (s === n.id || t === n.id) { hiL.add(l); hiN.add(byId.get(s)); hiN.add(byId.get(t)); } } }
   function linkColor(l) { const on = hiL.has(l), any = hiN.size > 0;
-    if (l.type === 'prerequis') return on ? 'rgba(125,249,255,.5)' : any ? 'rgba(125,249,255,.06)' : 'rgba(125,249,255,.3)';
-    if (l.type === 'outil') return on ? 'rgba(255,190,120,.45)' : any ? 'rgba(255,190,120,.05)' : 'rgba(255,190,120,.22)';
+    if (l.type === 'prerequis') return on ? 'rgba(125,249,255,.75)' : any ? 'rgba(125,249,255,.06)' : 'rgba(125,249,255,.3)';
+    if (l.type === 'outil') return on ? 'rgba(255,190,120,.7)' : any ? 'rgba(255,190,120,.05)' : 'rgba(255,190,120,.22)';
     const c = SEMC[(l.source.sem || byId.get(l.source)?.sem)] || '#8fa8ff'; if (l.niveau === 'semestre') return any ? 'rgba(255,255,255,.04)' : 'rgba(220,230,255,.16)'; return on ? c : any ? 'rgba(120,140,190,.05)' : hexA(c, .22); }
-  function linkWidth(l) { return hiL.has(l) ? (l.type === 'hierarchie' ? .5 : .65) : (l.type === 'prerequis' ? .45 : l.type === 'outil' ? .35 : .25); }
+  function linkWidth(l) { return hiL.has(l) ? (l.type === 'hierarchie' ? .5 : .8) : (l.type === 'prerequis' ? .45 : l.type === 'outil' ? .35 : .25); }
   function partN(l) { return l.type === 'hierarchie' ? 0 : hiL.has(l) ? (l.type === 'prerequis' ? 3 : 2) : hiN.size ? 0 : (l.type === 'prerequis' ? 1 : 0); }
   function partV(l) { return hiL.has(l) ? .006 : .0025; }
   function partW(l) { return hiL.has(l) ? 1.5 : 1.1; }
   function hexA(h, a) { const c = new THREE.Color(h); return `rgba(${c.r * 255 | 0},${c.g * 255 | 0},${c.b * 255 | 0},${a})`; }
   function majSurbrillance() {
     voisinage(hov || sel); const any = hiN.size > 0;
-    for (const n of data.nodes) if (n.__lab) n.__lab.visible = any && hiN.has(n);
     for (const n of data.nodes) if (n.__mats) n.__mats.forEach((m, i) => { const v = !any || hiN.has(n) ? n.__base[i] : n.__base[i] * .12; if (m.uniforms) m.uniforms.o.value = v; else m.opacity = v; });
     G.linkColor(linkColor).linkWidth(linkWidth).linkDirectionalParticles(partN).linkDirectionalParticleSpeed(partV).linkDirectionalParticleWidth(partW);
   }
