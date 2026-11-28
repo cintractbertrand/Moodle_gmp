@@ -146,7 +146,7 @@ async function construire() {
     }
     if (n.type === 'notion') { // intitulé affiché seulement quand la notion est liée à l'élément choisi
       const txt = n.label.length > 42 ? n.label.slice(0, 40) + '…' : n.label;
-      const t = new SpriteText(txt, 3.6, 'rgba(200,215,240,.95)'); t.fontFace = 'system-ui, Segoe UI, sans-serif'; t.backgroundColor = 'rgba(5,8,17,.6)'; t.padding = [1.6, .8]; t.borderRadius = 1.5;
+      const t = new SpriteText(txt, 5, 'rgba(200,215,240,.95)'); t.fontFace = 'system-ui, Segoe UI, sans-serif'; t.backgroundColor = 'rgba(5,8,17,.6)'; t.padding = [1.6, .8]; t.borderRadius = 1.5;
       t.material.depthWrite = false; t.material.depthTest = false; t.renderOrder = 10; t.position.y = r + 5; t.visible = false; g.add(t); n.__lab = t;
     }
     n.__base = n.__mats.map((m) => m.opacity ?? 1); return g;
@@ -182,11 +182,23 @@ async function construire() {
   }
 
   // ---------- caméra cinématique ----------
-  function voler(n) {
-    const d = n.type === 'notion' ? 170 : 240; const cp = G.camera().position; // garder l'angle de vue actuel
-    let dx = cp.x - n.x, dy = cp.y - n.y, dz = cp.z - n.z; const L = Math.hypot(dx, dy, dz) || 1; dx /= L; dy /= L; dz /= L;
-    const p = { x: n.x + dx * d, y: n.y + dy * d, z: n.z + dz * d };
-    c.autoRotate = false; G.cameraPosition(p, { x: n.x, y: n.y, z: n.z }, 1700);
+  function voler(n) { // cadrer l'élément ET toutes ses dépendances, en gardant l'angle de vue
+    const pts = [n];
+    for (const l of data.links) { const s = l.source.id ?? l.source, t = l.target.id ?? l.target; if (s === n.id) pts.push(byId.get(t)); else if (t === n.id) pts.push(byId.get(s)); }
+    let mn = [1e9, 1e9, 1e9], mx = [-1e9, -1e9, -1e9]; for (const p of pts) ['x', 'y', 'z'].forEach((k, i) => { mn[i] = Math.min(mn[i], p[k]); mx[i] = Math.max(mx[i], p[k]); });
+    const ctrP = new THREE.Vector3((mn[0] + mx[0]) / 2, (mn[1] + mx[1]) / 2, (mn[2] + mx[2]) / 2);
+    let rad = 40; for (const p of pts) rad = Math.max(rad, ctrP.distanceTo(new THREE.Vector3(p.x, p.y, p.z)) + 12);
+    const cam = G.camera(), w = innerWidth, h = innerHeight, mobil = w < 720;
+    const vh = (cam.fov * Math.PI / 180) / 2, hf = Math.atan(Math.tan(vh) * w / h);
+    const uW = mobil ? 1 : Math.max(.5, (w - 390) / w), uH = mobil ? .42 : 1; // zone libre à côté du panneau
+    const half = Math.min(Math.atan(Math.tan(vh) * uH), Math.atan(Math.tan(hf) * uW));
+    const d = rad / Math.sin(half) * 1.04;
+    const dir = cam.position.clone().sub(ctrP).normalize();
+    const q = cam.quaternion; const right = new THREE.Vector3(1, 0, 0).applyQuaternion(q), up = new THREE.Vector3(0, 1, 0).applyQuaternion(q);
+    // décaler la visée pour que le groupe tombe au centre de la zone libre
+    const tgt = ctrP.clone(); if (mobil) tgt.addScaledVector(up, -(1 - uH) * d * Math.tan(vh)); else tgt.addScaledVector(right, (1 - uW) * d * Math.tan(hf));
+    const p = tgt.clone().addScaledVector(dir, d);
+    c.autoRotate = false; G.cameraPosition({ x: p.x, y: p.y, z: p.z }, { x: tgt.x, y: tgt.y, z: tgt.z }, 1700);
   }
   function choisir(n, fly) { if (!n) return; sel = n; panneau(); majSurbrillance(); if (fly) voler(n); }
 
