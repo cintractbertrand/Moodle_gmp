@@ -166,7 +166,7 @@ async function construire() {
   { const cv = document.createElement('canvas'); cv.width = cv.height = 128; const x = cv.getContext('2d'); const gr = x.createRadialGradient(64, 64, 0, 64, 64, 64);
     gr.addColorStop(0, 'rgba(255,255,255,.9)'); gr.addColorStop(.35, 'rgba(255,255,255,.35)'); gr.addColorStop(1, 'rgba(255,255,255,0)'); x.fillStyle = gr; x.fillRect(0, 0, 128, 128);
     const tx = new THREE.CanvasTexture(cv);
-    for (const [k, a] of Object.entries(ANC)) for (let j = 0; j < 3; j++) { const sp = new THREE.Sprite(new THREE.SpriteMaterial({ map: tx, color: SEMC[k], transparent: true, opacity: .3, depthWrite: false, blending: THREE.AdditiveBlending }));
+    for (const [k, a] of Object.entries(ANC)) for (let j = 0; j < 3; j++) { const sp = new THREE.Sprite(new THREE.SpriteMaterial({ map: tx, color: SEMC[k], transparent: true, opacity: (POIDS[k] || 1) < 1 ? .3 : .15, depthWrite: false, blending: THREE.AdditiveBlending })); // S1-S3 plus clairs de nature : nuage plus léger
       const sc = ((POIDS[k] || 1) * 290) * (1 - j * .2); sp.scale.set(sc, sc * .8, 1); sp.position.set(a[0] + (j - 1) * 35, a[1] + (j % 2 ? 20 : -15), a[2] + (j - 1) * 25); sp.visible = false; G.scene().add(sp); nebuleuses.push(sp); } }
   grille.position.y = -150; grille.material.transparent = true; grille.material.opacity = .55; grille.visible = false; G.scene().add(grille);
 
@@ -333,7 +333,7 @@ async function construire() {
     style = STYLES.some((x) => x[0] === k) ? k : 'neon'; try { localStorage.setItem('cst_style', style); } catch (e) { }
     const S = { // fond, halo (bloom), lumière propre des planètes, atmosphère, étoiles, nébuleuses, grille, fil de fer, palette des liens
       neon: { bg: '#050811', bl: [.8, .35, .45], em: [.3, .45], atm: true, st: true, neb: false, gr: false, fil: false, pal: ['125,249,255', '255,190,120'] },
-      nebuleuse: { bg: '#07050f', bl: [.7, .6, .5], em: [.25, .35], atm: true, st: true, neb: true, gr: false, fil: false, pal: ['190,170,255', '255,170,200'] },
+      nebuleuse: { bg: '#07050f', bl: [.5, .55, .55], em: [.16, .26], atm: true, st: true, neb: true, gr: false, fil: false, pal: ['190,170,255', '255,170,200'] },
       holo: { bg: '#010b12', bl: [.55, .3, .35], em: [.45, .5], lu: [1.2, .3], atm: true, st: false, neb: false, gr: true, fil: true, pal: ['103,232,249', '94,234,212'] },
       papier: { bg: '#fbf8f1', bl: null, em: [.12, .18], lu: [2.8, 1.6], atm: false, st: false, neb: false, gr: false, fil: false, pal: ['30,80,150', '180,95,20'] },
       sobre: { bg: '#0b1020', bl: null, em: [.15, .25], atm: false, st: true, neb: false, gr: false, fil: false, pal: ['148,180,230', '220,180,140'] },
