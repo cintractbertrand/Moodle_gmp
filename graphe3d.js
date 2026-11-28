@@ -144,6 +144,11 @@ async function construire() {
     if (n.type === 'chapitre') {
       const t = new SpriteText(n.label, 7.5, 'rgba(178,198,232,.9)'); t.fontWeight = '600'; t.fontFace = 'system-ui, Segoe UI, sans-serif'; t.material.depthWrite = false; t.position.y = r + 12; g.add(t); n.__mats.push(t.material);
     }
+    if (n.type === 'notion') { // intitulé affiché seulement quand la notion est liée à l'élément choisi
+      const txt = n.label.length > 42 ? n.label.slice(0, 40) + '…' : n.label;
+      const t = new SpriteText(txt, 3.6, 'rgba(200,215,240,.95)'); t.fontFace = 'system-ui, Segoe UI, sans-serif'; t.backgroundColor = 'rgba(5,8,17,.6)'; t.padding = [1.6, .8]; t.borderRadius = 1.5;
+      t.material.depthWrite = false; t.material.depthTest = false; t.renderOrder = 10; t.position.y = r + 5; t.visible = false; g.add(t); n.__lab = t;
+    }
     n.__base = n.__mats.map((m) => m.opacity ?? 1); return g;
   }
   // animation légère : électrons, halos, respiration de la sélection
@@ -161,16 +166,17 @@ async function construire() {
   function voisinage(n) { hiN.clear(); hiL.clear(); if (!n) return; hiN.add(n);
     for (const l of data.links) { const s = l.source.id ?? l.source, t = l.target.id ?? l.target; if (s === n.id || t === n.id) { hiL.add(l); hiN.add(byId.get(s)); hiN.add(byId.get(t)); } } }
   function linkColor(l) { const on = hiL.has(l), any = hiN.size > 0;
-    if (l.type === 'prerequis') return on ? 'rgba(125,249,255,.95)' : any ? 'rgba(125,249,255,.06)' : 'rgba(125,249,255,.3)';
-    if (l.type === 'outil') return on ? 'rgba(255,190,120,.9)' : any ? 'rgba(255,190,120,.05)' : 'rgba(255,190,120,.22)';
+    if (l.type === 'prerequis') return on ? 'rgba(125,249,255,.5)' : any ? 'rgba(125,249,255,.06)' : 'rgba(125,249,255,.3)';
+    if (l.type === 'outil') return on ? 'rgba(255,190,120,.45)' : any ? 'rgba(255,190,120,.05)' : 'rgba(255,190,120,.22)';
     const c = SEMC[(l.source.sem || byId.get(l.source)?.sem)] || '#8fa8ff'; if (l.niveau === 'semestre') return any ? 'rgba(255,255,255,.04)' : 'rgba(220,230,255,.16)'; return on ? c : any ? 'rgba(120,140,190,.05)' : hexA(c, .22); }
-  function linkWidth(l) { return hiL.has(l) ? (l.type === 'hierarchie' ? .8 : 1.3) : (l.type === 'prerequis' ? .45 : l.type === 'outil' ? .35 : .25); }
-  function partN(l) { return l.type === 'hierarchie' ? 0 : hiL.has(l) ? (l.type === 'prerequis' ? 7 : 4) : hiN.size ? 0 : (l.type === 'prerequis' ? 1 : 0); }
-  function partV(l) { return hiL.has(l) ? .028 : .0045; }
-  function partW(l) { return hiL.has(l) ? 2.1 : 1.1; }
+  function linkWidth(l) { return hiL.has(l) ? (l.type === 'hierarchie' ? .5 : .65) : (l.type === 'prerequis' ? .45 : l.type === 'outil' ? .35 : .25); }
+  function partN(l) { return l.type === 'hierarchie' ? 0 : hiL.has(l) ? (l.type === 'prerequis' ? 3 : 2) : hiN.size ? 0 : (l.type === 'prerequis' ? 1 : 0); }
+  function partV(l) { return hiL.has(l) ? .011 : .0045; }
+  function partW(l) { return hiL.has(l) ? 1.5 : 1.1; }
   function hexA(h, a) { const c = new THREE.Color(h); return `rgba(${c.r * 255 | 0},${c.g * 255 | 0},${c.b * 255 | 0},${a})`; }
   function majSurbrillance() {
     voisinage(hov || sel); const any = hiN.size > 0;
+    for (const n of data.nodes) if (n.__lab) n.__lab.visible = any && hiN.has(n);
     for (const n of data.nodes) if (n.__mats) n.__mats.forEach((m, i) => { m.opacity = !any || hiN.has(n) ? n.__base[i] : n.__base[i] * .12; });
     G.linkColor(linkColor).linkWidth(linkWidth).linkDirectionalParticles(partN).linkDirectionalParticleSpeed(partV).linkDirectionalParticleWidth(partW);
   }
