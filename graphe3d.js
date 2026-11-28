@@ -243,8 +243,10 @@ async function construire() {
   })();
 
   // ---------- surbrillance ----------
-  function voisinage(n) { hiN.clear(); hiL.clear(); if (!n) return; hiN.add(n);
-    for (const l of data.links) { const s = l.source.id ?? l.source, t = l.target.id ?? l.target; if (l.type !== 'constellation' && (s === n.id || t === n.id)) { hiL.add(l); hiN.add(byId.get(s)); hiN.add(byId.get(t)); } } }
+  const groupe = (n) => n.type === 'chapitre' ? new Set([n.id, ...data.nodes.filter((x) => x.chap === n.id).map((x) => x.id)]) : new Set([n.id]);
+  function voisinage(n) { hiN.clear(); hiL.clear(); if (!n) return; hiN.add(n); const G0 = groupe(n);
+    for (const l of data.links) { if (l.type === 'constellation') continue; const s = l.source.id ?? l.source, t = l.target.id ?? l.target;
+      if (G0.has(s) || G0.has(t)) { hiL.add(l); hiN.add(byId.get(s)); hiN.add(byId.get(t)); } } }
   function linkColor(l) { const on = hiL.has(l), any = hiN.size > 0;
     if (l.type === 'constellation') return hexA(SEMC[l.source.sem || byId.get(l.source)?.sem] || '#8fa8ff', any ? .25 : .7);
     if (l.type === 'prerequis') return `rgba(${PAL.pre},${on ? .75 : any ? .08 : .4})`;
@@ -274,8 +276,8 @@ async function construire() {
     G.cameraPosition({ x: cx + d * Math.cos(el) * Math.sin(az), y: cy + d * Math.sin(el), z: cz + d * Math.cos(el) * Math.cos(az) }, { x: cx, y: cy, z: cz }, ms); c.target.set(cx, cy, cz);
   }
   function voler(n) { // cadrer l'élément ET toutes ses dépendances, en gardant l'angle de vue
-    const pts = [n];
-    for (const l of data.links) { if (l.type === 'constellation') continue; const s = l.source.id ?? l.source, t = l.target.id ?? l.target; if (s === n.id) pts.push(byId.get(t)); else if (t === n.id) pts.push(byId.get(s)); }
+    const pts = [n]; const G0 = groupe(n);
+    for (const l of data.links) { if (l.type === 'constellation') continue; const s = l.source.id ?? l.source, t = l.target.id ?? l.target; if (G0.has(s)) pts.push(byId.get(t)); if (G0.has(t)) pts.push(byId.get(s)); }
     let mn = [1e9, 1e9, 1e9], mx = [-1e9, -1e9, -1e9]; for (const p of pts) ['x', 'y', 'z'].forEach((k, i) => { mn[i] = Math.min(mn[i], p[k]); mx[i] = Math.max(mx[i], p[k]); });
     const ctrP = new THREE.Vector3((mn[0] + mx[0]) / 2, (mn[1] + mx[1]) / 2, (mn[2] + mx[2]) / 2);
     let rad = 40; for (const p of pts) rad = Math.max(rad, ctrP.distanceTo(new THREE.Vector3(p.x, p.y, p.z)) + 12);
@@ -299,13 +301,20 @@ async function construire() {
     const n = sel, col = SEMC[n.sem] || '#7df9ff'; const nb = n.nb || {};
     const T = { semestre: 'Semestre', chapitre: 'Chapitre', notion: 'Notion' }[n.type];
     const cnt = n.type === 'semestre' ? [[nb.chap, 'chapitres'], [nb.notions, 'notions']] : [[nb.n1 ?? 0, 'questions N1'], [nb.n2 ?? 0, 'automatismes N2 · nombres variables'], [nb.n3 ?? 0, 'exercices N3']];
+    const relChap = (c) => { // liens des notions du chapitre vers d'autres chapitres, regroupés
+      const G0 = groupe(c); const av = [], ap = [];
+      for (const l of data.links) { if (l.type === 'constellation' || l.type === 'hierarchie') continue; const s = byId.get(l.source.id ?? l.source), t = byId.get(l.target.id ?? l.target);
+        if (G0.has(t.id) && !G0.has(s.id)) av.push([s, t, l]); else if (G0.has(s.id) && !G0.has(t.id)) ap.push([t, s, l]); }
+      const bloc = (L, titre, fl) => { if (!L.length) return ''; L.sort((a, b) => (a[0].chap || '').localeCompare(b[0].chap || '') || (a[2].type === 'outil') - (b[2].type === 'outil'));
+        return `<h4>${titre} <span style="opacity:.6">(${L.length})</span></h4>` + L.map(([o, mine, l]) => `<button data-go="${esc(o.id)}">${l.type === 'outil' ? '<span class="cst-o">outil</span> ' : ''}${esc(o.label)} <span style="opacity:.55">· ${esc((o.chapLabel || '').slice(0, 2))}</span><em>${fl} ${esc(mine.label)} — ${esc(l.why || '')}</em></button>`).join(''); };
+      return bloc(av, "S'appuie sur", 'pour') + bloc(ap, 'Sert pour', 'depuis'); };
     const rel = (arr, side, titre) => { const L = (arr || []).filter((l) => l.type !== 'hierarchie').sort((a, b) => (a.type === 'outil') - (b.type === 'outil')); if (!L.length) return ''; return `<h4>${titre}</h4>` + L.map((l) => { const o = byId.get(side === 's' ? (l.source.id ?? l.source) : (l.target.id ?? l.target)); return `<button data-go="${esc(o.id)}">${l.type === 'outil' ? '<span class="cst-o">outil</span> ' : ''}${esc(o.label)}<em>${esc(l.why || '')}${l.fiches ? ' · vu dans ' + l.fiches + ' corrigé' + (l.fiches > 1 ? 's' : '') + " de l'atelier" : l.preuve ? ' · repéré dans ' + l.preuve + ' passages du site' : ''}</em></button>`; }).join(''); };
     const kids = (out.get(n.id) || []).filter((l) => l.type === 'hierarchie' && l.niveau !== 'semestre').map((l) => byId.get(l.target.id ?? l.target));
     pn.innerHTML = `<button class="px" aria-label="Fermer le panneau">✕</button><span class="cst-badge" style="color:${col}">${esc(n.semLabel || n.sem)}</span><span class="cst-type">${T}</span>
       <h3>${esc(n.label)}</h3><div class="sub">${esc(n.type === 'notion' ? n.chapLabel : n.type === 'semestre' ? n.sub : (nb.notions || 0) + ' notions')}</div>
       <div class="cst-cnt" style="grid-template-columns:repeat(${cnt.length},1fr)">${cnt.map(([v, t]) => `<div><b>${v ?? 0}</b><span>${t}</span></div>`).join('')}</div>
       <div class="cst-act"><button class="cst-btn" data-h="${esc(n.cours)}" style="--c:${col}">Ouvrir le cours</button><button class="cst-btn b2" data-h="${esc(n.exos)}">Lancer les exercices</button></div>
-      <div class="cst-rel">${rel(inc.get(n.id), 's', "S'appuie sur")}${rel(out.get(n.id), 't', 'Sert pour')}${kids.length ? '<h4>' + (n.type === 'semestre' ? 'Chapitres' : 'Notions') + '</h4>' + kids.map((o) => `<button data-go="${esc(o.id)}">${esc(o.label)}</button>`).join('') : ''}</div>`;
+      <div class="cst-rel">${n.type === 'chapitre' ? relChap(n) : rel(inc.get(n.id), 's', "S'appuie sur") + rel(out.get(n.id), 't', 'Sert pour')}${kids.length ? '<h4>' + (n.type === 'semestre' ? 'Chapitres' : 'Notions') + '</h4>' + kids.map((o) => `<button data-go="${esc(o.id)}">${esc(o.label)}</button>`).join('') : ''}</div>`;
     pn.classList.add('on');
     pn.querySelector('.px').onclick = () => { sel = null; panneau(); majSurbrillance(); };
     pn.querySelectorAll('[data-go]').forEach((b) => b.onclick = () => choisir(byId.get(b.dataset.go), true));
