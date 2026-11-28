@@ -1,0 +1,4080 @@
+{
+ "version": 1,
+ "explication": "Fusionne les dépendances repérées dans les corrigés (liens_fiches.json) avec la couche « cours »\nen un seul fichier de référence : dependances.json (codes de sous-chapitres de l'atelier).\nCe fichier sert à la constellation du site (via site_graphe3d/depot/outils/graphe_json.py)\net servira tel quel pour la constellation de l'atelier GMP.\n\nTypes : prerequis (B s'appuie sur A), application (A sert à résoudre B), outil (technique commune réutilisée).\nSources : fiches (vu dans les corrigés), cours (programme), cours+fiches.",
+ "ecartes": [
+  {
+   "a": "06.5",
+   "b": "16",
+   "pourquoi": "colonnes de coordonnées, pas du calcul matriciel"
+  },
+  {
+   "a": "04.1",
+   "b": "12.6",
+   "pourquoi": "« Im » partie imaginaire, pas l'image"
+  },
+  {
+   "a": "01.7",
+   "b": "19.1",
+   "pourquoi": "trigo d'énoncé, pas un prérequis"
+  },
+  {
+   "a": "09",
+   "b": "14.4.1",
+   "pourquoi": "arctan incident"
+  },
+  {
+   "a": "08.2",
+   "b": "10.2",
+   "pourquoi": "mot « variations » incident"
+  }
+ ],
+ "liens": [
+  {
+   "a": "01.1",
+   "b": "01.2",
+   "type": "prerequis",
+   "source": "cours",
+   "raison": "passer de a+ib à r e^{iθ}",
+   "fiches": 0,
+   "sur": 0,
+   "preuves": []
+  },
+  {
+   "a": "01.2",
+   "b": "01.3",
+   "type": "prerequis",
+   "source": "cours+fiches",
+   "raison": "Moivre et Euler partent de la forme exponentielle (forme exponentielle)",
+   "fiches": 6,
+   "sur": 7,
+   "preuves": [
+    {
+     "fiche": "b~1A~complexes~s1adapcplx_13",
+     "technique": "forme exponentielle",
+     "extrait": "bf{1. linéarisation.} \\emph{méthode (formules d'euler).} on pose $u=\\ee^{i\\theta}$, de sorte que $\\cos\\theta=\\frac{u+u^{-1}}2$, $\\sin\\theta=\\frac{u-u^"
+    },
+    {
+     "fiche": "b~1A~fonctions_usuelles~anc_amphi2020_complexes_s37_complexes_02",
+     "technique": "forme exponentielle",
+     "extrait": "2i}$, on développe le cube (binôme) puis on regroupe $e^{\\pm3it}$ et $e^{\\pm it}$. $$\\sin^3t=\\frac{\\left(e^{it}-e^{-it}\\right)^3}{(2i)^3}=\\frac{e^{3"
+    }
+   ]
+  },
+  {
+   "a": "01.2",
+   "b": "01.6",
+   "type": "prerequis",
+   "source": "cours",
+   "raison": "racines n-ièmes en forme exponentielle",
+   "fiches": 0,
+   "sur": 0,
+   "preuves": []
+  },
+  {
+   "a": "01.2",
+   "b": "17",
+   "type": "outil",
+   "source": "cours",
+   "raison": "module, argument ↔ coordonnées polaires (r, θ)",
+   "fiches": 0,
+   "sur": 0,
+   "preuves": []
+  },
+  {
+   "a": "01.3",
+   "b": "12.2.1",
+   "type": "outil",
+   "source": "fiches",
+   "raison": "linéarisation",
+   "fiches": 2,
+   "sur": 4,
+   "preuves": [
+    {
+     "fiche": "b~1A~integrales~anc_s2_analyse_ds2_2013_2014_primitive_version1_01~vclaude~s3",
+     "technique": "linéarisation",
+     "extrait": "intégration par parties ; changement de variable (règles de bioche) ; linéarisation ; parties successives pour $e^{ax}p(x)$ ; passage aux complexes"
+    },
+    {
+     "fiche": "b~1A~integrales~anc_s2_analyse_ds2_2013_2014_primitive_version1_01~s3",
+     "technique": "linéarisation",
+     "extrait": "\\textbf{méthode.} changement de variable, parties, bioche, linéarisation, intégrations par parties successives ou complexes pour $e^{ax}\\"
+    }
+   ]
+  },
+  {
+   "a": "01.3",
+   "b": "12.5.1",
+   "type": "prerequis",
+   "source": "cours+fiches",
+   "raison": "linéariser cosⁿ, sinⁿ avant d'intégrer (linéarisation)",
+   "fiches": 5,
+   "sur": 7,
+   "preuves": [
+    {
+     "fiche": "b~1A~integrales~anc_s2_analyse_ds2_2013_2014_primitive_version1_01~vclaude~s6",
+     "technique": "linéarisation",
+     "extrait": "intégration par parties ; changement de variable (règles de bioche) ; linéarisation ; parties successives pour $e^{ax}p(x)$ ; passage aux complexes"
+    },
+    {
+     "fiche": "b~1A~integrales~anc_s2_analyse_ds2_2012_version2_01~s5~vclaude4",
+     "technique": "linéarisation",
+     "extrait": "changement de variable $u=\\sin x$ ou $u=\\cos x$ (puissance impaire), linéarisation (puissances paires).} \\medskip $u=\\cos x$, $du=-\\sin x\\,dx$ ; $"
+    }
+   ]
+  },
+  {
+   "a": "01.3",
+   "b": "12.5.2",
+   "type": "outil",
+   "source": "fiches",
+   "raison": "linéarisation",
+   "fiches": 3,
+   "sur": 7,
+   "preuves": [
+    {
+     "fiche": "b~1A~integrales~anc_s2_analyse_ds2_2013_2014_primitive_version1_01~vclaude~s4",
+     "technique": "linéarisation",
+     "extrait": "intégration par parties ; changement de variable (règles de bioche) ; linéarisation ; parties successives pour $e^{ax}p(x)$ ; passage aux complexes"
+    },
+    {
+     "fiche": "b~1A~integrales~anc_s2_analyse_ds2_2013_2014_primitive_version1_01~s4",
+     "technique": "linéarisation",
+     "extrait": "\\textbf{méthode.} changement de variable, parties, bioche, linéarisation, intégrations par parties successives ou complexes pour $e^{ax}\\"
+    }
+   ]
+  },
+  {
+   "a": "01.3",
+   "b": "12.6",
+   "type": "prerequis",
+   "source": "fiches",
+   "raison": "linéarisation",
+   "fiches": 4,
+   "sur": 7,
+   "preuves": [
+    {
+     "fiche": "b~1A~integrales~anc_f211_tdprimitives_01",
+     "technique": "linéarisation",
+     "extrait": "hode.} formes $u'u^n$, $u'/\\sqrt u$, $u'/u$, intégration par parties, linéarisation, complexes pour $e^{ax}\\sin$. \\medskip \\textbf{a)} $\\displaysty"
+    },
+    {
+     "fiche": "b~1A~integrales~s2integration_01",
+     "technique": "linéarisation",
+     "extrait": "4 . $$ \\item $f(x)=\\displaystyle\\int\\cos^4x\\dd x$. \\emph{méthode} : linéarisation. $\\cos^2x=\\frac{1+\\cos2x}2$, donc $$ \\cos^4x=\\frac{1+2\\cos2x+\\co"
+    }
+   ]
+  },
+  {
+   "a": "01.4",
+   "b": "02.4",
+   "type": "prerequis",
+   "source": "cours+fiches",
+   "raison": "racines du second degré dans ℂ (discriminant / second degré)",
+   "fiches": 2,
+   "sur": 7,
+   "preuves": [
+    {
+     "fiche": "b~1A~polynomes~bd_2122ds1_1_05~vclaude2~vclaude4",
+     "technique": "discriminant / second degré",
+     "extrait": "acine évidente, on divise par division euclidienne, puis on étudie le discriminant du quotient.} \\medskip $p(-3)=0$ et $p'(x)=4x^3+18x^2+22x+12$, $p'(-"
+    },
+    {
+     "fiche": "b~1A~polynomes~bd_2122ds1_1_05~vclaude5",
+     "technique": "discriminant / second degré",
+     "extrait": "acine évidente, on divise par division euclidienne, puis on étudie le discriminant du quotient.} \\medskip $p(3)=81-108+27=0$ et $p'(x)=4x^3-12x^2$, $p'"
+    }
+   ]
+  },
+  {
+   "a": "01.4",
+   "b": "13.2",
+   "type": "prerequis",
+   "source": "cours",
+   "raison": "équation caractéristique : discriminant, racines complexes",
+   "fiches": 0,
+   "sur": 0,
+   "preuves": []
+  },
+  {
+   "a": "01.4",
+   "b": "14.3",
+   "type": "outil",
+   "source": "cours",
+   "raison": "le signe de rt − s² joue le rôle du discriminant",
+   "fiches": 0,
+   "sur": 0,
+   "preuves": []
+  },
+  {
+   "a": "01.6",
+   "b": "02.4",
+   "type": "prerequis",
+   "source": "cours",
+   "raison": "racines complexes pour factoriser Xⁿ − a",
+   "fiches": 0,
+   "sur": 0,
+   "preuves": []
+  },
+  {
+   "a": "01.7",
+   "b": "12.2.1",
+   "type": "outil",
+   "source": "fiches",
+   "raison": "trigonométrie (formules)",
+   "fiches": 2,
+   "sur": 4,
+   "preuves": [
+    {
+     "fiche": "b~1A~integrales~anc_s2_analyse_ds2_2013_2014_primitive_version1_01~vclaude~s3",
+     "technique": "trigonométrie (formules)",
+     "extrait": "la primitive ou l'intégrale suivante : $\\displaystyle g(x)=\\int x\\arctan(x)\\, dx$"
+    },
+    {
+     "fiche": "b~1A~integrales~anc_s2_analyse_ds2_2013_2014_primitive_version1_01~s3",
+     "technique": "trigonométrie (formules)",
+     "extrait": "la primitive ou l'intégrale suivante : $\\displaystyle g(x)=\\int \\arctan(x)\\, dx$"
+    }
+   ]
+  },
+  {
+   "a": "01.7",
+   "b": "12.5",
+   "type": "outil",
+   "source": "fiches",
+   "raison": "trigonométrie (formules)",
+   "fiches": 2,
+   "sur": 2,
+   "preuves": [
+    {
+     "fiche": "b~1A~integrales~exo7_ex006866",
+     "technique": "trigonométrie (formules)",
+     "extrait": ", dx$. $$\\begin{aligned} \\int \\sin^8x\\cos^3 x \\, dx & = \\int \\sin^8 x \\cos^2 x (\\cos x \\, dx) = \\int \\sin^8 x (1-\\sin^2 x) (\\cos x \\, dx)"
+    },
+    {
+     "fiche": "b~1A~integrales~exo7_ex005467",
+     "technique": "trigonométrie (formules)",
+     "extrait": "n\\frac{x}{2}}{1-\\tan\\frac{\\pi}{4}\\tan\\frac{x}{2}}\\right|+c \\\\ & =\\ln|\\tan(\\frac{x}{2}+\\frac{\\pi}{4})|+c. \\end{aligned}$$ ou bien $$ \\int_{}^{}"
+    }
+   ]
+  },
+  {
+   "a": "01.7",
+   "b": "12.5.1",
+   "type": "outil",
+   "source": "fiches",
+   "raison": "trigonométrie (formules)",
+   "fiches": 4,
+   "sur": 7,
+   "preuves": [
+    {
+     "fiche": "b~1A~integrales~anc_s2_analyse_ds2_2012_version2_01~vclaude~s5",
+     "technique": "trigonométrie (formules)",
+     "extrait": "uissances impaires de $\\sin$.} \\medskip $5\\sin^3x-2\\sin x=5\\sin x(1-\\cos^2x)-2\\sin x=3\\sin x-5\\cos^2x\\sin x$ : $$\\boxed{g(x)=-3\\cos x+\\frac53\\co"
+    },
+    {
+     "fiche": "b~1A~integrales~anc_s2_analyse_ds_2015_2016_primitive_equa_diff_02~vclaude~s4",
+     "technique": "trigonométrie (formules)",
+     "extrait": "tielle ; passage aux complexes.} \\medskip $\\sin^4x\\cos^3x=\\sin^4x(1-\\sin^2x)\\cos x$, $u=\\sin x$, $du=\\cos x\\,dx$ : $$\\boxed{f(x)=\\frac{\\sin^5x}5"
+    }
+   ]
+  },
+  {
+   "a": "01.7",
+   "b": "12.5.2",
+   "type": "outil",
+   "source": "fiches",
+   "raison": "trigonométrie (formules)",
+   "fiches": 6,
+   "sur": 7,
+   "preuves": [
+    {
+     "fiche": "b~1A~integrales~anc_s2_analyse_ds2_2013_2014_primitive_version1_01~vclaude~s4",
+     "technique": "trigonométrie (formules)",
+     "extrait": "ip $u=\\sin x$, $du=\\cos x\\,dx$ : $\\displaystyle\\int\\frac{\\cos x\\,dx}{\\sin^2x\\cos^2x}=\\int\\frac{du}{u^2(1-u^2)}$ avec $\\dfrac1{u^2(1-u^2)}=\\dfrac1"
+    },
+    {
+     "fiche": "b~1A~integrales~anc_s2_analyse_ds2_2013_2014_primitive_version1_01~s4",
+     "technique": "trigonométrie (formules)",
+     "extrait": "^{ax}\\sin(bx+c)$. \\medskip $u=\\cos x$ : $\\displaystyle\\int\\frac{dx}{\\cos^2x\\sin x}=-\\int\\frac{du}{u^2(1-u^2)}$ avec $\\dfrac1{u^2(1-u^2)}=\\dfrac1"
+    }
+   ]
+  },
+  {
+   "a": "01.7",
+   "b": "12.6",
+   "type": "outil",
+   "source": "fiches",
+   "raison": "trigonométrie (formules)",
+   "fiches": 7,
+   "sur": 7,
+   "preuves": [
+    {
+     "fiche": "b~1A~integrales~anc_f211_tdprimitives_01",
+     "technique": "trigonométrie (formules)",
+     "extrait": "-i$ : $$\\boxed{i=0}$$ \\medskip \\textbf{j)} $\\cos^4x\\sin^3x=\\cos^4x(1-\\cos^2x)\\sin x$, $u=\\cos x$, $du=-\\sin x\\,dx$ : $$i=\\int_{\\sqrt2/2}^{1}(u^4-"
+    },
+    {
+     "fiche": "b~1A~integrales~s2integration_01",
+     "technique": "trigonométrie (formules)",
+     "extrait": "x$ pour $\\dd u$ avec $u=\\cos x$ ($\\dd u=-\\sin x\\,\\dd x$) et on écrit $\\sin^2x=1-u^2$ : $$ \\cos^4x\\sin^3x\\,\\dd x=u^4(1-u^2)(-\\dd u). $$ bornes : $x"
+    }
+   ]
+  },
+  {
+   "a": "01.7",
+   "b": "13.1",
+   "type": "outil",
+   "source": "fiches",
+   "raison": "trigonométrie (formules)",
+   "fiches": 4,
+   "sur": 7,
+   "preuves": [
+    {
+     "fiche": "b~1A~equations_differentielles~anc_s2_analyse_ds2_2013_equat_diff_v2_01",
+     "technique": "trigonométrie (formules)",
+     "extrait": ". variation : $\\sin x\\cdot\\lambda'\\sin x=-1$, donc $\\lambda'=-\\dfrac1{\\sin^2x}$ et $\\lambda=\\dfrac{\\cos x}{\\sin x}+c$. $$\\boxed{y(x)=\\cos x+c\\sin"
+    },
+    {
+     "fiche": "b~1A~equations_differentielles~anc_f211_tdequadiff_01",
+     "technique": "trigonométrie (formules)",
+     "extrait": "x)=\\tan x+\\frac{c}{\\cos x}}$$ \\medskip \\textbf{4.} $y'\\cos x-y\\sin x=\\sin2x$ : le membre de gauche est $(y\\cos x)'$, et $\\sin 2x=2\\sin x\\cos x$."
+    }
+   ]
+  },
+  {
+   "a": "01.7",
+   "b": "17",
+   "type": "outil",
+   "source": "fiches",
+   "raison": "trigonométrie (formules)",
+   "fiches": 6,
+   "sur": 7,
+   "preuves": [
+    {
+     "fiche": "b~2A~courbes_parametrees_et_polaires~anc_f411_courbe_01",
+     "technique": "trigonométrie (formules)",
+     "extrait": "on étudie $v=\\rho\\sin(\\theta-\\theta_0)$). \\medskip \\textbf{1.} $\\rho=\\sin2\\theta$ (rosace à quatre pétales). $\\rho(\\theta+\\pi)=\\rho(\\theta)$ don"
+    },
+    {
+     "fiche": "b~2A~courbes_parametrees_et_polaires~anc_f411_courbe_11",
+     "technique": "trigonométrie (formules)",
+     "extrait": "son symétrique par rapport à $o$). \\medskip \\textbf{2.} $\\rho=\\dfrac{\\cos2\\theta}{\\cos\\theta}$ (strophoïde droite, $a=1$). $\\rho$ est paire et $"
+    }
+   ]
+  },
+  {
+   "a": "02.1",
+   "b": "02.3",
+   "type": "prerequis",
+   "source": "cours",
+   "raison": "racine multiple : divisions successives",
+   "fiches": 0,
+   "sur": 0,
+   "preuves": []
+  },
+  {
+   "a": "02.1",
+   "b": "02.4",
+   "type": "prerequis",
+   "source": "cours+fiches",
+   "raison": "factoriser par division (division euclidienne)",
+   "fiches": 5,
+   "sur": 7,
+   "preuves": [
+    {
+     "fiche": "b~1A~polynomes~bd_2425s1ds1_06",
+     "technique": "division euclidienne",
+     "extrait": "nts réels et $z$ racine, alors $\\bar z$ est racine ; on factorise par division euclidienne.} \\medskip \\textbf{1.} $p(1)=1-7+6-1+7-6=0$. de plus $p'(x)=7x^6-35x"
+    },
+    {
+     "fiche": "b~1A~polynomes~bd_2526s1ds2_02~vclaude6",
+     "technique": "division euclidienne",
+     "extrait": "racine au moins double, donc $(x+1)^2=x^2+2x+1$ divise $p$. \\medskip division euclidienne de $p$ par $x^2+2x+1$ : $3x^5+5x^4+7x^3+9x^2+2x-2=(x^2+2x+1)(3x^3)+("
+    }
+   ]
+  },
+  {
+   "a": "02.1",
+   "b": "10.4",
+   "type": "outil",
+   "source": "fiches",
+   "raison": "division euclidienne",
+   "fiches": 2,
+   "sur": 7,
+   "preuves": [
+    {
+     "fiche": "b~1A~developpements_limites~fred_ds1a03_2012_04",
+     "technique": "division euclidienne",
+     "extrait": "nfty$ si $f(x)-(ax+b)\\to0$ ; pour une fraction rationnelle on pose la division euclidienne du num\\'erateur par le d\\'enominateur : le quotient donne l'asymptote"
+    },
+    {
+     "fiche": "b~1A~trigo_reciproques~anc_f111_ds2_2012_dl_05~s1~vclaude5",
+     "technique": "division euclidienne",
+     "extrait": "\\textbf{méthode.} division euclidienne ou dl en $t=1/x$ : $f(x)=ax+b+\\dfrac cx+o(\\frac1x)$ donne l'asymptote"
+    }
+   ]
+  },
+  {
+   "a": "02.1",
+   "b": "11.1",
+   "type": "prerequis",
+   "source": "cours+fiches",
+   "raison": "partie entière = quotient de la division euclidienne (division euclidienne)",
+   "fiches": 1,
+   "sur": 2,
+   "preuves": [
+    {
+     "fiche": "b~1A~fractions_rationnelles~exo7_ex006967",
+     "technique": "division euclidienne",
+     "extrait": "ieur ou égal au degré du dénominateur (ici $1$), il faut effectuer la division euclidienne du numérateur par le dénominateur pour faire apparaître la partie pol"
+    }
+   ]
+  },
+  {
+   "a": "02.1",
+   "b": "11.2",
+   "type": "prerequis",
+   "source": "fiches",
+   "raison": "division euclidienne",
+   "fiches": 2,
+   "sur": 2,
+   "preuves": [
+    {
+     "fiche": "b~1A~fractions_rationnelles~exo7_ex006968",
+     "technique": "division euclidienne",
+     "extrait": "{x^5+x^4+1}{x^3-x}$. pour obtenir la partie polynomiale, on fait une division euclidienne : $x^5+x^4+1 = (x^3-x)(x^2+x+1)+ x^2+x+1$. ce qui donne $f = x^2+x+1+"
+    },
+    {
+     "fiche": "b~1A~fractions_rationnelles~exo7_ex006969",
+     "technique": "division euclidienne",
+     "extrait": "nd{array} $$ il reste à trouver $d$ et $e$: par exemple en faisant la division euclidienne de $x-2$ par $x-1$: $x-2 = (x-1)-1$. $$ g = \\frac{1}{x^3}-\\frac{2}{x^"
+    }
+   ]
+  },
+  {
+   "a": "02.2",
+   "b": "10.1",
+   "type": "outil",
+   "source": "cours+fiches",
+   "raison": "DL d'un quotient : division suivant les puissances croissantes (puissances croissantes)",
+   "fiches": 2,
+   "sur": 7,
+   "preuves": [
+    {
+     "fiche": "b~1A~trigo_reciproques~anc_f111_ds2_2012_dl_01~vclaude2",
+     "technique": "puissances croissantes",
+     "extrait": "frac{\\mathrm{sh}}{\\mathrm{ch}}$ : on effectue la division suivant les puissances croissantes du dl de $\\mathrm{sh}$ par celui de $\\mathrm{ch}$, à l'ordre voulu. à"
+    },
+    {
+     "fiche": "b~1A~developpements_limites~ds_dl_etude_b_01",
+     "technique": "puissances croissantes",
+     "extrait": "ordre plus grand ; \\item on peut aussi faire la division suivant les puissances croissantes de $p_f$ par $p_g$ jusqu'à l'ordre $n$. \\end{itemize}"
+    }
+   ]
+  },
+  {
+   "a": "02.2",
+   "b": "10.2",
+   "type": "outil",
+   "source": "fiches",
+   "raison": "puissances croissantes",
+   "fiches": 3,
+   "sur": 7,
+   "preuves": [
+    {
+     "fiche": "b~2A~developpements_limites~anc_formation_continue_gi_revision_ds1_2009_05",
+     "technique": "puissances croissantes",
+     "extrait": "\\textbf{méthode.} quotient : division suivant les puissances croissantes ; composée : on substitue le dl de l'intérieur. \\medskip \\textbf{1.}"
+    },
+    {
+     "fiche": "b~2A~developpements_limites~anc_formation_continue_gi_td_synthese_01",
+     "technique": "puissances croissantes",
+     "extrait": "$(1+u)^\\alpha$), on substitue, on multiplie ou on divise (suivant les puissances croissantes) en tronquant à l'ordre demandé. \\textbf{a)} $e^{2x}=1+2x+\\dfrac{(2x"
+    }
+   ]
+  },
+  {
+   "a": "02.2",
+   "b": "11.2",
+   "type": "outil",
+   "source": "fiches",
+   "raison": "puissances croissantes",
+   "fiches": 1,
+   "sur": 2,
+   "preuves": [
+    {
+     "fiche": "b~1A~fractions_rationnelles~exo7_ex006969",
+     "technique": "puissances croissantes",
+     "extrait": "déterminer les coefficients est d'effectuer une division suivant les puissances croissantes, ici à l'ordre $2$ (de sorte que le reste soit divisible par $x^3$ co"
+    }
+   ]
+  },
+  {
+   "a": "02.3",
+   "b": "02.4",
+   "type": "prerequis",
+   "source": "fiches",
+   "raison": "racine multiple / P'(a)",
+   "fiches": 4,
+   "sur": 7,
+   "preuves": [
+    {
+     "fiche": "b~1A~polynomes~bd_2425s1ds1_06",
+     "technique": "racine multiple / P'(a)",
+     "extrait": "\\textit{cours : $a$ est racine d'ordre $\\geq 2$ si $p(a)=p'(a)=0$ ; si $p$ est à coefficients réels et $z$ racine, alors $\\bar z$ est"
+    },
+    {
+     "fiche": "b~1A~polynomes~bd_2122ds1_1_05~vclaude2~vclaude4",
+     "technique": "racine multiple / P'(a)",
+     "extrait": "medskip $p(-3)=0$ et $p'(x)=4x^3+18x^2+22x+12$, $p'(-3)=0$ : $-3$ est racine double, donc $x^2+6x+9$ divise $p$. \\medskip division euclidienne : $$\\begi"
+    }
+   ]
+  },
+  {
+   "a": "02.3",
+   "b": "06.2",
+   "type": "outil",
+   "source": "fiches",
+   "raison": "racine multiple / P'(a)",
+   "fiches": 3,
+   "sur": 6,
+   "preuves": [
+    {
+     "fiche": "b~1A~determinants~s2det_06",
+     "technique": "racine multiple / P'(a)",
+     "extrait": "ses facteurs l'est : $$ \\delta=0\\iff x=-6\\ \\text{ ou }\\ x=-1\\ (\\text{racine double}). $$ ensemble des solutions : $\\boxed{\\{-6,\\,-1\\}}$. \\emph{vérifica"
+    },
+    {
+     "fiche": "b~1A~determinants~anc_s2_matrices_ds1_2015_2016_sujet_a_02",
+     "technique": "racine multiple / P'(a)",
+     "extrait": "$$ l'équation $(x+1)^2(x+3)=0$ a pour solutions $$\\boxed{x=-1\\ (\\text{racine double})\\quad\\text{ou}\\quad x=-3}.$$"
+    }
+   ]
+  },
+  {
+   "a": "02.3",
+   "b": "07.1",
+   "type": "outil",
+   "source": "cours",
+   "raison": "multiplicité d'une valeur propre",
+   "fiches": 0,
+   "sur": 0,
+   "preuves": []
+  },
+  {
+   "a": "02.3",
+   "b": "07.3",
+   "type": "outil",
+   "source": "fiches",
+   "raison": "racine multiple / P'(a)",
+   "fiches": 1,
+   "sur": 2,
+   "preuves": [
+    {
+     "fiche": "b~1A~diagonalisation~s2diago_02",
+     "technique": "racine multiple / P'(a)",
+     "extrait": "soit $$ \\boxed{\\det(a-xi_3)=-(x-1)^2(x+1)}. $$ valeurs propres : $1$ (multiplicité $2$) et $-1$ (multiplicité $1$). \\textbf{2. espaces propres.} \\emph"
+    }
+   ]
+  },
+  {
+   "a": "02.3",
+   "b": "11.2",
+   "type": "prerequis",
+   "source": "cours",
+   "raison": "pôle multiple = racine multiple",
+   "fiches": 0,
+   "sur": 0,
+   "preuves": []
+  },
+  {
+   "a": "02.3",
+   "b": "13.2",
+   "type": "outil",
+   "source": "cours+fiches",
+   "raison": "racine double de l'équation caractéristique (racine multiple / P'(a))",
+   "fiches": 3,
+   "sur": 7,
+   "preuves": [
+    {
+     "fiche": "b~1A~equations_differentielles~anc_s2_analyse_ds2_2012_version2_02",
+     "technique": "racine multiple / P'(a)",
+     "extrait": "e $x^k\\times$(polynôme)$\\times e^{mx}\\times(\\cos,\\sin)$ où $k$ est la multiplicité de $m$ (ou $m+i\\beta$) comme racine. \\medskip \\textbf{1.} $y'+\\frac1"
+    },
+    {
+     "fiche": "b~1A~equations_differentielles~anc_s2_analyse_ds2_2012_version2_02~vclaude6",
+     "technique": "racine multiple / P'(a)",
+     "extrait": "dskip \\textbf{3.} équation caractéristique $r^2+4r+4=0$ : $\\delta=0$, racine double $r=-2$. on traite chaque terme (principe de superposition) : \\begin{i"
+    }
+   ]
+  },
+  {
+   "a": "02.4",
+   "b": "06.2",
+   "type": "prerequis",
+   "source": "fiches",
+   "raison": "factorisation dans R[X] / C[X]",
+   "fiches": 4,
+   "sur": 6,
+   "preuves": [
+    {
+     "fiche": "b~1A~determinants~s2det_06",
+     "technique": "factorisation dans R[X] / C[X]",
+     "extrait": "\\emph{méthode~:} on calcule le déterminant $\\delta(x)$ en le factorisant par des opérations sur les colonnes, puis on cherche ses zéros. \\"
+    },
+    {
+     "fiche": "b~1A~determinants~anc_s2_matrices_ds1_2015_2016_sujet_a_02",
+     "technique": "factorisation dans R[X] / C[X]",
+     "extrait": "\\textbf{méthode.} on factorise $x+1$ dans la première ligne, on fait apparaître des zéros, puis on"
+    }
+   ]
+  },
+  {
+   "a": "02.4",
+   "b": "07.1",
+   "type": "prerequis",
+   "source": "cours",
+   "raison": "factoriser le polynôme caractéristique",
+   "fiches": 0,
+   "sur": 0,
+   "preuves": []
+  },
+  {
+   "a": "02.4",
+   "b": "07.3",
+   "type": "prerequis",
+   "source": "fiches",
+   "raison": "factorisation dans R[X] / C[X]",
+   "fiches": 2,
+   "sur": 2,
+   "preuves": [
+    {
+     "fiche": "b~1A~diagonalisation~s2diago_02",
+     "technique": "factorisation dans R[X] / C[X]",
+     "extrait": "y}\\right) $$ \\begin{enumerate} \\item d\\'eterminer $\\det(a-xi_3)$ et factoriser ce polyn\\^ome. \\item pour chaque zéro du polynôme précèdent, reche"
+    },
+    {
+     "fiche": "b~1A~diagonalisation~s2diago_01",
+     "technique": "factorisation dans R[X] / C[X]",
+     "extrait": "t(a-xi_3)=-x^3+2x^2+x-2=-(x-2)(x^2-1)=\\boxed{-(x-2)(x-1)(x+1)} $$ (on factorise par groupement : $-x^3+2x^2+x-2=-x^2(x-2)+(x-2)$). les valeurs propr"
+    }
+   ]
+  },
+  {
+   "a": "02.4",
+   "b": "10.2",
+   "type": "outil",
+   "source": "fiches",
+   "raison": "factorisation dans R[X] / C[X]",
+   "fiches": 3,
+   "sur": 7,
+   "preuves": [
+    {
+     "fiche": "b~1A~developpements_limites~exo7_ex001265",
+     "technique": "factorisation dans R[X] / C[X]",
+     "extrait": "\\\\ & = \\frac{-1+o(1)}{\\frac12 + o(1)} \\quad \\text{ après factorisation par } x^2 \\\\ & = -2 + o(1) \\end{aligned}$$ donc $$ \\lim_{x \\rig"
+    },
+    {
+     "fiche": "b~1A~developpements_limites~anc_f111_dsfev1b7_02~vclaude3",
+     "technique": "factorisation dans R[X] / C[X]",
+     "extrait": "})$. dénominateur : $\\tan(x)-\\sin(x)=\\frac{1}{2}x^{3}+o(x^{3})$. on factorise $x^{3}$ : $\\dfrac{\\mathrm{e}^{x}-1-\\sin(x)-\\frac{x^2}{2}}{\\tan(x)-\\s"
+    }
+   ]
+  },
+  {
+   "a": "02.4",
+   "b": "11.1",
+   "type": "prerequis",
+   "source": "cours",
+   "raison": "pôles = racines du dénominateur factorisé",
+   "fiches": 0,
+   "sur": 0,
+   "preuves": []
+  },
+  {
+   "a": "03.1",
+   "b": "03.3",
+   "type": "prerequis",
+   "source": "fiches",
+   "raison": "sous-espace / Vect",
+   "fiches": 2,
+   "sur": 2,
+   "preuves": [
+    {
+     "fiche": "b~1A~espaces_vectoriels~exo7_ex000908",
+     "technique": "sous-espace / Vect",
+     "extrait": "soit $e$ le sous-espace vectoriel de $\\mathbb{r}^3$ engendré par les vecteurs $v_1 = (2, 3, -"
+    },
+    {
+     "fiche": "b~1A~espaces_vectoriels~s2ev_04",
+     "technique": "sous-espace / Vect",
+     "extrait": "ble. le vecteur $\\begin{pmatrix}0\\\\0\\\\1\\end{pmatrix}$ n'est pas dans $\\operatorname{vect}\\big(\\begin{pmatrix}1\\\\0\\\\2\\end{pmatrix},\\begin{pmatrix}1\\\\2\\\\1\\end{pm"
+    }
+   ]
+  },
+  {
+   "a": "03.1",
+   "b": "03.5",
+   "type": "prerequis",
+   "source": "fiches",
+   "raison": "sous-espace / Vect",
+   "fiches": 6,
+   "sur": 7,
+   "preuves": [
+    {
+     "fiche": "b~1A~espaces_vectoriels~anc_f212_exostype_01",
+     "technique": "sous-espace / Vect",
+     "extrait": "ibre. \\medskip \\textbf{2.} on remarque $\\vec u_3=2\\vec u_2$, donc $f=\\operatorname{vect}(\\vec u_1,\\vec u_2)$. cette famille est libre (question 1) : $$\\boxed{"
+    },
+    {
+     "fiche": "b~1A~espaces_vectoriels~anc_f212_tdev_06",
+     "technique": "sous-espace / Vect",
+     "extrait": "ode.} un ensemble défini par des équations linéaires homogènes est un sous-espace vectoriel ; on détermine la dimension par une paramétrisation. \\meds"
+    }
+   ]
+  },
+  {
+   "a": "03.1",
+   "b": "04.3",
+   "type": "outil",
+   "source": "fiches",
+   "raison": "sous-espace / Vect",
+   "fiches": 2,
+   "sur": 3,
+   "preuves": [
+    {
+     "fiche": "b~1A~applications_lineaires~anc_f212_ds1b08_02",
+     "technique": "sous-espace / Vect",
+     "extrait": "\\textbf{méthode.} pour un sous-espace : contient $0$ et stable par combinaison linéaire. on écrit $p=a+bx+c"
+    },
+    {
+     "fiche": "b~1A~applications_lineaires~anc_formation_continue_irc_ds2011_04",
+     "technique": "sous-espace / Vect",
+     "extrait": "da p+\\mu q)=\\lambda xp'+\\mu xq'=x(\\lambda p+\\mu q)'$. donc $e$ est un sous-espace vectoriel de $\\r_3[x]$ : c'est un $\\r$-espace vectoriel. \\medskip \\t"
+    }
+   ]
+  },
+  {
+   "a": "03.1",
+   "b": "04.4",
+   "type": "outil",
+   "source": "fiches",
+   "raison": "sous-espace / Vect",
+   "fiches": 7,
+   "sur": 7,
+   "preuves": [
+    {
+     "fiche": "b~1A~applications_lineaires~anc_f212_exostype_04",
+     "technique": "sous-espace / Vect",
+     "extrait": "\\textbf{méthode.} valeurs propres = racines de $\\det(m-xi)$ ; sous-espace propre = $\\operatorname{ker}(m-\\lambda i)$ ; $d=p^{-1}mp$. \\medskip"
+    },
+    {
+     "fiche": "b~1A~applications_lineaires~anc_f212_exostype_05",
+     "technique": "sous-espace / Vect",
+     "extrait": "$$ \\medskip \\textbf{2.} $e=\\operatorname{ker}(f-\\mathrm{id})$ est un sous-espace vectoriel. or $a_f-i=\\begin{pmatrix}1&1&0\\\\0&0&0\\\\1&1&0\\end{pmatrix}$"
+    }
+   ]
+  },
+  {
+   "a": "03.1",
+   "b": "07.1",
+   "type": "outil",
+   "source": "fiches",
+   "raison": "sous-espace / Vect",
+   "fiches": 4,
+   "sur": 7,
+   "preuves": [
+    {
+     "fiche": "b~1A~diagonalisation~anc_f212_ds2_2013_serie_1_04",
+     "technique": "sous-espace / Vect",
+     "extrait": "tbf{méthode.} polynôme caractéristique $\\det(a-xi)$, valeurs propres, sous-espaces propres $\\ker(a-\\lambda i)$ ; $a$ est diagonalisable si la somme des"
+    },
+    {
+     "fiche": "b~1A~diagonalisation~anc_f212_ds2_2013_serie_2_04",
+     "technique": "sous-espace / Vect",
+     "extrait": "\\textbf{méthode.} polynôme caractéristique, sous-espaces propres, puis $p$ et $d$. \\medskip $a=\\begin{pmatrix}5&-3&0\\\\6&-4&0"
+    }
+   ]
+  },
+  {
+   "a": "03.1",
+   "b": "07.4",
+   "type": "outil",
+   "source": "fiches",
+   "raison": "sous-espace / Vect",
+   "fiches": 6,
+   "sur": 7,
+   "preuves": [
+    {
+     "fiche": "b~1A~diagonalisation~s2diago_05",
+     "technique": "sous-espace / Vect",
+     "extrait": "14$. pour $\\vect v\\in\\r^3$, la projection orthogonale sur la droite $\\vect(\\vect n)$ est $\\dfrac{\\vect v\\cdot\\vect n}{14}\\,\\vect n$, et celle sur"
+    },
+    {
+     "fiche": "b~1A~diagonalisation~anc_s2_matrices_ds2_2010_01",
+     "technique": "sous-espace / Vect",
+     "extrait": "x}-1&0&0\\\\4&1&2\\\\-2&-1&-2\\end{pmatrix}$ donne $x=0$ et $y=-2z$ : $e_2=\\operatorname{vect}(\\overrightarrow{u_3})$ avec $\\overrightarrow{u_3}=\\begin{pmatrix}0\\\\2"
+    }
+   ]
+  },
+  {
+   "a": "03.2",
+   "b": "03.4",
+   "type": "prerequis",
+   "source": "cours+fiches",
+   "raison": "base = famille libre et génératrice (famille libre)",
+   "fiches": 7,
+   "sur": 7,
+   "preuves": [
+    {
+     "fiche": "b~1A~espaces_vectoriels~claude_03_4_03",
+     "technique": "famille libre",
+     "extrait": "les polynômes sont de degrés échelonnés $0,1,2$ : la famille est libre, et elle a $3=\\dim\\mathbb{r}_2[x]$ éléments, c'est une base. de plus"
+    },
+    {
+     "fiche": "b~1A~espaces_vectoriels~s2ev_07",
+     "technique": "famille libre",
+     "extrait": "s$ compte $3$ vecteurs : $s$ est une base si et seulement si elle est libre. on résout $\\alpha\\vec e_1+\\beta\\vec e_2+\\gamma\\vec e_3=\\vec 0$ : $$"
+    }
+   ]
+  },
+  {
+   "a": "03.2",
+   "b": "03.5",
+   "type": "prerequis",
+   "source": "fiches",
+   "raison": "famille libre",
+   "fiches": 6,
+   "sur": 7,
+   "preuves": [
+    {
+     "fiche": "b~1A~espaces_vectoriels~anc_f212_exostype_01",
+     "technique": "famille libre",
+     "extrait": "\\textbf{méthode.} famille libre : seule la combinaison linéaire nulle triviale ; pour une famille gén"
+    },
+    {
+     "fiche": "b~1A~espaces_vectoriels~exo7_ex001019",
+     "technique": "famille libre",
+     "extrait": "m f \\le 3$. un calcul montre que la famille $\\{ v_1, v_2, v_3 \\}$ est libre, d'où $\\dim f\\ge 3$ et donc $\\dim f = 3$. \\item essayons d'abord d'e"
+    }
+   ]
+  },
+  {
+   "a": "03.2",
+   "b": "04.1",
+   "type": "outil",
+   "source": "fiches",
+   "raison": "famille libre",
+   "fiches": 3,
+   "sur": 7,
+   "preuves": [
+    {
+     "fiche": "b~1A~applications_lineaires_matrices~exo7_ex000956",
+     "technique": "famille libre",
+     "extrait": "e de $\\operatorname{im} f_2$. il suffit donc de trouver deux vecteurs linéairement indépendants. prenons par exemple $v_1 = f_2(1,0,0) = (2,0,1) \\in\\operatorname{im"
+    },
+    {
+     "fiche": "b~1A~applications_lineaires~anc_f212_ds1b06_2007_01~vclaude3",
+     "technique": "famille libre",
+     "extrait": "ge est engendr\\'ee par les colonnes de $m$ ; les colonnes 2 et 3 sont libres et engendrent les autres, elles forment une base. $$\\boxed{\\text{bas"
+    }
+   ]
+  },
+  {
+   "a": "03.3",
+   "b": "03.4",
+   "type": "prerequis",
+   "source": "cours",
+   "raison": "base = famille libre et génératrice",
+   "fiches": 0,
+   "sur": 0,
+   "preuves": []
+  },
+  {
+   "a": "03.3",
+   "b": "03.5",
+   "type": "prerequis",
+   "source": "fiches",
+   "raison": "famille génératrice",
+   "fiches": 5,
+   "sur": 7,
+   "preuves": [
+    {
+     "fiche": "b~1A~espaces_vectoriels~anc_f212_exostype_01",
+     "technique": "famille génératrice",
+     "extrait": "bre : seule la combinaison linéaire nulle triviale ; pour une famille génératrice, on enlève les vecteurs combinaisons des autres ; pour montrer $h=g$"
+    },
+    {
+     "fiche": "b~1A~espaces_vectoriels~exo7_ex001019",
+     "technique": "famille génératrice",
+     "extrait": "\\begin{enumerate} \\item $g$ est engendré par deux vecteurs donc $\\dim g \\le 2$. clairement $v_4$ et $v_5$ ne"
+    }
+   ]
+  },
+  {
+   "a": "03.3",
+   "b": "04.1",
+   "type": "prerequis",
+   "source": "fiches",
+   "raison": "famille génératrice",
+   "fiches": 5,
+   "sur": 7,
+   "preuves": [
+    {
+     "fiche": "b~1A~applications_lineaires_matrices~exo7_ex002744",
+     "technique": "famille génératrice",
+     "extrait": "u : en résolvant $ax=0$ on trouve $(x,y,z)=t(-2,-1,11)$. l'image est engendrée par les colonnes ; les deux premières sont indépendantes et la troi"
+    },
+    {
+     "fiche": "b~1A~applications_lineaires~anc_f212_ds1b06_2007_01~vclaude3",
+     "technique": "famille génératrice",
+     "extrait": "th\\'eor\\`eme du rang : $\\dim\\operatorname{im}(f)=3-1=2$. l'image est engendr\\'ee par les colonnes de $m$ ; les colonnes 2 et 3 sont libres et enge"
+    }
+   ]
+  },
+  {
+   "a": "03.4",
+   "b": "03.5",
+   "type": "prerequis",
+   "source": "cours+fiches",
+   "raison": "dimension = nombre de vecteurs d'une base (base)",
+   "fiches": 5,
+   "sur": 7,
+   "preuves": [
+    {
+     "fiche": "b~1A~espaces_vectoriels~anc_f212_exostype_01",
+     "technique": "base",
+     "extrait": "u_1,\\vec u_2)$. cette famille est libre (question 1) : $$\\boxed{\\text{base de }f:\\ (\\vec u_1,\\vec u_2),\\qquad\\dim f=2}$$ \\medskip \\textbf{3.} on c"
+    },
+    {
+     "fiche": "b~1A~espaces_vectoriels~anc_f212_ds1b06_01~vclaude2",
+     "technique": "base",
+     "extrait": "e $e$ et libre (degr\\'es et parit\\'es distincts), donc $$\\boxed{\\text{base de }e:\\ (1,\\,x^2,\\,x^3-x),\\qquad \\dim e=3}$$ \\medskip \\textbf{3.} $p\\in"
+    }
+   ]
+  },
+  {
+   "a": "03.4",
+   "b": "04.1",
+   "type": "outil",
+   "source": "fiches",
+   "raison": "base",
+   "fiches": 6,
+   "sur": 7,
+   "preuves": [
+    {
+     "fiche": "b~1A~applications_lineaires_matrices~exo7_ex000956",
+     "technique": "base",
+     "extrait": "hbb{r}^3$. donc $\\dim \\operatorname{im} f_2 = 2$. nous allons trouver une base de $\\operatorname{im} f_2$. il suffit donc de trouver deux vecteurs l"
+    },
+    {
+     "fiche": "b~1A~applications_lineaires_matrices~exo7_ex002744",
+     "technique": "base",
+     "extrait": "et la troisième est combinaison des deux autres, donc $(c_1,c_2)$ est une base de $\\operatorname{im}a$."
+    }
+   ]
+  },
+  {
+   "a": "03.4",
+   "b": "04.2",
+   "type": "prerequis",
+   "source": "cours+fiches",
+   "raison": "matrice relative à des bases (base)",
+   "fiches": 3,
+   "sur": 3,
+   "preuves": [
+    {
+     "fiche": "b~1A~applications_lineaires_matrices~exo7_ex001097",
+     "technique": "base",
+     "extrait": "\\begin{enumerate} \\item on note la base $\\mathcal{b} = (e_1,e_2,e_3)$ et $x = \\begin{pmatrix}x\\\\y\\\\z\\end{pmat"
+    },
+    {
+     "fiche": "b~1A~applications_lineaires_matrices~exo7_ex002433",
+     "technique": "base",
+     "extrait": "rsible (on va même calculer son inverse) donc $\\mathcal{b}'$ est bien une base. de plus $$ p^{-1} = \\begin{pmatrix} -6 & 5 & -2 \\\\ 4 & -3 & 1 \\\\"
+    }
+   ]
+  },
+  {
+   "a": "03.4",
+   "b": "04.3",
+   "type": "outil",
+   "source": "fiches",
+   "raison": "base",
+   "fiches": 2,
+   "sur": 3,
+   "preuves": [
+    {
+     "fiche": "b~1A~applications_lineaires~anc_f212_ds1b08_02",
+     "technique": "base",
+     "extrait": "n{enumerate} \\item montrer que $f$ est lin\\'eaire. \\item d\\'eterminer une base et la dimension de $ker(f)$. \\item $f$ est-elle un automorphisme? \\en"
+    },
+    {
+     "fiche": "b~1A~applications_lineaires~anc_formation_continue_irc_ds2011_04",
+     "technique": "base",
+     "extrait": "$, $g(x)=2x-x=x$, $g(x^2)=2x^2-2x^2=0$, $g(x^3)=2x^3-3x^3=-x^3$. dans la base $(1,x,x^2,x^3)$ : $$\\boxed{\\begin{pmatrix}2&0&0&0\\\\0&1&0&0\\\\0&0&0&0\\\\"
+    }
+   ]
+  },
+  {
+   "a": "03.4",
+   "b": "04.4",
+   "type": "outil",
+   "source": "fiches",
+   "raison": "base",
+   "fiches": 7,
+   "sur": 7,
+   "preuves": [
+    {
+     "fiche": "b~1A~applications_lineaires~anc_f212_exostype_04",
+     "technique": "base",
+     "extrait": "oppement selon la 3\\textsuperscript{e} ligne), donc $\\mathcal b'$ est une base. c) $$\\boxed{p=\\begin{pmatrix}1&1&1\\\\-1&1&0\\\\0&1&0\\end{pmatrix},\\qqu"
+    },
+    {
+     "fiche": "b~1A~applications_lineaires~anc_f212_exostype_05",
+     "technique": "base",
+     "extrait": "end{pmatrix}=-1(-1-0)-1(1-0)+1(2-0)=1-1+2=2\\neq0$ : $\\mathcal b'$ est une base. \\medskip \\textbf{5.} $$\\boxed{p=\\begin{pmatrix}-1&1&1\\\\1&-1&0\\\\0&2&"
+    }
+   ]
+  },
+  {
+   "a": "03.4",
+   "b": "04.5",
+   "type": "outil",
+   "source": "fiches",
+   "raison": "base",
+   "fiches": 4,
+   "sur": 7,
+   "preuves": [
+    {
+     "fiche": "b~1A~applications_lineaires~bd_2526s1ds2_04",
+     "technique": "base",
+     "extrait": "t la matrice de $g\\circ g$ ; trois vecteurs de $\\mathbb{r}^3$ forment une base ssi leur déterminant est non nul ; la matrice de $g$ dans une base de"
+    },
+    {
+     "fiche": "b~1A~applications_lineaires~bd_2526s1ds2_03",
+     "technique": "base",
+     "extrait": "soit $f$ l'endomorphisme de $\\mathbb{r}^3$ dont la matrice dans la base canonique $\\beta_c$ est $$m=mat(f,\\beta_c)=\\left(\\begin{array}{ccc}1"
+    }
+   ]
+  },
+  {
+   "a": "03.4",
+   "b": "06.4",
+   "type": "outil",
+   "source": "fiches",
+   "raison": "base",
+   "fiches": 4,
+   "sur": 5,
+   "preuves": [
+    {
+     "fiche": "b~1A~a_classer~anc_f212_tddet_04",
+     "technique": "base",
+     "extrait": "$m$ est la matrice de $f$. \\medskip \\textbf{1.} matrice de $f$ dans la base canonique : $m=\\begin{pmatrix}1&-2&1\\\\1&0&-1\\\\2&1&0\\end{pmatrix}$. en"
+    },
+    {
+     "fiche": "b~1A~determinants~claude_06_4_01",
+     "technique": "base",
+     "extrait": "to\\mathbb{r}^3$, $f(x,y,z)=(x+y,\\,y+z,\\,z+x)$. écrire sa matrice dans la base canonique, calculer son déterminant et dire si $f$ est bijective."
+    }
+   ]
+  },
+  {
+   "a": "03.4",
+   "b": "07.1",
+   "type": "prerequis",
+   "source": "cours+fiches",
+   "raison": "base de vecteurs propres (base)",
+   "fiches": 4,
+   "sur": 7,
+   "preuves": [
+    {
+     "fiche": "b~1A~diagonalisation~exo7_ex002761",
+     "technique": "base",
+     "extrait": "pres pour $1$ et $-1$. ils sont orthogonaux donc indépendants : c'est une base. avec $p=\\begin{pmatrix}2&-1\\\\1&2\\end{pmatrix}$, $d=p^{-1}ap=\\mathrm{"
+    },
+    {
+     "fiche": "b~1A~applications_lineaires~anc_f212_iutb20_02~vclaude4",
+     "technique": "base",
+     "extrait": "$), puis les sous-espaces propres $\\operatorname{ker}(a-\\lambda i)$ ; une base de vecteurs propres diagonalise $a$. \\medskip \\textbf{valeurs propre"
+    }
+   ]
+  },
+  {
+   "a": "03.4",
+   "b": "07.2",
+   "type": "outil",
+   "source": "fiches",
+   "raison": "base",
+   "fiches": 2,
+   "sur": 2,
+   "preuves": [
+    {
+     "fiche": "b~1A~diagonalisation~s2diago_04",
+     "technique": "base",
+     "extrait": "ème spectral~:} une matrice symétrique réelle est diagonalisable dans une base \\emph{orthonormée} de vecteurs propres ; la matrice de passage $p$ es"
+    },
+    {
+     "fiche": "b~1A~diagonalisation~anc_f212_ds2_2013_serie_2_03",
+     "technique": "base",
+     "extrait": "\\textbf{méthode.} $a$ est symétrique réelle : diagonalisable dans une base orthonormée ; vecteurs propres de valeurs propres distinctes orthogon"
+    }
+   ]
+  },
+  {
+   "a": "03.4",
+   "b": "07.3",
+   "type": "outil",
+   "source": "fiches",
+   "raison": "base",
+   "fiches": 2,
+   "sur": 2,
+   "preuves": [
+    {
+     "fiche": "b~1A~diagonalisation~s2diago_02",
+     "technique": "base",
+     "extrait": "\\emph{remarque sur l'énoncé~:} la base $\\mathcal b=(\\vect i,\\vect j,\\vect k)$ est tronquée dans l'énoncé (il"
+    },
+    {
+     "fiche": "b~1A~diagonalisation~s2diago_01",
+     "technique": "base",
+     "extrait": "tions posées sont les points 1, 3 et 4. \\textbf{1. $\\mathcal b'$ est une base.} trois vecteurs de $\\r^3$ forment une base si et seulement si le dét"
+    }
+   ]
+  },
+  {
+   "a": "03.4",
+   "b": "07.4",
+   "type": "outil",
+   "source": "fiches",
+   "raison": "base",
+   "fiches": 5,
+   "sur": 7,
+   "preuves": [
+    {
+     "fiche": "b~1A~diagonalisation~s2diago_05",
+     "technique": "base",
+     "extrait": "déterminer la matrice dans la base canonique de $\\r^{3}$ de la projection orthogonale sur le plan d'éq"
+    },
+    {
+     "fiche": "b~1A~diagonalisation~anc_s2_matrices_ds2_2010_01",
+     "technique": "base",
+     "extrait": "\\qquad \\det p=-1\\,(0+4)-1\\,(-1-2)=-4+3=-1\\neq 0 .$$ donc $\\beta'$ est une base de $\\r^3$. (c) $e_1=\\ker(a-i)$ : $a-i=\\begin{pmatrix}0&0&0\\\\4&2&2\\\\-"
+    }
+   ]
+  },
+  {
+   "a": "03.5",
+   "b": "04.1",
+   "type": "prerequis",
+   "source": "cours+fiches",
+   "raison": "théorème du rang (dimension / rang)",
+   "fiches": 7,
+   "sur": 7,
+   "preuves": [
+    {
+     "fiche": "b~1A~applications_lineaires_matrices~exo7_ex000956",
+     "technique": "dimension / rang",
+     "extrait": "liquer un peu de théorie ! noyau et image sont liés par la formule du rang : $\\dim \\ker f + \\dim \\operatorname{im} f = \\dim e$ pour $f : e \\to f"
+    },
+    {
+     "fiche": "b~1A~applications_lineaires_matrices~exo7_ex002744",
+     "technique": "dimension / rang",
+     "extrait": "le pivot de gauss donne $\\operatorname{rang}a=2$. le noyau : en résolvant $ax=0$ on trouve $(x,y,z)=t(-2,-1,11)$."
+    }
+   ]
+  },
+  {
+   "a": "03.5",
+   "b": "04.2",
+   "type": "outil",
+   "source": "fiches",
+   "raison": "dimension / rang",
+   "fiches": 2,
+   "sur": 3,
+   "preuves": [
+    {
+     "fiche": "b~1A~applications_lineaires_matrices~exo7_ex001097",
+     "technique": "dimension / rang",
+     "extrait": "atrix}_{\\mathcal{b}} = \\textrm{vect} (e_1-e_3)$. le noyau est donc de dimension $1$. \\item on applique le pivot de gauss comme si c'était un système"
+    },
+    {
+     "fiche": "b~1A~equations_differentielles~anc_f212_td_changement_base_01",
+     "technique": "dimension / rang",
+     "extrait": "ec{w}'=\\begin{pmatrix}1\\\\-2\\\\1\\end{pmatrix}.$$ \\medskip \\textbf{2.} $\\dim v=3$ et $\\mathcal b'$ a $3$ vecteurs : il suffit qu'elle soit libre."
+    }
+   ]
+  },
+  {
+   "a": "03.5",
+   "b": "04.3",
+   "type": "outil",
+   "source": "fiches",
+   "raison": "dimension / rang",
+   "fiches": 3,
+   "sur": 3,
+   "preuves": [
+    {
+     "fiche": "b~1A~applications_lineaires~anc_f212_ds1b08_02",
+     "technique": "dimension / rang",
+     "extrait": "d\\iff a=c=d=0$. donc $p=bx$ : $$\\boxed{e=\\operatorname{vect}(x),\\quad \\dim e=1}$$ ($x$ est non nul donc libre). \\medskip \\textbf{3.} a) pour $p"
+    },
+    {
+     "fiche": "b~1A~applications_lineaires~anc_formation_continue_irc_ds2011_04",
+     "technique": "dimension / rang",
+     "extrait": "ff a=b=d=0$. donc $p=cx^2$ : $$\\boxed{e=\\operatorname{vect}(x^2),\\quad\\dim e=1.}$$ \\medskip \\textbf{3.} a) $g(\\lambda p+\\mu q)=2(\\lambda p+\\mu"
+    }
+   ]
+  },
+  {
+   "a": "03.5",
+   "b": "04.4",
+   "type": "outil",
+   "source": "fiches",
+   "raison": "dimension / rang",
+   "fiches": 7,
+   "sur": 7,
+   "preuves": [
+    {
+     "fiche": "b~1A~applications_lineaires~anc_f212_exostype_04",
+     "technique": "dimension / rang",
+     "extrait": "nes sont $x+y-2z=0$, donc $e$ est un plan : $$\\boxed{e=\\{x+y-2z=0\\},\\ \\dim e=2,\\ \\text{base }\\big(\\begin{pmatrix}-1\\\\1\\\\0\\end{pmatrix},\\begin{pm"
+    },
+    {
+     "fiche": "b~1A~applications_lineaires~anc_f212_exostype_05",
+     "technique": "dimension / rang",
+     "extrait": "1\\\\-1\\\\0\\end{pmatrix}+z\\begin{pmatrix}0\\\\0\\\\1\\end{pmatrix}$. $$\\boxed{\\dim e=2,\\ \\text{base }\\big(\\begin{pmatrix}-1\\\\1\\\\0\\end{pmatrix},\\begin{pm"
+    }
+   ]
+  },
+  {
+   "a": "03.5",
+   "b": "04.5",
+   "type": "outil",
+   "source": "fiches",
+   "raison": "dimension / rang",
+   "fiches": 5,
+   "sur": 7,
+   "preuves": [
+    {
+     "fiche": "b~1A~applications_lineaires~bd_2526s1ds2_04",
+     "technique": "dimension / rang",
+     "extrait": "trix}=-1\\neq 0.$$ trois vecteurs indépendants dans $\\mathbb{r}^3$ (de dimension $3$) forment une base. $$\\boxed{(\\overrightarrow{v_1},\\overrightarrow"
+    },
+    {
+     "fiche": "b~1A~applications_lineaires~bd_2526s1ds2_03",
+     "technique": "dimension / rang",
+     "extrait": "$\\boxed{\\text{base : }\\{\\begin{pmatrix}1\\\\1\\\\-1\\end{pmatrix}\\},\\qquad \\dim ker(f)=1}$$ \\medskip \\textbf{3.} $ker(f)\\neq\\{0\\}$ : $f$ n'est pas i"
+    }
+   ]
+  },
+  {
+   "a": "03.5",
+   "b": "07.4",
+   "type": "outil",
+   "source": "fiches",
+   "raison": "dimension / rang",
+   "fiches": 5,
+   "sur": 7,
+   "preuves": [
+    {
+     "fiche": "b~1A~diagonalisation~s2diago_05",
+     "technique": "dimension / rang",
+     "extrait": "0$, $-2+20-18=0$, $3+12-15=0$ ; $\\operatorname{tr}p=\\frac{28}{14}=2$ (dimension du plan) ; $\\operatorname{tr}s=\\frac77=1=2-1$ ; $p^2=p$ et $s^2=i_3$"
+    },
+    {
+     "fiche": "b~1A~diagonalisation~anc_s2_matrices_ds2_2010_01",
+     "technique": "dimension / rang",
+     "extrait": "d{pmatrix}$, d'où l'unique équation $2x+y+z=0$ : $e_1$ est un plan de dimension $2$, de base $(\\overrightarrow{u_1},\\overrightarrow{u_2})$ (on vérifi"
+    }
+   ]
+  },
+  {
+   "a": "03.6",
+   "b": "07.2",
+   "type": "prerequis",
+   "source": "cours+fiches",
+   "raison": "base orthonormée : produit scalaire (produit vectoriel / scalaire)",
+   "fiches": 1,
+   "sur": 2,
+   "preuves": [
+    {
+     "fiche": "b~1A~diagonalisation~s2diago_04",
+     "technique": "produit vectoriel / scalaire",
+     "extrait": "\\begin{pmatrix}-1\\\\0\\\\1\\end{pmatrix}$. on les orthogonalise : $\\vect a\\cdot\\vect b=1$ et $\\|\\vect a\\|^2=2$, donc $\\vect b'=\\vect b-\\tfrac12\\vect a=\\b"
+    }
+   ]
+  },
+  {
+   "a": "03.6",
+   "b": "14.1",
+   "type": "outil",
+   "source": "cours",
+   "raison": "vecteur normal du plan tangent",
+   "fiches": 0,
+   "sur": 0,
+   "preuves": []
+  },
+  {
+   "a": "04.1",
+   "b": "04.3",
+   "type": "prerequis",
+   "source": "fiches",
+   "raison": "injective / surjective, noyau / image",
+   "fiches": 2,
+   "sur": 3,
+   "preuves": [
+    {
+     "fiche": "b~1A~applications_lineaires~anc_f212_ds1b08_02",
+     "technique": "injective / surjective",
+     "extrait": "}(x),\\ \\dim=1.}$$ c) $\\operatorname{ker}f\\neq\\{0\\}$ : $f$ n'est pas injective, donc $\\boxed{f\\text{ n'est pas un automorphisme}}$ (on a $\\dim\\ope"
+    },
+    {
+     "fiche": "b~1A~applications_lineaires~claude_04_3_02",
+     "technique": "noyau / image",
+     "extrait": "g(x)=1$, $g(x^2)=2x+1$ : $g(ax^2+bx+c)=2ax+a+b\\in\\mathbb{r}_1[x]$. le noyau est donné par $a=b=0$ : $$\\boxed{\\ker g=\\mathbb{r}_0[x]\\ \\text{(const"
+    }
+   ]
+  },
+  {
+   "a": "04.1",
+   "b": "04.4",
+   "type": "prerequis",
+   "source": "fiches",
+   "raison": "noyau / image",
+   "fiches": 5,
+   "sur": 7,
+   "preuves": [
+    {
+     "fiche": "b~1A~applications_lineaires~anc_f212_exostype_04",
+     "technique": "noyau / image",
+     "extrait": "e=\\operatorname{ker}(f-2\\,\\mathrm{id})$ est un sous-espace vectoriel (noyau d'une application linéaire). on résout $(m-2i)x=0$ : les trois lignes"
+    },
+    {
+     "fiche": "b~1A~applications_lineaires~anc_formation_continue_irc_ds2010_02",
+     "technique": "noyau / image",
+     "extrait": "\\medskip \\textbf{1.} a) $e=\\operatorname{ker}(f-\\mathrm{id})$ est le noyau d'une application linéaire : c'est un sous-espace vectoriel (il conti"
+    }
+   ]
+  },
+  {
+   "a": "04.1",
+   "b": "04.5",
+   "type": "prerequis",
+   "source": "fiches",
+   "raison": "injective / surjective, noyau / image",
+   "fiches": 5,
+   "sur": 7,
+   "preuves": [
+    {
+     "fiche": "b~1A~applications_lineaires~claude_04_5_02",
+     "technique": "injective / surjective",
+     "extrait": "st triangulaire à diagonale non nulle : $\\det a=1\\neq0$, donc $f$ est bijective. en résolvant $ax=y$ on trouve $z=y_3$, $y=y_2-y_3$, $x=y_1-y_2+y_3"
+    },
+    {
+     "fiche": "b~1A~applications_lineaires~bd_2526s1ds2_03",
+     "technique": "injective / surjective",
+     "extrait": "m ker(f)=1}$$ \\medskip \\textbf{3.} $ker(f)\\neq\\{0\\}$ : $f$ n'est pas injectif (de façon équivalente $\\det m=0$). $$\\boxed{f\\text{ n'est pas un aut"
+    }
+   ]
+  },
+  {
+   "a": "04.1",
+   "b": "06.4",
+   "type": "outil",
+   "source": "fiches",
+   "raison": "injective / surjective",
+   "fiches": 2,
+   "sur": 5,
+   "preuves": [
+    {
+     "fiche": "b~1A~determinants~claude_06_4_01",
+     "technique": "injective / surjective",
+     "extrait": "(1-0)-1(0-1)=\\boxed{2}$. le déterminant est non nul : $f$ est \\textbf{bijective}."
+    },
+    {
+     "fiche": "b~1A~determinants~claude_06_4_04",
+     "technique": "injective / surjective",
+     "extrait": "\\\\a&0&1\\end{pmatrix}$ de déterminant $1+a^3$. donc $$\\boxed{f_a\\text{ bijective}\\iff a\\neq-1}.$$"
+    }
+   ]
+  },
+  {
+   "a": "04.1",
+   "b": "06.8",
+   "type": "application",
+   "source": "cours",
+   "raison": "noyau = solutions d'un système homogène",
+   "fiches": 0,
+   "sur": 0,
+   "preuves": []
+  },
+  {
+   "a": "04.1",
+   "b": "07.4",
+   "type": "prerequis",
+   "source": "fiches",
+   "raison": "noyau / image, injective / surjective",
+   "fiches": 5,
+   "sur": 7,
+   "preuves": [
+    {
+     "fiche": "b~1A~diagonalisation~anc_s2_matrices_ds2_2010_01",
+     "technique": "noyau / image",
+     "extrait": "tbf{méthode.} polynôme caractéristique $\\det(a-xi)$, espaces propres $\\ker(a-\\lambda i)$, matrice de passage dont les colonnes sont les coordonn"
+    },
+    {
+     "fiche": "b~1A~diagonalisation~anc_s2_matrices_ds2_2010_01~vclaude",
+     "technique": "noyau / image",
+     "extrait": "extit{cours : polynôme caractéristique $\\det(a-xi)$, espaces propres $\\ker(a-\\lambda i)$, matrice de passage (colonnes = coordonnées de la nouve"
+    }
+   ]
+  },
+  {
+   "a": "04.2",
+   "b": "04.4",
+   "type": "prerequis",
+   "source": "cours+fiches",
+   "raison": "matrice dans une autre base (matrice d'une application)",
+   "fiches": 7,
+   "sur": 7,
+   "preuves": [
+    {
+     "fiche": "b~1A~applications_lineaires~anc_f212_exostype_04",
+     "technique": "matrice d'une application",
+     "extrait": "\\begin{enumerate} \\item ecrire la matrice $m=mat(f,\\mathcal b)$, la matrice de $f$ dans la base $\\mathcal b$. \\item montrer que $p(x)=det(m-xi)$ est un"
+    },
+    {
+     "fiche": "b~1A~applications_lineaires~anc_f212_exostype_05",
+     "technique": "matrice d'une application",
+     "extrait": "\\textbf{méthode.} $\\operatorname{mat}(g\\circ f)=a_ga_f$. $e=\\operatorname{ker}(f-\\mathrm{id})$. changement"
+    }
+   ]
+  },
+  {
+   "a": "04.2",
+   "b": "04.5",
+   "type": "prerequis",
+   "source": "fiches",
+   "raison": "matrice d'une application",
+   "fiches": 7,
+   "sur": 7,
+   "preuves": [
+    {
+     "fiche": "b~1A~applications_lineaires~bd_2526s1ds2_04",
+     "technique": "matrice d'une application",
+     "extrait": "\\textit{cours : $n\\times n$ est la matrice de $g\\circ g$ ; trois vecteurs de $\\mathbb{r}^3$ forment une base ssi leur"
+    },
+    {
+     "fiche": "b~1A~applications_lineaires~claude_04_5_02",
+     "technique": "matrice d'une application",
+     "extrait": "soit $a=\\begin{pmatrix}1&1&0\\\\0&1&1\\\\0&0&1\\end{pmatrix}$ la matrice de $f\\in\\mathcal{l}(\\mathbb{r}^3)$. montrer que $f$ est bijective et calcul"
+    }
+   ]
+  },
+  {
+   "a": "04.2",
+   "b": "06.4",
+   "type": "prerequis",
+   "source": "fiches",
+   "raison": "matrice d'une application",
+   "fiches": 4,
+   "sur": 5,
+   "preuves": [
+    {
+     "fiche": "b~1A~a_classer~anc_f212_tddet_04",
+     "technique": "matrice d'une application",
+     "extrait": "$ est un automorphisme si et seulement si $\\det m\\ne0$, où $m$ est la matrice de $f$. \\medskip \\textbf{1.} matrice de $f$ dans la base canonique : $m=\\b"
+    },
+    {
+     "fiche": "b~1A~determinants~claude_06_4_01",
+     "technique": "matrice d'une application",
+     "extrait": "r}^3\\to\\mathbb{r}^3$, $f(x,y,z)=(x+y,\\,y+z,\\,z+x)$. écrire sa matrice dans la base canonique, calculer son déterminant et dire si $f$ est bijective."
+    }
+   ]
+  },
+  {
+   "a": "04.2",
+   "b": "07.3",
+   "type": "prerequis",
+   "source": "fiches",
+   "raison": "matrice d'une application",
+   "fiches": 2,
+   "sur": 2,
+   "preuves": [
+    {
+     "fiche": "b~1A~diagonalisation~s2diago_02",
+     "technique": "matrice d'une application",
+     "extrait": "\\dim e_{-1}+\\dim e_1=1+2=3$, donc $f$ est diagonalisable. \\textbf{4. matrice de $f$ dans $\\mathcal b'$.} chaque vecteur de $\\mathcal b'$ est propre : $f"
+    },
+    {
+     "fiche": "b~1A~diagonalisation~s2diago_01",
+     "technique": "matrice d'une application",
+     "extrait": "-1\\neq0 . $$ donc $\\mathcal b'$ est une base de $\\r^3$, et $p$ est la matrice de passage de $\\mathcal b$ à $\\mathcal b'$. on trouve (en résolvant $px=y$"
+    }
+   ]
+  },
+  {
+   "a": "04.2",
+   "b": "07.4",
+   "type": "prerequis",
+   "source": "fiches",
+   "raison": "matrice d'une application",
+   "fiches": 6,
+   "sur": 7,
+   "preuves": [
+    {
+     "fiche": "b~1A~diagonalisation~s2diago_05",
+     "technique": "matrice d'une application",
+     "extrait": "déterminer la matrice dans la base canonique de $\\r^{3}$ de la projection orthogonale sur le plan d'éq"
+    },
+    {
+     "fiche": "b~1A~diagonalisation~anc_s2_matrices_ds2_2010_01",
+     "technique": "matrice d'une application",
+     "extrait": "me caractéristique $\\det(a-xi)$, espaces propres $\\ker(a-\\lambda i)$, matrice de passage dont les colonnes sont les coordonnées des vecteurs de la nouve"
+    }
+   ]
+  },
+  {
+   "a": "04.4",
+   "b": "07.1",
+   "type": "prerequis",
+   "source": "cours+fiches",
+   "raison": "diagonaliser = changer de base (changement de base / passage)",
+   "fiches": 2,
+   "sur": 7,
+   "preuves": [
+    {
+     "fiche": "b~1A~diagonalisation~exo7_ex002761",
+     "technique": "changement de base / passage",
+     "extrait": ": c'est une base. avec $p=\\begin{pmatrix}2&-1\\\\1&2\\end{pmatrix}$, $d=p^{-1}ap=\\mathrm{diag}(1,-1)$ et $a=pdp^{-1}$, donc $a^n=pd^np^{-1}$, qui vaut"
+    },
+    {
+     "fiche": "b~1A~diagonalisation~s2diago_03",
+     "technique": "changement de base / passage",
+     "extrait": "$$ \\boxed{p=\\begin{pmatrix}-4&-4&2\\\\3&0&1\\\\2&1&0\\end{pmatrix},\\qquad p^{-1}ap=\\mathrm{diag}(0,1,2)}\\qquad(\\det p=2\\neq0). $$ \\textbf{matrice $b$.}"
+    }
+   ]
+  },
+  {
+   "a": "04.4",
+   "b": "07.2",
+   "type": "outil",
+   "source": "fiches",
+   "raison": "changement de base / passage",
+   "fiches": 1,
+   "sur": 2,
+   "preuves": [
+    {
+     "fiche": "b~1A~diagonalisation~s2diago_04",
+     "technique": "changement de base / passage",
+     "extrait": "gonalisable dans une base \\emph{orthonormée} de vecteurs propres ; la matrice de passage $p$ est alors orthogonale ($p^{-1}=p^{\\mathsf t}$). les espaces propr"
+    }
+   ]
+  },
+  {
+   "a": "04.4",
+   "b": "07.3",
+   "type": "prerequis",
+   "source": "fiches",
+   "raison": "changement de base / passage",
+   "fiches": 2,
+   "sur": 2,
+   "preuves": [
+    {
+     "fiche": "b~1A~diagonalisation~s2diago_02",
+     "technique": "changement de base / passage",
+     "extrait": "{mat}(f,\\mathcal b')=\\begin{pmatrix}-1&0&0\\\\0&1&0\\\\0&0&1\\end{pmatrix}=p^{-1}ap}, $$ où $p$ est la matrice de passage de la base canonique $\\mathcal"
+    },
+    {
+     "fiche": "b~1A~diagonalisation~s2diago_01",
+     "technique": "changement de base / passage",
+     "extrait": "-1\\neq0 . $$ donc $\\mathcal b'$ est une base de $\\r^3$, et $p$ est la matrice de passage de $\\mathcal b$ à $\\mathcal b'$. on trouve (en résolvant $px=y$) $$ p"
+    }
+   ]
+  },
+  {
+   "a": "04.4",
+   "b": "07.4",
+   "type": "prerequis",
+   "source": "fiches",
+   "raison": "changement de base / passage",
+   "fiches": 4,
+   "sur": 7,
+   "preuves": [
+    {
+     "fiche": "b~1A~diagonalisation~anc_s2_matrices_ds2_2010_01",
+     "technique": "changement de base / passage",
+     "extrait": "me caractéristique $\\det(a-xi)$, espaces propres $\\ker(a-\\lambda i)$, matrice de passage dont les colonnes sont les coordonnées des vecteurs de la nouvelle ba"
+    },
+    {
+     "fiche": "b~1A~diagonalisation~anc_s2_matrices_ds2_2010_01~vclaude",
+     "technique": "changement de base / passage",
+     "extrait": "me caractéristique $\\det(a-xi)$, espaces propres $\\ker(a-\\lambda i)$, matrice de passage (colonnes = coordonnées de la nouvelle base), $d=p^{-1}ap$, $a^n=pd^n"
+    }
+   ]
+  },
+  {
+   "a": "04.5",
+   "b": "07.3",
+   "type": "prerequis",
+   "source": "cours",
+   "raison": "endomorphisme de R³ donné par sa matrice",
+   "fiches": 0,
+   "sur": 0,
+   "preuves": []
+  },
+  {
+   "a": "06.1",
+   "b": "06.2",
+   "type": "prerequis",
+   "source": "fiches",
+   "raison": "déterminant",
+   "fiches": 6,
+   "sur": 6,
+   "preuves": [
+    {
+     "fiche": "b~1A~determinants~s2det_06",
+     "technique": "déterminant",
+     "extrait": "\\emph{méthode~:} on calcule le déterminant $\\delta(x)$ en le factorisant par des opérations sur les colonnes, pu"
+    },
+    {
+     "fiche": "b~1A~determinants~claude_06_2_03",
+     "technique": "déterminant",
+     "extrait": "en développant suivant la dernière ligne : $$\\det(a-\\lambda i_3)=(3-\\lambda)\\bigl[(1-\\lambda)^2-4\\bigr]=(3-\\lambda)(\\la"
+    }
+   ]
+  },
+  {
+   "a": "06.1",
+   "b": "06.3",
+   "type": "prerequis",
+   "source": "cours+fiches",
+   "raison": "inverse par la comatrice (déterminant)",
+   "fiches": 5,
+   "sur": 7,
+   "preuves": [
+    {
+     "fiche": "b~1A~matrices~s2matrices_05",
+     "technique": "déterminant",
+     "extrait": "trouve la première ligne de $8i_3$ \\ensuremath{\\checkmark}. (aussi : $\\det a=8\\neq0$.)"
+    },
+    {
+     "fiche": "b~1A~matrices~s2matrices_02",
+     "technique": "déterminant",
+     "extrait": "rix}4&-5\\\\0&-4\\end{pmatrix}. $$ \\emph{noyau et image de $g\\circ f$.} $\\det m'=4\\cdot(-4)-0=-16\\neq0$ : $m'$ est inversible, donc $\\ker(g\\circ f)"
+    }
+   ]
+  },
+  {
+   "a": "06.1",
+   "b": "06.4",
+   "type": "prerequis",
+   "source": "fiches",
+   "raison": "déterminant",
+   "fiches": 5,
+   "sur": 5,
+   "preuves": [
+    {
+     "fiche": "b~1A~a_classer~anc_f212_tddet_04",
+     "technique": "déterminant",
+     "extrait": "méthode.} $f$ linéaire : $f$ est un automorphisme si et seulement si $\\det m\\ne0$, où $m$ est la matrice de $f$. \\medskip \\textbf{1.} matrice d"
+    },
+    {
+     "fiche": "b~1A~determinants~claude_06_4_01",
+     "technique": "déterminant",
+     "extrait": "$m=\\begin{pmatrix}1&1&0\\\\0&1&1\\\\1&0&1\\end{pmatrix}$ et $\\det m=1(1-0)-1(0-1)=\\boxed{2}$. le déterminant est non nul : $f$ est \\tex"
+    }
+   ]
+  },
+  {
+   "a": "06.1",
+   "b": "06.7",
+   "type": "prerequis",
+   "source": "fiches",
+   "raison": "déterminant",
+   "fiches": 2,
+   "sur": 5,
+   "preuves": [
+    {
+     "fiche": "b~1A~systemes_lineaires~anc_f212_iutb20_01",
+     "technique": "déterminant",
+     "extrait": "f{méthode.} système de cramer : autant d'équations que d'inconnues et déterminant $\\delta\\neq 0$. alors $x_j=\\dfrac{\\delta_j}{\\delta}$, où $\\delta_j$ e"
+    },
+    {
+     "fiche": "b~1A~determinants~exo7_ex002733",
+     "technique": "déterminant",
+     "extrait": "les quatre premières équations ont un déterminant égal à $8\\neq0$ : elles ont une unique solution $(x,y,z,t)=(-2,1,7,-2"
+    }
+   ]
+  },
+  {
+   "a": "06.1",
+   "b": "06.8",
+   "type": "prerequis",
+   "source": "cours+fiches",
+   "raison": "formules de Cramer (déterminant)",
+   "fiches": 5,
+   "sur": 7,
+   "preuves": [
+    {
+     "fiche": "b~1A~systemes_lineaires~anc_s2_matrices_ds2_2015_sujet_b_01",
+     "technique": "déterminant",
+     "extrait": "f{méthode.} système de cramer : autant d'équations que d'inconnues et déterminant $\\delta\\neq 0$. alors $x_j=\\dfrac{\\delta_j}{\\delta}$, où $\\delta_j$ e"
+    },
+    {
+     "fiche": "b~1A~systemes_lineaires~anc_f212_ds2_2013_serie_2_02",
+     "technique": "déterminant",
+     "extrait": "f{méthode.} système de cramer : autant d'équations que d'inconnues et déterminant $\\delta\\neq 0$. alors $x_j=\\dfrac{\\delta_j}{\\delta}$, où $\\delta_j$ e"
+    }
+   ]
+  },
+  {
+   "a": "06.1",
+   "b": "07.1",
+   "type": "prerequis",
+   "source": "cours+fiches",
+   "raison": "polynôme caractéristique = det(A − λI) (déterminant)",
+   "fiches": 5,
+   "sur": 7,
+   "preuves": [
+    {
+     "fiche": "b~1A~diagonalisation~anc_f212_ds2_2013_serie_1_04",
+     "technique": "déterminant",
+     "extrait": "\\textbf{méthode.} polynôme caractéristique $\\det(a-xi)$, valeurs propres, sous-espaces propres $\\ker(a-\\lambda i)$ ; $"
+    },
+    {
+     "fiche": "b~1A~diagonalisation~s2diago_03",
+     "technique": "déterminant",
+     "extrait": "i les valeurs propres sont toutes simples). rappel pour $3\\times3$ : $\\det(m-\\lambda i)=-\\lambda^3+\\operatorname{tr}(m)\\lambda^2-m\\lambda+\\det m"
+    }
+   ]
+  },
+  {
+   "a": "06.1",
+   "b": "07.3",
+   "type": "prerequis",
+   "source": "fiches",
+   "raison": "déterminant",
+   "fiches": 2,
+   "sur": 2,
+   "preuves": [
+    {
+     "fiche": "b~1A~diagonalisation~s2diago_02",
+     "technique": "déterminant",
+     "extrait": "la base canonique. \\textbf{1. polynôme caractéristique.} on utilise $\\det(a-xi_3)=-x^3+\\operatorname{tr}(a)\\,x^2-m\\,x+\\det a$, où $m$ est la so"
+    },
+    {
+     "fiche": "b~1A~diagonalisation~s2diago_01",
+     "technique": "déterminant",
+     "extrait": "ase.} trois vecteurs de $\\r^3$ forment une base si et seulement si le déterminant de leurs coordonnées (dans $\\mathcal b$) est non nul. la matrice dont"
+    }
+   ]
+  },
+  {
+   "a": "06.1",
+   "b": "07.4",
+   "type": "prerequis",
+   "source": "fiches",
+   "raison": "déterminant",
+   "fiches": 4,
+   "sur": 7,
+   "preuves": [
+    {
+     "fiche": "b~1A~diagonalisation~anc_s2_matrices_ds2_2010_01",
+     "technique": "déterminant",
+     "extrait": "\\textbf{méthode.} polynôme caractéristique $\\det(a-xi)$, espaces propres $\\ker(a-\\lambda i)$, matrice de passage dont"
+    },
+    {
+     "fiche": "b~1A~diagonalisation~anc_s2_matrices_ds2_2010_01~vclaude",
+     "technique": "déterminant",
+     "extrait": "\\textit{cours : polynôme caractéristique $\\det(a-xi)$, espaces propres $\\ker(a-\\lambda i)$, matrice de passage (colo"
+    }
+   ]
+  },
+  {
+   "a": "06.3",
+   "b": "06.5",
+   "type": "prerequis",
+   "source": "fiches",
+   "raison": "inverse d'une matrice",
+   "fiches": 3,
+   "sur": 7,
+   "preuves": [
+    {
+     "fiche": "b~1A~determinants~exo7_ex001061",
+     "technique": "inverse d'une matrice",
+     "extrait": "n fait il n'est pas plus difficile de montrer que $\\big(a(\\theta)\\big)^{-1} = a(-\\theta)$. on sait aussi que par définition $\\big(a(\\theta)\\big)^0"
+    },
+    {
+     "fiche": "b~1A~determinants~fred_ds2b07b08_2023_01~vclaude3",
+     "technique": "inverse d'une matrice",
+     "extrait": "xtit{cours : $\\det$ par la r\\`egle de sarrus ou d\\'eveloppement ; $a$ inversible $\\iff\\det a\\neq0$, et $a^{-1}=\\frac1{\\det a}\\,{}^t\\mathrm{com}(a)$ ;"
+    }
+   ]
+  },
+  {
+   "a": "06.3",
+   "b": "07.4",
+   "type": "prerequis",
+   "source": "fiches",
+   "raison": "inverse d'une matrice",
+   "fiches": 4,
+   "sur": 7,
+   "preuves": [
+    {
+     "fiche": "b~1A~diagonalisation~anc_s2_matrices_ds2_2010_01",
+     "technique": "inverse d'une matrice",
+     "extrait": "st celle de la question 2.(b). (b) par la méthode du pivot (ou par la comatrice, $\\det p=-1$) : $$\\boxed{p^{-1}=\\begin{pmatrix}-4&-1&-2\\\\-3&-1&-2\\\\2&"
+    },
+    {
+     "fiche": "b~1A~diagonalisation~anc_s2_matrices_ds2_2010_01~vclaude",
+     "technique": "inverse d'une matrice",
+     "extrait": "st celle de la question 2.(b). (b) par la méthode du pivot (ou par la comatrice, $\\det p=1$) : $$\\boxed{p^{-1}=\\begin{pmatrix}1&0&0\\\\-1&-1&-1\\\\2&2&1\\"
+    }
+   ]
+  },
+  {
+   "a": "06.5",
+   "b": "07.1",
+   "type": "outil",
+   "source": "fiches",
+   "raison": "produit matriciel",
+   "fiches": 6,
+   "sur": 7,
+   "preuves": [
+    {
+     "fiche": "b~1A~diagonalisation~anc_f212_ds2_2013_serie_1_04",
+     "technique": "produit matriciel",
+     "extrait": "réduisent à $-x-z=0$ et $2x+2z=0$) : plan de dimension $2$, base $x_2=\\begin{pmatrix}0\\\\1\\\\0\\end{pmatrix}$, $x_3=\\begin{pmatrix}-1\\\\0\\\\1\\end{pmatrix}$. comme $1+2=3$, $a$ est diago"
+    },
+    {
+     "fiche": "b~1A~diagonalisation~s2diago_03",
+     "technique": "produit matriciel",
+     "extrait": "rix}$ est vecteur propre pour chaque racine $\\lambda$ : $$ \\lambda=-1:\\begin{pmatrix}1\\\\-1\\\\1\\\\-1\\end{pmatrix},\\quad\\lambda=1:\\begin{pmatrix}1\\\\1\\\\1\\\\1\\end{pmatrix},\\quad\\lambda=2:"
+    }
+   ]
+  },
+  {
+   "a": "06.5",
+   "b": "07.2",
+   "type": "outil",
+   "source": "fiches",
+   "raison": "produit matriciel",
+   "fiches": 2,
+   "sur": 2,
+   "preuves": [
+    {
+     "fiche": "b~1A~diagonalisation~s2diago_04",
+     "technique": "produit matriciel",
+     "extrait": "$1$ (simple), $-2$ (double). \\begin{itemize} \\item $\\lambda=1$ : $a-i=\\begin{pmatrix}-2&1&1\\\\1&-2&1\\\\1&1&-2\\end{pmatrix}$ ; chaque ligne a pour somme nulle, donc $(1,1,1)$ est solu"
+    },
+    {
+     "fiche": "b~1A~diagonalisation~anc_f212_ds2_2013_serie_2_03",
+     "technique": "produit matriciel",
+     "extrait": "\\\\1\\\\2\\end{pmatrix}$. ils sont orthogonaux deux à deux (par exemple $\\begin{pmatrix}-1\\\\-1\\\\1\\end{pmatrix}\\cdot\\begin{pmatrix}1\\\\1\\\\2\\end{pmatrix}=0$). après normalisation : $$\\box"
+    }
+   ]
+  },
+  {
+   "a": "06.5",
+   "b": "07.3",
+   "type": "outil",
+   "source": "fiches",
+   "raison": "produit matriciel",
+   "fiches": 2,
+   "sur": 2,
+   "preuves": [
+    {
+     "fiche": "b~1A~diagonalisation~s2diago_02",
+     "technique": "produit matriciel",
+     "extrait": "5y+z=0$, c'est-à-dire $z=-2x+5y$. un plan, donc de dimension $2$ : $$ \\begin{pmatrix}x\\\\y\\\\z\\end{pmatrix}=\\begin{pmatrix}x\\\\y\\\\-2x+5y\\end{pmatrix}=x\\begin{pmatrix}1\\\\0\\\\-2\\end{pmat"
+    },
+    {
+     "fiche": "b~1A~diagonalisation~s2diago_01",
+     "technique": "produit matriciel",
+     "extrait": "e les images de $\\vect u,\\vect v,\\vect w$ : \\begin{align*} a\\vect u&=a\\begin{pmatrix}1\\\\0\\\\1\\end{pmatrix}=\\begin{pmatrix}-2+3\\\\-6+6\\\\8-7\\end{pmatrix}=\\begin{pmatrix}1\\\\0\\\\1\\end{pma"
+    }
+   ]
+  },
+  {
+   "a": "06.5",
+   "b": "07.4",
+   "type": "outil",
+   "source": "fiches",
+   "raison": "produit matriciel",
+   "fiches": 6,
+   "sur": 7,
+   "preuves": [
+    {
+     "fiche": "b~1A~diagonalisation~claude_07_4_02",
+     "technique": "produit matriciel",
+     "extrait": "$a=\\begin{pmatrix}1&2\\\\2&1\\end{pmatrix}$ a pour valeurs propres $3$ (vecteur propre $\\begin{pmatrix}1\\\\1\\end{pmatrix}$) et $-1$ (vecteur propre $\\begin{pmatrix}1\\\\-1\\end{pmatrix}$)"
+    },
+    {
+     "fiche": "b~1A~diagonalisation~anc_s2_matrices_ds2_2010_01",
+     "technique": "produit matriciel",
+     "extrait": "_2})$ (on vérifie $-2+1+1=0$ et $2+0-2=0$). $e_2=\\ker(a-2i)$ : $a-2i=\\begin{pmatrix}-1&0&0\\\\4&1&2\\\\-2&-1&-2\\end{pmatrix}$ donne $x=0$ et $y=-2z$ : $e_2=\\operatorname{vect}(\\overrig"
+    }
+   ]
+  },
+  {
+   "a": "06.7",
+   "b": "06.8",
+   "type": "outil",
+   "source": "cours",
+   "raison": "pivot pour résoudre un système",
+   "fiches": 0,
+   "sur": 0,
+   "preuves": []
+  },
+  {
+   "a": "06.7",
+   "b": "07.3",
+   "type": "outil",
+   "source": "fiches",
+   "raison": "pivot de Gauss",
+   "fiches": 1,
+   "sur": 2,
+   "preuves": [
+    {
+     "fiche": "b~1A~diagonalisation~s2diago_02",
+     "technique": "pivot de Gauss",
+     "extrait": "ses}4x-5y+z=0&(l_1)\\\\2x-3y+z=0&(l_2)\\\\2x-5y+3z=0&(l_3)\\end{cases} $$ $l_1-l_2$ : $2x-2y=0$, donc $y=x$. alors $l_2$ : $2x-3x+z=0$, donc $z=x$. ($l_"
+    }
+   ]
+  },
+  {
+   "a": "06.7",
+   "b": "07.4",
+   "type": "outil",
+   "source": "fiches",
+   "raison": "pivot de Gauss",
+   "fiches": 2,
+   "sur": 7,
+   "preuves": [
+    {
+     "fiche": "b~1A~diagonalisation~anc_s2_matrices_ds2_2010_01",
+     "technique": "pivot de Gauss",
+     "extrait": "tbf{3.} (a) $p$ est celle de la question 2.(b). (b) par la méthode du pivot (ou par la comatrice, $\\det p=-1$) : $$\\boxed{p^{-1}=\\begin{pmatrix}-"
+    },
+    {
+     "fiche": "b~1A~diagonalisation~anc_s2_matrices_ds2_2010_01~vclaude",
+     "technique": "pivot de Gauss",
+     "extrait": "tbf{3.} (a) $p$ est celle de la question 2.(b). (b) par la méthode du pivot (ou par la comatrice, $\\det p=1$) : $$\\boxed{p^{-1}=\\begin{pmatrix}1&"
+    }
+   ]
+  },
+  {
+   "a": "06.8",
+   "b": "07.1",
+   "type": "outil",
+   "source": "cours",
+   "raison": "vecteurs propres : système homogène",
+   "fiches": 0,
+   "sur": 0,
+   "preuves": []
+  },
+  {
+   "a": "06.8",
+   "b": "19.3",
+   "type": "outil",
+   "source": "cours",
+   "raison": "systèmes différentiels : système en Y(p)",
+   "fiches": 0,
+   "sur": 0,
+   "preuves": []
+  },
+  {
+   "a": "07.1",
+   "b": "07.2",
+   "type": "prerequis",
+   "source": "fiches",
+   "raison": "valeurs / vecteurs propres, diagonalisation",
+   "fiches": 2,
+   "sur": 2,
+   "preuves": [
+    {
+     "fiche": "b~1A~diagonalisation~s2diago_04",
+     "technique": "valeurs / vecteurs propres",
+     "extrait": "étrique réelle est diagonalisable dans une base \\emph{orthonormée} de vecteurs propres ; la matrice de passage $p$ est alors orthogonale ($p^{-1}=p^{\\mathsf"
+    },
+    {
+     "fiche": "b~1A~diagonalisation~s2diago_04",
+     "technique": "diagonalisation",
+     "extrait": "\\emph{théorème spectral~:} une matrice symétrique réelle est diagonalisable dans une base \\emph{orthonormée} de vecteurs propres ; la matrice"
+    }
+   ]
+  },
+  {
+   "a": "07.1",
+   "b": "07.3",
+   "type": "prerequis",
+   "source": "fiches",
+   "raison": "valeurs / vecteurs propres, diagonalisation",
+   "fiches": 2,
+   "sur": 2,
+   "preuves": [
+    {
+     "fiche": "b~1A~diagonalisation~s2diago_02",
+     "technique": "valeurs / vecteurs propres",
+     "extrait": "ect k$) ; $e=\\r^3$ et $\\mathcal b$ est la base canonique. \\textbf{1. polynôme caractéristique.} on utilise $\\det(a-xi_3)=-x^3+\\operatorname{tr}(a)\\,x^2-m\\"
+    },
+    {
+     "fiche": "b~1A~diagonalisation~s2diago_02",
+     "technique": "diagonalisation",
+     "extrait": "$ est une base de $\\r^3$ : $\\dim e_{-1}+\\dim e_1=1+2=3$, donc $f$ est diagonalisable. \\textbf{4. matrice de $f$ dans $\\mathcal b'$.} chaque vecteur d"
+    }
+   ]
+  },
+  {
+   "a": "07.1",
+   "b": "07.4",
+   "type": "prerequis",
+   "source": "cours+fiches",
+   "raison": "Aⁿ = P Dⁿ P⁻¹, systèmes découplés (valeurs / vecteurs propres, diagonalisation)",
+   "fiches": 5,
+   "sur": 7,
+   "preuves": [
+    {
+     "fiche": "b~1A~diagonalisation~claude_07_4_02",
+     "technique": "valeurs / vecteurs propres",
+     "extrait": "$a=\\begin{pmatrix}1&2\\\\2&1\\end{pmatrix}$ a pour valeurs propres $3$ (vecteur propre $\\begin{pmatrix}1\\\\1\\end{pmatrix}$) et $-1$ (vect"
+    },
+    {
+     "fiche": "b~1A~diagonalisation~anc_s2_matrices_ds2_2010_01",
+     "technique": "valeurs / vecteurs propres",
+     "extrait": "\\textbf{méthode.} polynôme caractéristique $\\det(a-xi)$, espaces propres $\\ker(a-\\lambda i)$, matrice d"
+    }
+   ]
+  },
+  {
+   "a": "08.1",
+   "b": "08.2",
+   "type": "prerequis",
+   "source": "fiches",
+   "raison": "dérivée",
+   "fiches": 5,
+   "sur": 7,
+   "preuves": [
+    {
+     "fiche": "b~1A~fonctions_usuelles~exo7_ex005443",
+     "technique": "dérivée",
+     "extrait": "e même $f_1(x)\\underset{x\\rightarrow-\\infty}{\\rightarrow}0$. \\textbf{dérivée, variations.} pour $x>0$, $$\\begin{aligned} f'(x) & =(-\\frac{3}{x^4"
+    },
+    {
+     "fiche": "b~1A~developpements_limites~anc_f111_ds1_02",
+     "technique": "dérivée",
+     "extrait": "\\textbf{méthode.} étude classique : domaine, limites, dérivée et tableau, croissances comparées pour $\\frac{\\ln x}x$. \\medskip \\te"
+    }
+   ]
+  },
+  {
+   "a": "08.1",
+   "b": "08.3",
+   "type": "prerequis",
+   "source": "fiches",
+   "raison": "dérivée",
+   "fiches": 5,
+   "sur": 6,
+   "preuves": [
+    {
+     "fiche": "b~1A~fonctions_usuelles~s2_revision_fonction_01",
+     "technique": "dérivée",
+     "extrait": "on donne : le domaine de définition, la parité et la périodicité, la dérivée, le tableau de variations et les limites ou valeurs remarquables. cha"
+    },
+    {
+     "fiche": "b~1A~fonctions_usuelles~claude_08_3_02",
+     "technique": "dérivée",
+     "extrait": "$$\\boxed{\\arcsin'(x)=\\frac1{\\sqrt{1-x^2}},\\quad\\arccos'(x)=-\\frac1{\\sqrt{1-x^2}}\\ \\ (x\\in]-"
+    }
+   ]
+  },
+  {
+   "a": "08.1",
+   "b": "10.1",
+   "type": "prerequis",
+   "source": "cours",
+   "raison": "formule de Taylor : dérivées successives",
+   "fiches": 0,
+   "sur": 0,
+   "preuves": []
+  },
+  {
+   "a": "08.1",
+   "b": "10.3",
+   "type": "outil",
+   "source": "fiches",
+   "raison": "dérivée",
+   "fiches": 4,
+   "sur": 7,
+   "preuves": [
+    {
+     "fiche": "b~1A~developpements_limites~fred_ds2b08_2010_03~vclaude4",
+     "technique": "dérivée",
+     "extrait": "$[-1;1]$ : $\\boxed{d_f=[-1;1]}$. \\medskip \\textbf{2.} sur $]-1;1[$, $f'(x)=\\dfrac{-1}{\\sqrt{1-x^2}}$ car $\\arccos'=-\\arcsin'$. avec $(1-x^2)^{-1"
+    },
+    {
+     "fiche": "b~1A~developpements_limites~fred_ds3b07b08_2024_03",
+     "technique": "dérivée",
+     "extrait": "\\textit{cours : on intègre le dl de la dérivée pour obtenir celui de $f$ ; le premier terme non linéaire donne la po"
+    }
+   ]
+  },
+  {
+   "a": "08.1",
+   "b": "12.1",
+   "type": "prerequis",
+   "source": "cours",
+   "raison": "primitive = dérivée lue à l'envers",
+   "fiches": 0,
+   "sur": 0,
+   "preuves": []
+  },
+  {
+   "a": "08.1",
+   "b": "12.2.2",
+   "type": "outil",
+   "source": "fiches",
+   "raison": "dérivée",
+   "fiches": 5,
+   "sur": 7,
+   "preuves": [
+    {
+     "fiche": "b~1A~integrales~fred_ds4b07b08_2024_02",
+     "technique": "dérivée",
+     "extrait": "par parties $\\displaystyle\\int u'v=uv-\\int uv'$.} \\medskip on pose $u'(x)=\\mathrm{e}^x$, $v(x)=x$, donc $u(x)=\\mathrm{e}^x$, $v'(x)=1$ : $$f(x)="
+    },
+    {
+     "fiche": "b~1A~integrales~anc_s2_analyse_ds2_2013_2014_primitive_version2_01~s7~vclaude2",
+     "technique": "dérivée",
+     "extrait": "cherche une primitive de la forme $(ax^{3}+bx^{2}+cx+d)e^{-3x}$ ; sa dérivée est $(q'-3q)e^{-3x}$ avec $q=ax^{3}+bx^{2}+cx+d$. on identifie avec $"
+    }
+   ]
+  },
+  {
+   "a": "08.1",
+   "b": "14.1",
+   "type": "prerequis",
+   "source": "cours",
+   "raison": "dérivées partielles = dérivées usuelles",
+   "fiches": 0,
+   "sur": 0,
+   "preuves": []
+  },
+  {
+   "a": "08.2",
+   "b": "10.5",
+   "type": "prerequis",
+   "source": "cours",
+   "raison": "plan d'étude d'une fonction",
+   "fiches": 0,
+   "sur": 0,
+   "preuves": []
+  },
+  {
+   "a": "08.2",
+   "b": "16",
+   "type": "prerequis",
+   "source": "cours+fiches",
+   "raison": "variations de x(t) et y(t) (tableau de variations)",
+   "fiches": 4,
+   "sur": 7,
+   "preuves": [
+    {
+     "fiche": "b~2A~courbes_parametrees~fred_ds_s4_2a_2022_01",
+     "technique": "tableau de variations",
+     "extrait": "=\\frac{(t+1)(t^2-t+1)}{t^2}$ et calculer $\\displaystyle y'(t)$. \\item tableau de variations sur $d$. \\item montrer que le seul point qui coupe l'axe des ordonn\\"
+    },
+    {
+     "fiche": "b~2A~equations_differentielles~anc_f411_ds1b06_01~vclaude5",
+     "technique": "tableau de variations",
+     "extrait": "rsque $t\\to1$ (asymptote, position de $\\mathcal{c}$). \\item donner le tableau de variations pour $t\\in i$. \\item montrer que le seul point stationnaire est $m_{"
+    }
+   ]
+  },
+  {
+   "a": "08.2",
+   "b": "17",
+   "type": "outil",
+   "source": "fiches",
+   "raison": "tableau de variations",
+   "fiches": 6,
+   "sur": 7,
+   "preuves": [
+    {
+     "fiche": "b~2A~courbes_parametrees_et_polaires~anc_f411_courbe_01",
+     "technique": "tableau de variations",
+     "extrait": "e et période, symétries ($\\rho(-\\theta)$, $\\rho(\\theta+\\pi)$, \\dots), tableau de variations de $\\rho$, tangentes à l'origine (là où $\\rho=0$, la tangente a pour"
+    },
+    {
+     "fiche": "b~2A~courbes_polaires~exo7_ex006989",
+     "technique": "tableau de variations",
+     "extrait": "iations et signe de la fonction $r$\\\\ la fonction $r$ est strictement décroissante, et strictement positive, sur $]0;\\frac{\\pi}{4}[$: $$ \\begin{array}{c"
+    }
+   ]
+  },
+  {
+   "a": "09",
+   "b": "10.2",
+   "type": "outil",
+   "source": "fiches",
+   "raison": "arcsin / arccos / arctan",
+   "fiches": 2,
+   "sur": 7,
+   "preuves": [
+    {
+     "fiche": "b~1A~developpements_limites~exo7_ex001265",
+     "technique": "arcsin / arccos / arctan",
+     "extrait": "2 $$ \\end{enumerate} \\item nous utiliserons que $$\\begin{aligned} (\\arctan x)^{\\frac{1}{x^2}} & = \\exp\\left(\\frac{1}{x^2} \\ln \\left( \\arctan x \\"
+    },
+    {
+     "fiche": "b~1A~trigo_reciproques~anc_amphi2020_dl_pcp_td_dl2_03",
+     "technique": "arcsin / arccos / arctan",
+     "extrait": "3x^4+x^4\\epsilon(x).}$$ \\medskip \\textbf{2.} \\begin{itemize} \\item $\\arcsin'(x)=(1-x^2)^{-1/2}=1+\\frac{x^2}2+x^2\\epsilon$, d'où $\\boxed{\\arcsin x"
+    }
+   ]
+  },
+  {
+   "a": "09",
+   "b": "10.3",
+   "type": "prerequis",
+   "source": "fiches",
+   "raison": "arcsin / arccos / arctan",
+   "fiches": 4,
+   "sur": 7,
+   "preuves": [
+    {
+     "fiche": "b~1A~developpements_limites~fred_ds2b08_2010_03~vclaude4",
+     "technique": "arcsin / arccos / arctan",
+     "extrait": "\\textbf{1.} $\\arcsin$ et $\\arccos$ sont définies sur $[-1;1]$ : $\\boxed{d_f=[-1;1]}$. \\me"
+    },
+    {
+     "fiche": "b~1A~developpements_limites~fred_ds3b07b08_2024_03",
+     "technique": "arcsin / arccos / arctan",
+     "extrait": "soit $f(x)= \\arcsin x-\\arccos x$. \\begin{enumerate} \\item calculer le $dl_2(0)$ de $\\disp"
+    }
+   ]
+  },
+  {
+   "a": "09",
+   "b": "10.4",
+   "type": "outil",
+   "source": "fiches",
+   "raison": "arcsin / arccos / arctan",
+   "fiches": 2,
+   "sur": 7,
+   "preuves": [
+    {
+     "fiche": "b~1A~trigo_reciproques~anc_f111_ds2_2012_dl_05~vclaude2~s2",
+     "technique": "arcsin / arccos / arctan",
+     "extrait": ". alors $\\dfrac{1}{x-1}=\\dfrac{t}{1-t}=t+t^{2}+t^{3}+o(t^{3})=w$ et $\\arctan w=w-\\dfrac{w^3}3+o(w^3)=t+t^{2}+\\frac{2}{3}t^{3}+o(t^{3})$. donc $$g("
+    },
+    {
+     "fiche": "b~1A~trigo_reciproques~anc_f111_ds2_2012_dl_05~vclaude",
+     "technique": "arcsin / arccos / arctan",
+     "extrait": "$) : la courbe est \\emph{au-dessous}. \\medskip \\textbf{2.} $g(x)=x^2\\arctan\\dfrac1{x+2}$ ($x\\ne-2$). avec $u=\\frac1x$ : $v=\\frac1{x+2}=\\frac u{1+"
+    }
+   ]
+  },
+  {
+   "a": "09",
+   "b": "10.5",
+   "type": "prerequis",
+   "source": "fiches",
+   "raison": "arcsin / arccos / arctan",
+   "fiches": 1,
+   "sur": 1,
+   "preuves": [
+    {
+     "fiche": "b~1A~developpements_limites~s1dl_03",
+     "technique": "arcsin / arccos / arctan",
+     "extrait": "e ex80c.pdf : à regénérer}}\\end{center} \\subsubsection*{d) $i(x)=x^2\\arctan\\dfrac1{x+1}$} \\textbf{domaine.} $d_i=\\r\\setminus\\{-1\\}$. \\textbf{dér"
+    }
+   ]
+  },
+  {
+   "a": "09",
+   "b": "12.2.1",
+   "type": "prerequis",
+   "source": "fiches",
+   "raison": "arcsin / arccos / arctan",
+   "fiches": 4,
+   "sur": 4,
+   "preuves": [
+    {
+     "fiche": "b~1A~integrales~anc_s2_analyse_ds2_2012_version2_01~vclaude~s3",
+     "technique": "arcsin / arccos / arctan",
+     "extrait": "n rationnelle à dénominateur irréductible (forme canonique, $\\ln$ + $\\arctan$), intégration par parties, changement de variable $u=\\cos x$ et déco"
+    },
+    {
+     "fiche": "b~1A~integrales~anc_s2_analyse_ds2_2013_2014_primitive_version1_01~vclaude~s3",
+     "technique": "arcsin / arccos / arctan",
+     "extrait": "\\textit{cours : forme $u'u^n$ ; forme canonique et $\\arctan$ ; intégration par parties ; changement de variable (règles de bioche"
+    }
+   ]
+  },
+  {
+   "a": "09",
+   "b": "12.2.2",
+   "type": "outil",
+   "source": "fiches",
+   "raison": "arcsin / arccos / arctan",
+   "fiches": 2,
+   "sur": 7,
+   "preuves": [
+    {
+     "fiche": "b~1A~integrales~anc_s2_analyse_ds_2015_2016_primitive_equa_diff_02~vclaude~s5",
+     "technique": "arcsin / arccos / arctan",
+     "extrait": "\\textit{cours : forme canonique et $\\int\\frac{du}{u^2+a^2}=\\frac1a\\arctan\\frac ua$ ; intégration par parties ; règles de bioche ; polynôme $\\ti"
+    },
+    {
+     "fiche": "b~1A~integrales~anc_s2_analyse_ds2_2013_2014_primitive_version1_01~vclaude~s7",
+     "technique": "arcsin / arccos / arctan",
+     "extrait": "\\textit{cours : forme $u'u^n$ ; forme canonique et $\\arctan$ ; intégration par parties ; changement de variable (règles de bioche"
+    }
+   ]
+  },
+  {
+   "a": "09",
+   "b": "12.4",
+   "type": "prerequis",
+   "source": "cours+fiches",
+   "raison": "primitives en arctan (arcsin / arccos / arctan)",
+   "fiches": 5,
+   "sur": 7,
+   "preuves": [
+    {
+     "fiche": "b~1A~integrales~fred_ds4b07b08_2023_05",
+     "technique": "arcsin / arccos / arctan",
+     "extrait": "ur $\\delta<0$, forme canonique et $\\displaystyle\\int\\frac{dt}{1+t^2}=\\arctan t$. (dans l'énoncé, le « $dx$ » après $f(x)$ est parasite : $f(x)=\\fr"
+    },
+    {
+     "fiche": "b~1A~integrales~anc_s2_analyse_ds2_2012_version2_01~vclaude~s2",
+     "technique": "arcsin / arccos / arctan",
+     "extrait": "n rationnelle à dénominateur irréductible (forme canonique, $\\ln$ + $\\arctan$), intégration par parties, changement de variable $u=\\cos x$ et déco"
+    }
+   ]
+  },
+  {
+   "a": "09",
+   "b": "12.5",
+   "type": "prerequis",
+   "source": "fiches",
+   "raison": "arcsin / arccos / arctan",
+   "fiches": 2,
+   "sur": 2,
+   "preuves": [
+    {
+     "fiche": "b~1A~integrales~exo7_ex006866",
+     "technique": "arcsin / arccos / arctan",
+     "extrait": ", la deuxième sera du type $\\frac{1}{1+v^2}$ dont une primitive est $\\arctan v$. en détails cela donne : $$\\begin{aligned} \\int \\frac{x-1}{x^2+x+"
+    },
+    {
+     "fiche": "b~1A~integrales~exo7_ex005467",
+     "technique": "arcsin / arccos / arctan",
+     "extrait": "ac{2}{t+\\frac{1}{t}}\\frac{dt}{t} = 2\\int_{}^{}\\frac{1}{1+t^2}\\;dt = 2\\arctan(e^x)+c, $$ ou bien $$ \\int_{}^{}\\frac{1}{\\operatorname{ch} x}\\;dx ="
+    }
+   ]
+  },
+  {
+   "a": "09",
+   "b": "12.5.1",
+   "type": "outil",
+   "source": "fiches",
+   "raison": "arcsin / arccos / arctan",
+   "fiches": 3,
+   "sur": 7,
+   "preuves": [
+    {
+     "fiche": "b~1A~integrales~anc_s2_analyse_ds2_2012_version2_01~vclaude~s5",
+     "technique": "arcsin / arccos / arctan",
+     "extrait": "n rationnelle à dénominateur irréductible (forme canonique, $\\ln$ + $\\arctan$), intégration par parties, changement de variable $u=\\cos x$ et déco"
+    },
+    {
+     "fiche": "b~1A~integrales~anc_s2_analyse_ds_2015_2016_primitive_equa_diff_02~vclaude~s4",
+     "technique": "arcsin / arccos / arctan",
+     "extrait": "\\textit{cours : forme canonique et $\\int\\frac{du}{u^2+a^2}=\\frac1a\\arctan\\frac ua$ ; intégration par parties ; règles de bioche ; polynôme $\\ti"
+    }
+   ]
+  },
+  {
+   "a": "09",
+   "b": "12.5.2",
+   "type": "prerequis",
+   "source": "fiches",
+   "raison": "arcsin / arccos / arctan",
+   "fiches": 4,
+   "sur": 7,
+   "preuves": [
+    {
+     "fiche": "b~1A~integrales~anc_s2_analyse_ds2_2013_2014_primitive_version1_01~vclaude~s4",
+     "technique": "arcsin / arccos / arctan",
+     "extrait": "\\textit{cours : forme $u'u^n$ ; forme canonique et $\\arctan$ ; intégration par parties ; changement de variable (règles de bioche"
+    },
+    {
+     "fiche": "b~1A~integrales~anc_f211_ds2c09_01~s2~vclaude6",
+     "technique": "arcsin / arccos / arctan",
+     "extrait": "\\,du$$ primitive : $-\\frac{1}{6}\\ln(3u^{2}-2u+1)-\\frac{3\\sqrt{2}}{18}\\arctan \\frac{3u-1}{\\sqrt{2}}$. $$i=\\big[\\ldots\\big]_0^1=\\boxed{- \\frac{\\ln 2"
+    }
+   ]
+  },
+  {
+   "a": "09",
+   "b": "12.6",
+   "type": "prerequis",
+   "source": "fiches",
+   "raison": "arcsin / arccos / arctan",
+   "fiches": 7,
+   "sur": 7,
+   "preuves": [
+    {
+     "fiche": "b~1A~integrales~anc_f211_tdprimitives_01",
+     "technique": "arcsin / arccos / arctan",
+     "extrait": "=\\dfrac23\\sqrt{1+3\\sin x}+c}$. \\medskip \\textbf{f)} par parties ($u=\\arctan x$, $v'=1$) : $\\displaystyle\\int\\arctan x\\,dx=x\\arctan x-\\int\\frac{x}"
+    },
+    {
+     "fiche": "b~1A~integrales~s2integration_01",
+     "technique": "arcsin / arccos / arctan",
+     "extrait": "verge (elle vaut }+\\infty\\text{).}} $$ \\item $f(x)=\\displaystyle\\int\\arctan x\\dd x$. \\emph{méthode} : intégration par parties avec $u=\\arctan x$"
+    }
+   ]
+  },
+  {
+   "a": "09",
+   "b": "14.1",
+   "type": "outil",
+   "source": "fiches",
+   "raison": "arcsin / arccos / arctan",
+   "fiches": 3,
+   "sur": 7,
+   "preuves": [
+    {
+     "fiche": "b~2A~fonctions_de_plusieurs_variables~anc_f311_tdfpv_02",
+     "technique": "arcsin / arccos / arctan",
+     "extrait": "eft(\\frac1y+x\\,e^{x^2+xy}\\right)dy}$$ \\medskip \\textbf{(b)} $f(x,y)=\\arctan\\dfrac{x+y}{1-xy}$ (pour $xy\\neq1$). posons $w=\\dfrac{x+y}{1-xy}$ ; $f"
+    },
+    {
+     "fiche": "b~2A~fonctions_de_plusieurs_variables~f212ds1_01",
+     "technique": "arcsin / arccos / arctan",
+     "extrait": ",\\dd y$ ; dérivées secondes, théorème de schwarz $f_{xy}=f_{yx}$ ; $(\\arctan u)'=\\frac1{1+u^2}$.} \\medskip \\textbf{1.} $$f_x=\\frac{1/y}{1+x^2/y^2"
+    }
+   ]
+  },
+  {
+   "a": "10.1",
+   "b": "10.2",
+   "type": "prerequis",
+   "source": "cours+fiches",
+   "raison": "limites par DL (développement limité)",
+   "fiches": 7,
+   "sur": 7,
+   "preuves": [
+    {
+     "fiche": "b~2A~developpements_limites~anc_formation_continue_gi_revision_ds1_2009_05",
+     "technique": "développement limité",
+     "extrait": "ision suivant les puissances croissantes ; composée : on substitue le dl de l'intérieur. \\medskip \\textbf{1.} $\\sin x=x-\\tfrac{x^3}{6}$ et $e"
+    },
+    {
+     "fiche": "b~1A~developpements_limites~exo7_ex001265",
+     "technique": "développement limité",
+     "extrait": "donc $\\sqrt{x^2+3x+2} +x$ est une forme indéterminée ! calculons un développement limité à l'ordre $1$ en $-\\infty$ en faisant très attention au signe (car p"
+    }
+   ]
+  },
+  {
+   "a": "10.1",
+   "b": "10.3",
+   "type": "application",
+   "source": "cours+fiches",
+   "raison": "tangente et position par DL (développement limité)",
+   "fiches": 7,
+   "sur": 7,
+   "preuves": [
+    {
+     "fiche": "b~1A~developpements_limites~anc_s1_analyse_ds2_2011_groupe_a_02~s1",
+     "technique": "développement limité",
+     "extrait": "\\textbf{méthode.} si $f(x)=a_0+a_1x+a_kx^k+o(x^k)$ avec $a_k\\ne0$ le premier terme non nul après $a_1x$, la tangente"
+    },
+    {
+     "fiche": "b~1A~developpements_limites~fred_ds2b08_2012_04~s2",
+     "technique": "développement limité",
+     "extrait": "\\textit{cours : le dl à l'ordre 1 donne la tangente en $0$ ; le premier terme non nul d'ord"
+    }
+   ]
+  },
+  {
+   "a": "10.1",
+   "b": "10.4",
+   "type": "application",
+   "source": "cours+fiches",
+   "raison": "asymptote par DL (développement limité)",
+   "fiches": 4,
+   "sur": 7,
+   "preuves": [
+    {
+     "fiche": "b~1A~developpements_limites~fred_ds3b07b08_2024_05",
+     "technique": "développement limité",
+     "extrait": "\\item calculer la limite de $f$ en $+\\infty$. \\item faire un $dl_1(0)$ de $\\mbox{e}^t$. \\item montrer que $y=-x+1$ est asymptote"
+    },
+    {
+     "fiche": "b~1A~trigo_reciproques~anc_f111_ds2_2012_dl_05~s1~vclaude5",
+     "technique": "développement limité",
+     "extrait": "\\textbf{méthode.} division euclidienne ou dl en $t=1/x$ : $f(x)=ax+b+\\dfrac cx+o(\\frac1x)$ donne l'asymptote $y=ax"
+    }
+   ]
+  },
+  {
+   "a": "10.1",
+   "b": "10.5",
+   "type": "application",
+   "source": "cours",
+   "raison": "étude de fonction avec DL",
+   "fiches": 0,
+   "sur": 0,
+   "preuves": []
+  },
+  {
+   "a": "10.1",
+   "b": "14.3",
+   "type": "outil",
+   "source": "cours",
+   "raison": "DL à l'ordre 2 et extrema",
+   "fiches": 0,
+   "sur": 0,
+   "preuves": []
+  },
+  {
+   "a": "10.1",
+   "b": "16",
+   "type": "application",
+   "source": "cours",
+   "raison": "DL au point stationnaire",
+   "fiches": 0,
+   "sur": 0,
+   "preuves": []
+  },
+  {
+   "a": "10.2",
+   "b": "10.3",
+   "type": "prerequis",
+   "source": "fiches",
+   "raison": "équivalents / limites",
+   "fiches": 5,
+   "sur": 7,
+   "preuves": [
+    {
+     "fiche": "b~1A~developpements_limites~fred_ds2b08_2012_04~s2",
+     "technique": "équivalents / limites",
+     "extrait": "^3}{3}+x^3\\epsilon(x)$. tangente : $$\\boxed{y=1+x}$$ comme $g(x)-(1+x)\\sim-\\frac{x^3}{3}$, la courbe est en dessous de la tangente pour $x>0$ et"
+    },
+    {
+     "fiche": "b~1A~developpements_limites~ds_dl_etude_b_02",
+     "technique": "équivalents / limites",
+     "extrait": "c{\\frac{x^2}2+o(x^2)}{\\frac{x^2}2+o(x^2)}\\longrightarrow1\\qquad\\boxed{\\lim_{x\\to0}=1}$$ \\medskip \\textbf{3.} $\\sin x=x-\\dfrac{x^3}6+o(x^3)$. ta"
+    }
+   ]
+  },
+  {
+   "a": "10.2",
+   "b": "10.4",
+   "type": "prerequis",
+   "source": "fiches",
+   "raison": "équivalents / limites",
+   "fiches": 6,
+   "sur": 7,
+   "preuves": [
+    {
+     "fiche": "b~1A~developpements_limites~fred_ds3b07b08_2024_05",
+     "technique": "équivalents / limites",
+     "extrait": "\\textit{cours : $d_f$, limites, asymptote oblique $y=ax+b$ avec $a=\\lim f(x)/x$ et $b=\\lim(f(x)-ax)$, signe de $f'$ et $f''$, th\\'eor\\`eme de"
+    },
+    {
+     "fiche": "b~1A~developpements_limites~bd_2016dsdl1_08",
+     "technique": "équivalents / limites",
+     "extrait": "right)\\right)=x+\\frac12+\\frac1{6x}+o\\!\\left(\\frac1x\\right)$$ $$\\boxed{\\lim_{x\\to+\\infty}h=+\\infty,\\qquad y=x+\\tfrac12\\ \\text{ est asymptote obli"
+    }
+   ]
+  },
+  {
+   "a": "10.2",
+   "b": "16",
+   "type": "prerequis",
+   "source": "fiches",
+   "raison": "équivalents / limites",
+   "fiches": 4,
+   "sur": 7,
+   "preuves": [
+    {
+     "fiche": "b~2A~courbes_parametrees~fred_ds_s4_2a_2022_01",
+     "technique": "équivalents / limites",
+     "extrait": "nts remarquables et tangentes. \\end{enumerate} on donne $\\sqrt[3]{2}^2\\simeq 1,6$. \\vskip 1 cm"
+    },
+    {
+     "fiche": "b~2A~courbes_parametrees_et_polaires~anc_f411_courbe_38",
+     "technique": "équivalents / limites",
+     "extrait": "to\\infty$ : direction $oy$. \\medskip \\textbf{1.} $t\\to\\pm\\infty$ : $x\\sim t^5\\to\\pm\\infty$, $y\\sim\\frac1t\\to0$ : asymptote $y=0$ ; $y$ a le sig"
+    }
+   ]
+  },
+  {
+   "a": "10.2",
+   "b": "17",
+   "type": "prerequis",
+   "source": "fiches",
+   "raison": "équivalents / limites",
+   "fiches": 7,
+   "sur": 7,
+   "preuves": [
+    {
+     "fiche": "b~2A~courbes_parametrees_et_polaires~anc_f411_courbe_01",
+     "technique": "équivalents / limites",
+     "extrait": "pi}3$ (car $\\cos\\frac{2\\pi}3=\\cos\\frac{4\\pi}3$). en $\\theta=0$ : $\\rho\\sim\\frac32\\theta^2\\ge0$, la courbe a un \\textbf{point de rebroussement} e"
+    },
+    {
+     "fiche": "b~2A~courbes_parametrees_et_polaires~anc_f411_courbe_11",
+     "technique": "équivalents / limites",
+     "extrait": "ge en $o$, tangente $ox$). au voisinage de $\\theta=-\\frac\\pi2$ : $\\rho\\sim\\dfrac{\\sqrt2}{\\varphi^2}$ avec $\\varphi=\\theta+\\frac\\pi2$, donc $\\rho"
+    }
+   ]
+  },
+  {
+   "a": "10.3",
+   "b": "10.4",
+   "type": "prerequis",
+   "source": "fiches",
+   "raison": "tangente / position",
+   "fiches": 7,
+   "sur": 7,
+   "preuves": [
+    {
+     "fiche": "b~1A~developpements_limites~fred_ds3b07b08_2024_05",
+     "technique": "tangente / position",
+     "extrait": "ptote oblique en }+\\infty}$$ pour $x>0$, $\\dfrac1x>0$ : la courbe est au-dessus de l'asymptote. \\medskip \\textbf{4.} $$\\boxed{f'(x)=-\\frac{\\mathrm{e"
+    },
+    {
+     "fiche": "b~1A~developpements_limites~bd_2016dsdl1_08",
+     "technique": "tangente / position",
+     "extrait": "ymptote oblique}}$$ position : $\\frac1{6x}>0$ : la courbe est \\textbf{au-dessus} de l'asymptote."
+    }
+   ]
+  },
+  {
+   "a": "10.3",
+   "b": "16",
+   "type": "prerequis",
+   "source": "fiches",
+   "raison": "tangente / position",
+   "fiches": 6,
+   "sur": 7,
+   "preuves": [
+    {
+     "fiche": "b~2A~courbes_parametrees~fred_ds_s4_2a_2022_01",
+     "technique": "tangente / position",
+     "extrait": "nfty$ avec $y/x\\to a$ et $y-ax\\to b$, asymptote $y=ax+b$. pente de la tangente $=y'/x'$ ; tangente verticale si $x'=0\\neq y'$. le point coupe $oy$ s"
+    },
+    {
+     "fiche": "b~2A~courbes_parametrees_et_polaires~anc_f411_courbe_38",
+     "technique": "tangente / position",
+     "extrait": "$y$ a le signe de $t$ : au dessus de l'asymptote quand $x\\to+\\infty$, en dessous quand $x\\to-\\infty$. \\medskip \\textbf{2.} $t\\to k\\pi$ : $\\ln|\\sin t|"
+    }
+   ]
+  },
+  {
+   "a": "10.3",
+   "b": "17",
+   "type": "prerequis",
+   "source": "fiches",
+   "raison": "tangente / position",
+   "fiches": 7,
+   "sur": 7,
+   "preuves": [
+    {
+     "fiche": "b~2A~courbes_parametrees_et_polaires~anc_f411_courbe_01",
+     "technique": "tangente / position",
+     "extrait": "theta)$, $\\rho(\\theta+\\pi)$, \\dots), tableau de variations de $\\rho$, tangentes à l'origine (là où $\\rho=0$, la tangente a pour direction $\\theta$),"
+    },
+    {
+     "fiche": "b~2A~courbes_parametrees_et_polaires~anc_f411_courbe_11",
+     "technique": "tangente / position",
+     "extrait": "de et symétries pour réduire l'intervalle d'étude, tableau de $\\rho$, tangente en $o$ aux zéros de $\\rho$ (direction $\\theta$), branches infinies vi"
+    }
+   ]
+  },
+  {
+   "a": "10.4",
+   "b": "10.5",
+   "type": "prerequis",
+   "source": "fiches",
+   "raison": "asymptote / branche infinie",
+   "fiches": 1,
+   "sur": 1,
+   "preuves": [
+    {
+     "fiche": "b~1A~developpements_limites~s1dl_03",
+     "technique": "asymptote / branche infinie",
+     "extrait": "maine, dérivée et signe, comportement aux points délicats, limites et asymptotes, tableau de variations, graphe.} \\subsubsection*{a) $f(x)=\\sqrt[3]{"
+    }
+   ]
+  },
+  {
+   "a": "10.4",
+   "b": "16",
+   "type": "prerequis",
+   "source": "cours+fiches",
+   "raison": "branches infinies (asymptote / branche infinie)",
+   "fiches": 4,
+   "sur": 7,
+   "preuves": [
+    {
+     "fiche": "b~2A~courbes_parametrees~fred_ds_s4_2a_2022_01",
+     "technique": "asymptote / branche infinie",
+     "extrait": "\\textit{cours : $x\\to\\pm\\infty$ et $y\\to b$ donne l'asymptote horizontale $y=b$ ; si $x,y\\to\\infty$ avec $y/x\\to a$ et $y-ax\\to b$,"
+    },
+    {
+     "fiche": "b~2A~courbes_parametrees_et_polaires~anc_f411_courbe_38",
+     "technique": "asymptote / branche infinie",
+     "extrait": "\\textbf{méthode.} branche infinie ($|x|$ ou $|y|\\to\\infty$) : on regarde $\\dfrac yx$. si $\\to a$ fini n"
+    }
+   ]
+  },
+  {
+   "a": "10.4",
+   "b": "17",
+   "type": "prerequis",
+   "source": "fiches",
+   "raison": "asymptote / branche infinie",
+   "fiches": 7,
+   "sur": 7,
+   "preuves": [
+    {
+     "fiche": "b~2A~courbes_parametrees_et_polaires~anc_f411_courbe_01",
+     "technique": "asymptote / branche infinie",
+     "extrait": "rho|\\le1/\\theta\\to0$, la courbe s'enroule en spirale vers $o$ (pas de branche infinie). elle part du point $(1,0)$. \\medskip \\textbf{3.} $\\rho=\\dfrac{\\the"
+    },
+    {
+     "fiche": "b~2A~courbes_parametrees_et_polaires~anc_f411_courbe_11",
+     "technique": "asymptote / branche infinie",
+     "extrait": "a$), branches infinies via $v=\\rho\\sin(\\theta-\\theta_0)\\to v_\\infty$ (asymptote de direction $\\theta_0$, d'équation $-x\\sin\\theta_0+y\\cos\\theta_0=v_\\"
+    }
+   ]
+  },
+  {
+   "a": "11.1",
+   "b": "11.2",
+   "type": "prerequis",
+   "source": "fiches",
+   "raison": "éléments simples",
+   "fiches": 2,
+   "sur": 2,
+   "preuves": [
+    {
+     "fiche": "b~1A~fractions_rationnelles~exo7_ex006968",
+     "technique": "éléments simples",
+     "extrait": ", où $f_1 = \\frac{x^2+x+1}{x^3-x}$. puisque $x^3-x = x(x-1)(x+1)$, la décomposition en éléments simples est de la forme $$ f_1 = \\frac{x^2+x+1}{x(x-1)(x+1)}"
+    },
+    {
+     "fiche": "b~1A~fractions_rationnelles~exo7_ex006969",
+     "technique": "éléments simples",
+     "extrait": "-2x^5+11x^4-x^3+11x^2+2x+3}{x(x^2+1)^3}$. \\begin{enumerate} \\item la décomposition en éléments simples de $f$ est de la forme $f = \\frac{a}{x}+\\frac{bx+c}{"
+    }
+   ]
+  },
+  {
+   "a": "11.1",
+   "b": "12.2",
+   "type": "outil",
+   "source": "fiches",
+   "raison": "éléments simples, pôles",
+   "fiches": 2,
+   "sur": 5,
+   "preuves": [
+    {
+     "fiche": "b~1A~integrales~bd_s2ds_int_2025_01~vclaude~s7",
+     "technique": "éléments simples",
+     "extrait": "\\textit{cours : décomposition en éléments simples (pôles réels puis trinôme à $\\delta<0$ avec $\\frac{u"
+    },
+    {
+     "fiche": "b~1A~integrales~bd_s2ds_int_2025_01~vclaude~s7",
+     "technique": "pôles",
+     "extrait": "\\textit{cours : décomposition en éléments simples (pôles réels puis trinôme à $\\delta<0$ avec $\\frac{u'}{u}$), intégration par"
+    }
+   ]
+  },
+  {
+   "a": "11.1",
+   "b": "12.2.3",
+   "type": "outil",
+   "source": "fiches",
+   "raison": "éléments simples, pôles",
+   "fiches": 2,
+   "sur": 6,
+   "preuves": [
+    {
+     "fiche": "b~1A~integrales~bd_s2ds_int_2025_01~s3",
+     "technique": "éléments simples",
+     "extrait": "\\textit{cours : décomposition en éléments simples (pôles réels puis trinôme à $\\delta<0$ avec $\\frac{u"
+    },
+    {
+     "fiche": "b~1A~integrales~bd_s2ds_int_2025_01~s3",
+     "technique": "pôles",
+     "extrait": "\\textit{cours : décomposition en éléments simples (pôles réels puis trinôme à $\\delta<0$ avec $\\frac{u'}{u}$ et arctan), intég"
+    }
+   ]
+  },
+  {
+   "a": "11.1",
+   "b": "12.4",
+   "type": "prerequis",
+   "source": "cours+fiches",
+   "raison": "primitive d'une fraction : éléments simples (éléments simples, pôles)",
+   "fiches": 5,
+   "sur": 7,
+   "preuves": [
+    {
+     "fiche": "b~1A~integrales~fred_ds4b07b08_2023_05",
+     "technique": "éléments simples",
+     "extrait": "\\textit{cours : décomposition en éléments simples ; $\\displaystyle\\int\\frac{u'}{u}=\\ln|u|$ ; pour $\\de"
+    },
+    {
+     "fiche": "b~1A~integrales~anc_s2_analyse_ds2_2012_version2_01~vclaude~s2",
+     "technique": "éléments simples",
+     "extrait": "ctan$), intégration par parties, changement de variable $u=\\cos x$ et décomposition en éléments simples, puissances impaires de $\\sin$.} \\medskip $x^2+4x+"
+    }
+   ]
+  },
+  {
+   "a": "11.1",
+   "b": "12.5",
+   "type": "outil",
+   "source": "fiches",
+   "raison": "éléments simples",
+   "fiches": 1,
+   "sur": 2,
+   "preuves": [
+    {
+     "fiche": "b~1A~integrales~exo7_ex006866",
+     "technique": "éléments simples",
+     "extrait": "er cette intégrale on décompose la fraction $\\frac{x+2}{x^2-3x-4}$ en éléments simples, le dénominateur n'étant pas irréductible. on sait que cette fraction"
+    }
+   ]
+  },
+  {
+   "a": "11.1",
+   "b": "12.5.2",
+   "type": "prerequis",
+   "source": "fiches",
+   "raison": "éléments simples",
+   "fiches": 4,
+   "sur": 7,
+   "preuves": [
+    {
+     "fiche": "b~1A~integrales~anc_f211_ds2c11_12_02~s2",
+     "technique": "éléments simples",
+     "extrait": "\\textbf{méthode.} décomposition en éléments simples ; pour l'intégrale trigonométrique, changement de va"
+    },
+    {
+     "fiche": "b~1A~integrales~anc_f211_ds2c09_01~s2~vclaude6",
+     "technique": "éléments simples",
+     "extrait": "cours : règles de bioche : $u=\\cos x$, $u=\\sin x$ ou $u=\\tan x$, puis éléments simples.} \\medskip $u=\\cos t$, $du=-\\sin t\\,dt$, $\\sin^2t=1-u^2$ ; $t:0\\to\\f"
+    }
+   ]
+  },
+  {
+   "a": "11.1",
+   "b": "19.2",
+   "type": "prerequis",
+   "source": "cours+fiches",
+   "raison": "originaux : décomposer F(p) en éléments simples (éléments simples)",
+   "fiches": 2,
+   "sur": 7,
+   "preuves": [
+    {
+     "fiche": "b~3A~transformee_de_laplace~anc_formation_continue_ge_ds_laplace_fourier_et_z_03~vclaude3",
+     "technique": "éléments simples",
+     "extrait": "on décompose en éléments simples : $$f(p)=\\frac{3 (p + 3)}{13 (p^{2} + 4)} + \\frac{23}{13 (p - 3)}$$ e"
+    },
+    {
+     "fiche": "b~3A~transformee_de_laplace~anc_formation_continue_ge_interro_02~vclaude",
+     "technique": "éléments simples",
+     "extrait": "\\textit{cours : décomposition en éléments simples ; $\\mathcal l^{-1}\\left(\\frac1{p+a}\\right)=e^{-at}u("
+    }
+   ]
+  },
+  {
+   "a": "11.1",
+   "b": "19.3",
+   "type": "prerequis",
+   "source": "fiches",
+   "raison": "éléments simples, pôles",
+   "fiches": 4,
+   "sur": 7,
+   "preuves": [
+    {
+     "fiche": "b~2A~transformee_de_laplace~ds2_2022_02",
+     "technique": "pôles",
+     "extrait": "on écrit $f(p)=\\dfrac a{p-1}+\\dfrac b{(p-1)^2}+\\dfrac{cp+d}{p^2+1}$. pôle double : $b=\\dfrac{n(1)}{1^2+1}=\\dfrac12$, où $n(p)=p^3-2p^2+p+1$. e"
+    },
+    {
+     "fiche": "b~2A~transformee_de_laplace~ds2_2022_02~vclaude2",
+     "technique": "éléments simples",
+     "extrait": "t $\\displaystyle{\\cal l}(v)(p)=\\frac{1}{(p-3)^2}$ \\item décomposer en éléments simples sur $\\mathbb{r}$ la fraction $$\\displaystyle f(p)=\\frac{2 p^{3} - 11"
+    }
+   ]
+  },
+  {
+   "a": "11.1",
+   "b": "19.5",
+   "type": "outil",
+   "source": "fiches",
+   "raison": "éléments simples",
+   "fiches": 2,
+   "sur": 6,
+   "preuves": [
+    {
+     "fiche": "b~3A~transformee_de_laplace~claude_19_5_08",
+     "technique": "éléments simples",
+     "extrait": "\\textit{cours : on décompose $\\frac{x(z)}{z}$ en éléments simples et on utilise $z(a^n)=\\frac{z}{z-a}$.} \\medskip $\\dfrac{x(z)}{z}=\\df"
+    },
+    {
+     "fiche": "b~3A~transformee_de_laplace~claude_19_5_09",
+     "technique": "éléments simples",
+     "extrait": "a transformée en $z$, on isole $x(z)$, on décompose $\\frac{x(z)}z$ en éléments simples.} \\medskip $$(z^2-3z+2)x(z)=z^2x_0+zx_1-3zx_0=z\\ \\longrightarrow\\ \\f"
+    }
+   ]
+  },
+  {
+   "a": "11.2",
+   "b": "12.4",
+   "type": "prerequis",
+   "source": "cours+fiches",
+   "raison": "pôles multiples (pôle multiple)",
+   "fiches": 2,
+   "sur": 7,
+   "preuves": [
+    {
+     "fiche": "b~1A~integrales~fred_ds4b07b08_2023_05",
+     "technique": "pôle multiple",
+     "extrait": "bf{1.} on réduit au même dénominateur : $$\\frac13\\cdot\\frac{(x^2+x+1)-(x-1)^2}{(x-1)(x^2+x+1)}=\\frac13\\cdot\\frac{3x}{(x-1)(x^2+x+1)}=f(x).$$ \\meds"
+    },
+    {
+     "fiche": "b~1A~integrales~bd_s2ds_int2_2022_01~vclaude~s2",
+     "technique": "pôle multiple",
+     "extrait": "\\textit{cours : décomposition en éléments simples (pôles réels, pôle double, trinôme à $\\delta<0$ avec $\\frac{u'}{u}$), intégration par parties,"
+    }
+   ]
+  },
+  {
+   "a": "11.2",
+   "b": "12.6",
+   "type": "outil",
+   "source": "fiches",
+   "raison": "pôle multiple",
+   "fiches": 3,
+   "sur": 7,
+   "preuves": [
+    {
+     "fiche": "b~1A~integrales~anc_s2_analyse_ds_2015_2016_primitive_equa_diff_02",
+     "technique": "pôle multiple",
+     "extrait": "estion 1 est une coquille pour $dx$.} \\medskip \\textbf{1.} $x^2-4x+5=(x-2)^2+1$ et $x+1=\\frac12(2x-4)+3$ : $$\\boxed{f(x)=\\frac12\\ln(x^2-4x+5)+3\\ar"
+    },
+    {
+     "fiche": "b~1A~integrales~anc_s2_analyse_ds2_2013_2014_primitive_version1_01~vclaude4",
+     "technique": "pôle multiple",
+     "extrait": "$ \\medskip \\textbf{2.} $4 x - 9=2\\,(2 x - 2)-5$ et $x^{2} - 2 x + 17=(x-1)^2+16$ ($\\delta<0$) : $\\boxed{f(x)=2\\ln(x^{2} - 2 x + 17)-\\frac{5}{4}\\ar"
+    }
+   ]
+  },
+  {
+   "a": "11.2",
+   "b": "19.2",
+   "type": "prerequis",
+   "source": "cours",
+   "raison": "pôles multiples de F(p)",
+   "fiches": 0,
+   "sur": 0,
+   "preuves": []
+  },
+  {
+   "a": "12.1",
+   "b": "12.2",
+   "type": "prerequis",
+   "source": "cours+fiches",
+   "raison": "primitives usuelles dans les parties (primitive / intégrale)",
+   "fiches": 5,
+   "sur": 5,
+   "preuves": [
+    {
+     "fiche": "b~1A~integrales~bd_s2ds_int_2025_01~vclaude~s7",
+     "technique": "primitive / intégrale",
+     "extrait": "$, $v=\\ln x$) : $\\displaystyle\\big[\\frac{x^4}{4}\\ln x\\big]_1^e-\\frac14\\int_1^e x^3dx=\\frac{e^4}{4}-\\frac{e^4-1}{16}$ $$\\boxed{g=\\frac{3e^4+1}{16"
+    },
+    {
+     "fiche": "b~1A~integrales~claude_12_2_01",
+     "technique": "primitive / intégrale",
+     "extrait": "avec $u=x$, $v'=\\sin x$ : $$i=\\bigl[-x\\cos x\\bigr]_0^{\\pi}+\\int_0^{\\pi}\\cos x\\,dx=\\pi+\\bigl[\\sin x\\bigr]_0^{\\pi}=\\boxed{\\pi}.$$"
+    }
+   ]
+  },
+  {
+   "a": "12.1",
+   "b": "12.2.1",
+   "type": "prerequis",
+   "source": "fiches",
+   "raison": "primitive / intégrale",
+   "fiches": 4,
+   "sur": 4,
+   "preuves": [
+    {
+     "fiche": "b~1A~integrales~anc_s2_analyse_ds2_2012_version2_01~vclaude~s3",
+     "technique": "primitive / intégrale",
+     "extrait": "sin$.} \\medskip par parties ($u=\\arcsin x$, $v'=1$) : $\\displaystyle\\int\\arcsin x\\,dx=x\\arcsin x-\\int\\frac x{\\sqrt{1-x^2}}dx$ $$\\boxed{g(x)=x\\"
+    },
+    {
+     "fiche": "b~1A~integrales~anc_s2_analyse_ds2_2013_2014_primitive_version1_01~vclaude~s3",
+     "technique": "primitive / intégrale",
+     "extrait": "prenant $v=\\dfrac{x^2+1}2$ : $\\displaystyle g=\\frac{x^2+1}2\\arctan x-\\int\\frac{x^2+1}2\\cdot\\frac1{1+x^2}dx$ : $$\\boxed{g(x)=\\frac{x^2+1}2\\arcta"
+    }
+   ]
+  },
+  {
+   "a": "12.1",
+   "b": "12.2.2",
+   "type": "prerequis",
+   "source": "fiches",
+   "raison": "primitive / intégrale",
+   "fiches": 7,
+   "sur": 7,
+   "preuves": [
+    {
+     "fiche": "b~1A~integrales~anc_s2_analyse_ds_2015_2016_primitive_equa_diff_02~vclaude~s5",
+     "technique": "primitive / intégrale",
+     "extrait": "\\textit{cours : forme canonique et $\\int\\frac{du}{u^2+a^2}=\\frac1a\\arctan\\frac ua$ ; intégration par parties ;"
+    },
+    {
+     "fiche": "b~1A~integrales~fred_ds4b07b08_2024_02",
+     "technique": "primitive / intégrale",
+     "extrait": "\\textit{cours : intégration par parties $\\displaystyle\\int u'v=uv-\\int uv'$.} \\medskip on pose $u'(x)=\\mathrm{e}^x$, $v(x)=x$,"
+    }
+   ]
+  },
+  {
+   "a": "12.1",
+   "b": "12.2.3",
+   "type": "prerequis",
+   "source": "fiches",
+   "raison": "primitive / intégrale",
+   "fiches": 6,
+   "sur": 6,
+   "preuves": [
+    {
+     "fiche": "b~1A~integrales~anc_s2_analyse_ds2_2013_2014_primitive_version2_01~vclaude~s8",
+     "technique": "primitive / intégrale",
+     "extrait": "variable, intégration par parties, règles de bioche, linéarisation, $\\int e^{ax}p(x)\\,dx=e^{ax}\\left(\\frac pa-\\frac{p'}{a^2}+\\frac{p''}{a^3}-\\f"
+    },
+    {
+     "fiche": "b~1A~integrales~bd_s2ds_int_2025_01~s3",
+     "technique": "primitive / intégrale",
+     "extrait": "consigne: calculer la primitive ou l'intégrale suivante. \\\\ \\\\ mat\\'eriel autoris\\'e: aucun, except\\'"
+    }
+   ]
+  },
+  {
+   "a": "12.1",
+   "b": "12.3",
+   "type": "prerequis",
+   "source": "cours+fiches",
+   "raison": "primitives usuelles (primitive / intégrale)",
+   "fiches": 7,
+   "sur": 7,
+   "preuves": [
+    {
+     "fiche": "b~1A~integrales~claude_12_3_04",
+     "technique": "primitive / intégrale",
+     "extrait": "in x\\,(1-\\cos x)$. avec $u=\\cos x$, $du=-\\sin x\\,dx$, $u:1\\to0$ : $$l=\\int_0^1(1-u)\\,du=\\bigl[u-\\frac{u^2}{2}\\bigr]_0^1=\\boxed{\\frac12}.$$"
+    },
+    {
+     "fiche": "b~1A~integrales~claude_12_3_02",
+     "technique": "primitive / intégrale",
+     "extrait": ",\\frac\\pi2]$, on a $dx=\\cos t\\,dt$ et $\\sqrt{1-x^2}=\\cos t$. donc $$j=\\int_0^{\\pi/2}\\cos^2t\\,dt=\\int_0^{\\pi/2}\\frac{1+\\cos2t}{2}\\,dt=\\bigl[\\frac"
+    }
+   ]
+  },
+  {
+   "a": "12.1",
+   "b": "12.4",
+   "type": "prerequis",
+   "source": "fiches",
+   "raison": "primitive / intégrale",
+   "fiches": 7,
+   "sur": 7,
+   "preuves": [
+    {
+     "fiche": "b~1A~integrales~fred_ds4b07b08_2023_05",
+     "technique": "primitive / intégrale",
+     "extrait": "\\textit{cours : décomposition en éléments simples ; $\\displaystyle\\int\\frac{u'}{u}=\\ln|u|$ ; pour $\\delta<0$, forme canonique et $\\displayst"
+    },
+    {
+     "fiche": "b~1A~integrales~anc_s2_analyse_ds2_2012_version2_01~vclaude~s2",
+     "technique": "primitive / intégrale",
+     "extrait": "\\medskip $x^2+4x+5=(x+2)^2+1$ et $x=\\frac12(2x+4)-2$ : $$f(x)=\\frac12\\int\\frac{2x+4}{x^2+4x+5}dx-2\\int\\frac{dx}{(x+2)^2+1}\\ \\longrightarrow\\ \\b"
+    }
+   ]
+  },
+  {
+   "a": "12.1",
+   "b": "12.5",
+   "type": "prerequis",
+   "source": "fiches",
+   "raison": "primitive / intégrale",
+   "fiches": 2,
+   "sur": 2,
+   "preuves": [
+    {
+     "fiche": "b~1A~integrales~exo7_ex006866",
+     "technique": "primitive / intégrale",
+     "extrait": "\\begin{enumerate} \\item $\\int \\frac{x+2}{x^2-3x-4}\\,dx$ pour calculer cette intégrale on décompose"
+    },
+    {
+     "fiche": "b~1A~integrales~exo7_ex005467",
+     "technique": "primitive / intégrale",
+     "extrait": "\\tan\\frac{x}{2}$ et donc $dx = \\frac{2dt}{1+t^2}$. $$\\begin{aligned} \\int_{}^{}\\frac{1}{\\cos x}\\;dx & =\\int_{}^{}\\frac{1+t^2}{1-t^2}\\;\\frac{2dt"
+    }
+   ]
+  },
+  {
+   "a": "12.1",
+   "b": "12.5.1",
+   "type": "prerequis",
+   "source": "fiches",
+   "raison": "primitive / intégrale",
+   "fiches": 7,
+   "sur": 7,
+   "preuves": [
+    {
+     "fiche": "b~1A~integrales~anc_s2_analyse_ds2_2012_version2_01~vclaude~s5",
+     "technique": "primitive / intégrale",
+     "extrait": "calculer la primitive ou l'intégrale suivante : $\\displaystyle g(x)=\\int 5\\sin^3(x)-2\\sin("
+    },
+    {
+     "fiche": "b~1A~integrales~anc_s2_analyse_ds_2015_2016_primitive_equa_diff_02~vclaude~s4",
+     "technique": "primitive / intégrale",
+     "extrait": "\\textit{cours : forme canonique et $\\int\\frac{du}{u^2+a^2}=\\frac1a\\arctan\\frac ua$ ; intégration par parties ;"
+    }
+   ]
+  },
+  {
+   "a": "12.1",
+   "b": "12.5.2",
+   "type": "prerequis",
+   "source": "fiches",
+   "raison": "primitive / intégrale",
+   "fiches": 7,
+   "sur": 7,
+   "preuves": [
+    {
+     "fiche": "b~1A~integrales~anc_s2_analyse_ds2_2013_2014_primitive_version1_01~vclaude~s4",
+     "technique": "primitive / intégrale",
+     "extrait": "}\\cos(bx+c)$.} \\medskip $u=\\sin x$, $du=\\cos x\\,dx$ : $\\displaystyle\\int\\frac{\\cos x\\,dx}{\\sin^2x\\cos^2x}=\\int\\frac{du}{u^2(1-u^2)}$ avec $\\df"
+    },
+    {
+     "fiche": "b~1A~integrales~anc_s2_analyse_ds2_2013_2014_primitive_version1_01~s4",
+     "technique": "primitive / intégrale",
+     "extrait": "plexes pour $e^{ax}\\sin(bx+c)$. \\medskip $u=\\cos x$ : $\\displaystyle\\int\\frac{dx}{\\cos^2x\\sin x}=-\\int\\frac{du}{u^2(1-u^2)}$ avec $\\dfrac1{u^2"
+    }
+   ]
+  },
+  {
+   "a": "12.1",
+   "b": "12.6",
+   "type": "prerequis",
+   "source": "fiches",
+   "raison": "primitive / intégrale",
+   "fiches": 7,
+   "sur": 7,
+   "preuves": [
+    {
+     "fiche": "b~1A~integrales~anc_f211_tdprimitives_01",
+     "technique": "primitive / intégrale",
+     "extrait": "dskip \\textbf{f)} par parties ($u=\\arctan x$, $v'=1$) : $\\displaystyle\\int\\arctan x\\,dx=x\\arctan x-\\int\\frac{x}{1+x^2}dx$ $$\\boxed{f(x)=x\\arctan"
+    },
+    {
+     "fiche": "b~1A~integrales~s2integration_01",
+     "technique": "primitive / intégrale",
+     "extrait": "\\begin{enumerate}[label=\\arabic*)] \\item $i=\\displaystyle\\int_0^1x(1+x^2)^5\\dd x$. \\emph{méthode} : $x\\,\\dd x=\\frac12\\dd u$ avec $"
+    }
+   ]
+  },
+  {
+   "a": "12.1",
+   "b": "13.1",
+   "type": "prerequis",
+   "source": "cours",
+   "raison": "résoudre y' + a y = 0 par une primitive",
+   "fiches": 0,
+   "sur": 0,
+   "preuves": []
+  },
+  {
+   "a": "12.1",
+   "b": "14.4.1",
+   "type": "outil",
+   "source": "fiches",
+   "raison": "primitive / intégrale",
+   "fiches": 4,
+   "sur": 7,
+   "preuves": [
+    {
+     "fiche": "b~2A~fonctions_de_plusieurs_variables~anc_f311_tdfpv_07",
+     "technique": "primitive / intégrale",
+     "extrait": "ambda}=-\\dfrac{4x}{1+x^2}$ : $$\\boxed{\\lambda(x)=\\frac1{(1+x^2)^2}}$$ primitive : $f_y=\\lambda q=\\frac{x}{1+x^2}$, donc $f=\\frac{xy}{1+x^2}+\\varphi(x"
+    },
+    {
+     "fiche": "b~2A~fonctions_de_plusieurs_variables~anc_f311_tdfpv_06",
+     "technique": "primitive / intégrale",
+     "extrait": "^2)^{3/2}}=\\frac{\\partial q}{\\partial x},$$ donc $\\omega$ est exacte. primitive en $x$ : $\\int\\frac{x\\,dx}{y\\sqrt{x^2+y^2}}=\\frac{\\sqrt{x^2+y^2}}{y}+"
+    }
+   ]
+  },
+  {
+   "a": "12.1",
+   "b": "14.4.2",
+   "type": "outil",
+   "source": "fiches",
+   "raison": "primitive / intégrale",
+   "fiches": 3,
+   "sur": 5,
+   "preuves": [
+    {
+     "fiche": "b~2A~fonctions_de_plusieurs_variables~claude_14_4_2_03",
+     "technique": "primitive / intégrale",
+     "extrait": "}$. avec $x=\\cos t$, $y=\\sin t$ : $$\\oint_\\gamma\\vec v\\cdot d\\vec\\ell=\\int_0^{2\\pi}(\\sin^2t+\\cos^2t)\\,dt=\\boxed{2\\pi}.$$ la circulation sur une"
+    },
+    {
+     "fiche": "b~2A~fonctions_de_plusieurs_variables~claude_14_4_2_05",
+     "technique": "primitive / intégrale",
+     "extrait": "=(-2\\sin t,\\ 2\\cos t,\\ 0)\\,dt$ et $$\\oint_\\gamma\\vec v\\cdot d\\vec\\ell=\\int_0^{2\\pi}\\big(4\\sin^2t+4\\cos^2t\\big)\\,dt=\\boxed{8\\pi}.$$ la circulatio"
+    }
+   ]
+  },
+  {
+   "a": "12.1",
+   "b": "14.4.3",
+   "type": "outil",
+   "source": "fiches",
+   "raison": "primitive / intégrale",
+   "fiches": 6,
+   "sur": 7,
+   "preuves": [
+    {
+     "fiche": "b~2A~courbes_parametrees_et_polaires~anc_formation_continue_gi_gifd_05",
+     "technique": "primitive / intégrale",
+     "extrait": "\\textbf{méthode.} intégrale curviligne $\\int p\\,dx+q\\,dy$ le long d'un arc paramétré, calculée arc par arc ($\\int_"
+    },
+    {
+     "fiche": "b~2A~fonctions_de_plusieurs_variables~anc_formation_continue_gi_ds2_03",
+     "technique": "primitive / intégrale",
+     "extrait": "chaque composante convexe de $\\{yz\\neq0\\}$). \\medskip \\textbf{2.} $f=\\int-2xy\\,dx=-x^2y+\\varphi(y,z)$ ; $f_y=-x^2+\\varphi_y=-x^2+\\frac1z$ donne"
+    }
+   ]
+  },
+  {
+   "a": "12.1",
+   "b": "15.1",
+   "type": "prerequis",
+   "source": "cours+fiches",
+   "raison": "intégrales simples imbriquées (primitive / intégrale)",
+   "fiches": 7,
+   "sur": 7,
+   "preuves": [
+    {
+     "fiche": "b~2A~integrales_multiples~fred_ds2alt_s3_2022_01~s1",
+     "technique": "primitive / intégrale",
+     "extrait": ", $z$, $x$.} \\medskip $d=\\{0\\leq x\\leq 1,\\ 0\\leq y\\leq x\\}$ : $$i_1=\\int_0^1\\left(\\int_0^x (x+2y)\\,dy\\right)dx=\\int_0^1\\big[xy+y^2\\big]_0^x\\,d"
+    },
+    {
+     "fiche": "b~2A~integrales_multiples~bd_2425s3ds2_01",
+     "technique": "primitive / intégrale",
+     "extrait": "textit{cours : fubini (on choisit l'ordre d'intégration qui donne une primitive) ; en coordonnées polaires $x=r\\cos\\theta$, $y=r\\sin\\theta$, $\\dx\\dy="
+    }
+   ]
+  },
+  {
+   "a": "12.1",
+   "b": "15.2",
+   "type": "outil",
+   "source": "fiches",
+   "raison": "primitive / intégrale",
+   "fiches": 7,
+   "sur": 7,
+   "preuves": [
+    {
+     "fiche": "b~2A~integrales_multiples~anc_formation_continue_gi_ds1_2009_03~vclaude~s1",
+     "technique": "primitive / intégrale",
+     "extrait": ": $r\\in]0,3[$, $\\theta\\in]-\\frac\\pi2,0[$. $$\\iint_d(x^2+y^2)\\,dx\\,dy=\\int_{-\\pi/2}^{0}\\!\\!\\int_0^3r^2\\cdot r\\,dr\\,d\\theta=\\frac\\pi2\\cdot\\frac{8"
+    },
+    {
+     "fiche": "b~2A~integrales_multiples~1718s3ds2_01",
+     "technique": "primitive / intégrale",
+     "extrait": "$(0;0)$, $(0;3)$, $(2;1)$ : $x\\in[0;2]$, $\\frac x2\\le y\\le3-x$. $$i_1=\\int_0^2 x\\bigl(\\int_{x/2}^{3-x}\\dd y\\bigr)\\dd x=\\int_0^2 x\\bigl(3-\\frac{3"
+    }
+   ]
+  },
+  {
+   "a": "12.1",
+   "b": "15.3",
+   "type": "outil",
+   "source": "fiches",
+   "raison": "primitive / intégrale",
+   "fiches": 6,
+   "sur": 7,
+   "preuves": [
+    {
+     "fiche": "b~2A~integrales_multiples~s3intdble_09",
+     "technique": "primitive / intégrale",
+     "extrait": "le\\theta\\le2\\pi$, $0\\le\\rho\\le2$, $0\\le z\\le\\sqrt{4-\\rho^2}$. $$i=2\\pi\\int_0^2\\rho\\cos(\\rho^2)\\bigl(\\int_0^{\\sqrt{4-\\rho^2}}z\\dd z\\bigr)\\dd\\rho="
+    },
+    {
+     "fiche": "b~2A~integrales_multiples~fred_ds2alt_s3_2022_01~s4",
+     "technique": "primitive / intégrale",
+     "extrait": "t en $y$, $z$, $x$.} \\medskip $d=\\{0<x<1,\\ 0<y<z,\\ 0<z<x\\}$ : $$i_4=\\int_0^1\\int_0^x\\int_0^z z\\,dy\\,dz\\,dx=\\int_0^1\\int_0^x z^2\\,dz\\,dx=\\int_0"
+    }
+   ]
+  },
+  {
+   "a": "12.1",
+   "b": "15.4",
+   "type": "outil",
+   "source": "fiches",
+   "raison": "primitive / intégrale",
+   "fiches": 7,
+   "sur": 7,
+   "preuves": [
+    {
+     "fiche": "b~2A~integrales_multiples~ds2_2022_08",
+     "technique": "primitive / intégrale",
+     "extrait": "térieur du cône, $z\\le\\rho$, avec $z\\le1$ automatiquement). alors $$v=\\int_0^\\pi\\mathrm d\\theta\\int_0^1\\int_0^\\rho\\rho\\,\\mathrm dz\\,\\mathrm d\\rh"
+    },
+    {
+     "fiche": "b~2A~integrales_multiples~td_fred_s3s4_20",
+     "technique": "primitive / intégrale",
+     "extrait": "le r\\le1$, $0\\le\\varphi\\le\\frac\\pi4$, $0\\le\\theta\\le2\\pi$ : $$v_1=2\\pi\\int_0^{\\pi/4}\\sin\\varphi\\dd\\varphi\\int_0^1r^2\\dd r=2\\pi\\cdot\\bigl(1-\\frac"
+    }
+   ]
+  },
+  {
+   "a": "12.1",
+   "b": "15.5",
+   "type": "outil",
+   "source": "fiches",
+   "raison": "primitive / intégrale",
+   "fiches": 7,
+   "sur": 7,
+   "preuves": [
+    {
+     "fiche": "b~2A~integrales_multiples~1920s3ds2_04",
+     "technique": "primitive / intégrale",
+     "extrait": "a\\in[0;\\pi]$ ($y\\ge0$), $z\\in[0;h]$. $$\\iiint_cx\\,\\dd x\\,\\dd y\\,\\dd z=\\int_0^r\\rho^2\\dd\\rho\\int_0^\\pi\\cos\\theta\\,\\dd\\theta\\int_0^h\\dd z=\\frac{r^"
+    },
+    {
+     "fiche": "b~2A~integrales_multiples~2016s3ds2_02",
+     "technique": "primitive / intégrale",
+     "extrait": "$\\rho\\in[0;1]$, $\\theta\\in[0;\\pi]$, $\\varphi\\in[0;\\frac\\pi2]$. $$i_4=\\int_0^1\\rho^3\\dd\\rho\\int_0^\\pi\\dd\\theta\\int_0^{\\pi/2}\\sin\\varphi\\cos\\varp"
+    }
+   ]
+  },
+  {
+   "a": "12.2",
+   "b": "12.2.1",
+   "type": "prerequis",
+   "source": "fiches",
+   "raison": "intégration par parties",
+   "fiches": 4,
+   "sur": 4,
+   "preuves": [
+    {
+     "fiche": "b~1A~integrales~anc_s2_analyse_ds2_2012_version2_01~vclaude~s3",
+     "technique": "intégration par parties",
+     "extrait": "lle à dénominateur irréductible (forme canonique, $\\ln$ + $\\arctan$), intégration par parties, changement de variable $u=\\cos x$ et décomposition en éléments simpl"
+    },
+    {
+     "fiche": "b~1A~integrales~anc_s2_analyse_ds2_2013_2014_primitive_version1_01~vclaude~s3",
+     "technique": "intégration par parties",
+     "extrait": "\\textit{cours : forme $u'u^n$ ; forme canonique et $\\arctan$ ; intégration par parties ; changement de variable (règles de bioche) ; linéarisation ; parties"
+    }
+   ]
+  },
+  {
+   "a": "12.2",
+   "b": "12.2.2",
+   "type": "prerequis",
+   "source": "fiches",
+   "raison": "intégration par parties",
+   "fiches": 7,
+   "sur": 7,
+   "preuves": [
+    {
+     "fiche": "b~1A~integrales~anc_s2_analyse_ds_2015_2016_primitive_equa_diff_02~vclaude~s5",
+     "technique": "intégration par parties",
+     "extrait": "forme canonique et $\\int\\frac{du}{u^2+a^2}=\\frac1a\\arctan\\frac ua$ ; intégration par parties ; règles de bioche ; polynôme $\\times$ exponentielle ; passage aux co"
+    },
+    {
+     "fiche": "b~1A~integrales~fred_ds4b07b08_2024_02",
+     "technique": "intégration par parties",
+     "extrait": "\\textit{cours : intégration par parties $\\displaystyle\\int u'v=uv-\\int uv'$.} \\medskip on pose $u'(x)=\\mathr"
+    }
+   ]
+  },
+  {
+   "a": "12.2",
+   "b": "12.2.3",
+   "type": "prerequis",
+   "source": "fiches",
+   "raison": "intégration par parties",
+   "fiches": 5,
+   "sur": 6,
+   "preuves": [
+    {
+     "fiche": "b~1A~integrales~anc_s2_analyse_ds2_2013_2014_primitive_version2_01~vclaude~s8",
+     "technique": "intégration par parties",
+     "extrait": "\\textit{cours : changement de variable, intégration par parties, règles de bioche, linéarisation, $\\int e^{ax}p(x)\\,dx=e^{ax}\\left(\\f"
+    },
+    {
+     "fiche": "b~1A~integrales~bd_s2ds_int_2025_01~s3",
+     "technique": "intégration par parties",
+     "extrait": "pôles réels puis trinôme à $\\delta<0$ avec $\\frac{u'}{u}$ et arctan), intégration par parties (deux fois pour $\\mathrm{e}^{ax}\\cos$), changements de variable $u=\\s"
+    }
+   ]
+  },
+  {
+   "a": "12.2",
+   "b": "12.4",
+   "type": "outil",
+   "source": "fiches",
+   "raison": "intégration par parties",
+   "fiches": 2,
+   "sur": 7,
+   "preuves": [
+    {
+     "fiche": "b~1A~integrales~anc_s2_analyse_ds2_2012_version2_01~vclaude~s2",
+     "technique": "intégration par parties",
+     "extrait": "lle à dénominateur irréductible (forme canonique, $\\ln$ + $\\arctan$), intégration par parties, changement de variable $u=\\cos x$ et décomposition en éléments simpl"
+    },
+    {
+     "fiche": "b~1A~integrales~bd_s2ds_int2_2022_01~vclaude~s2",
+     "technique": "intégration par parties",
+     "extrait": "(pôles réels, pôle double, trinôme à $\\delta<0$ avec $\\frac{u'}{u}$), intégration par parties, changement de variable $u=\\cos x$ ou $u=\\sin x$, $u=\\ln x$.} \\medsk"
+    }
+   ]
+  },
+  {
+   "a": "12.2",
+   "b": "12.5.1",
+   "type": "prerequis",
+   "source": "fiches",
+   "raison": "intégration par parties",
+   "fiches": 3,
+   "sur": 7,
+   "preuves": [
+    {
+     "fiche": "b~1A~integrales~anc_s2_analyse_ds2_2012_version2_01~vclaude~s5",
+     "technique": "intégration par parties",
+     "extrait": "lle à dénominateur irréductible (forme canonique, $\\ln$ + $\\arctan$), intégration par parties, changement de variable $u=\\cos x$ et décomposition en éléments simpl"
+    },
+    {
+     "fiche": "b~1A~integrales~anc_s2_analyse_ds_2015_2016_primitive_equa_diff_02~vclaude~s4",
+     "technique": "intégration par parties",
+     "extrait": "forme canonique et $\\int\\frac{du}{u^2+a^2}=\\frac1a\\arctan\\frac ua$ ; intégration par parties ; règles de bioche ; polynôme $\\times$ exponentielle ; passage aux co"
+    }
+   ]
+  },
+  {
+   "a": "12.2",
+   "b": "12.5.2",
+   "type": "outil",
+   "source": "fiches",
+   "raison": "intégration par parties",
+   "fiches": 2,
+   "sur": 7,
+   "preuves": [
+    {
+     "fiche": "b~1A~integrales~anc_s2_analyse_ds2_2013_2014_primitive_version1_01~vclaude~s4",
+     "technique": "intégration par parties",
+     "extrait": "\\textit{cours : forme $u'u^n$ ; forme canonique et $\\arctan$ ; intégration par parties ; changement de variable (règles de bioche) ; linéarisation ; parties"
+    },
+    {
+     "fiche": "b~1A~integrales~anc_s2_analyse_ds2_2013_2014_primitive_version1_01~s4",
+     "technique": "intégration par parties",
+     "extrait": "changement de variable, parties, bioche, linéarisation, intégrations par parties successives ou complexes pour $e^{ax}\\sin(bx+c)$. \\medskip $u=\\cos"
+    }
+   ]
+  },
+  {
+   "a": "12.2",
+   "b": "12.6",
+   "type": "prerequis",
+   "source": "fiches",
+   "raison": "intégration par parties",
+   "fiches": 7,
+   "sur": 7,
+   "preuves": [
+    {
+     "fiche": "b~1A~integrales~anc_f211_tdprimitives_01",
+     "technique": "intégration par parties",
+     "extrait": "\\textbf{méthode.} formes $u'u^n$, $u'/\\sqrt u$, $u'/u$, intégration par parties, linéarisation, complexes pour $e^{ax}\\sin$. \\medskip \\textbf{a)} $\\"
+    },
+    {
+     "fiche": "b~1A~integrales~s2integration_01",
+     "technique": "intégration par parties",
+     "extrait": "} $$ \\item $f(x)=\\displaystyle\\int\\arctan x\\dd x$. \\emph{méthode} : intégration par parties avec $u=\\arctan x$, $v'=1$ ($u'=\\frac1{1+x^2}$, $v=x$) : $$ f(x)=x\\ar"
+    }
+   ]
+  },
+  {
+   "a": "12.2",
+   "b": "13.1",
+   "type": "outil",
+   "source": "cours",
+   "raison": "variation de la constante : intégrer par parties",
+   "fiches": 0,
+   "sur": 0,
+   "preuves": []
+  },
+  {
+   "a": "12.2",
+   "b": "15.3",
+   "type": "outil",
+   "source": "fiches",
+   "raison": "intégration par parties",
+   "fiches": 2,
+   "sur": 7,
+   "preuves": [
+    {
+     "fiche": "b~2A~integrales_multiples~s3intdble_09",
+     "technique": "intégration par parties",
+     "extrait": "\\frac12\\dd u$) : $i=\\dfrac\\pi2\\displaystyle\\int_0^4(4-u)\\cos u\\dd u$. par parties : $\\int(4-u)\\cos u\\dd u=(4-u)\\sin u-\\cos u$, donc $\\int_0^4=(0-\\cos4)"
+    },
+    {
+     "fiche": "b~2A~integrales_multiples~tdintdble_04",
+     "technique": "intégration par parties",
+     "extrait": "\\longrightarrow\\qquad i_5=\\int_0^{\\pi/4}\\frac{y\\cos y}{\\sin y}\\dd y$$ par parties : $i_5=\\bigl[y\\ln\\sin y\\bigr]_0^{\\pi/4}-\\int_0^{\\pi/4}\\ln(\\sin y)\\dd"
+    }
+   ]
+  },
+  {
+   "a": "12.2",
+   "b": "19.1",
+   "type": "outil",
+   "source": "cours",
+   "raison": "transformées usuelles par parties",
+   "fiches": 0,
+   "sur": 0,
+   "preuves": []
+  },
+  {
+   "a": "12.3",
+   "b": "12.4",
+   "type": "prerequis",
+   "source": "fiches",
+   "raison": "changement de variable",
+   "fiches": 5,
+   "sur": 7,
+   "preuves": [
+    {
+     "fiche": "b~1A~integrales~fred_ds4b07b08_2023_05",
+     "technique": "changement de variable",
+     "extrait": "calculer $\\displaystyle \\int\\frac{2x+1}{x^2+x+1}\\,dx$. \\item avec le changement de variable $\\displaystyle \\frac{\\sqrt 3}{2}t=x+\\frac{1}{2}$, calculer $\\displays"
+    },
+    {
+     "fiche": "b~1A~integrales~anc_s2_analyse_ds2_2012_version2_01~vclaude~s2",
+     "technique": "changement de variable",
+     "extrait": "ctible (forme canonique, $\\ln$ + $\\arctan$), intégration par parties, changement de variable $u=\\cos x$ et décomposition en éléments simples, puissances impaires"
+    }
+   ]
+  },
+  {
+   "a": "12.3",
+   "b": "12.5",
+   "type": "prerequis",
+   "source": "fiches",
+   "raison": "changement de variable",
+   "fiches": 2,
+   "sur": 2,
+   "preuves": [
+    {
+     "fiche": "b~1A~integrales~exo7_ex006866",
+     "technique": "changement de variable",
+     "extrait": "\\pi -x) = \\sin^8 x (-\\cos^3 x) (-dx) = \\sin^8x\\cos^3x \\, dx$. donc le changement de variable adéquat est $u = \\sin x$. posons $u = \\sin x$, $du = \\cos x \\, dx$."
+    },
+    {
+     "fiche": "b~1A~integrales~exo7_ex005467",
+     "technique": "changement de variable",
+     "extrait": "\\begin{enumerate} \\item on pose $t = \\tan\\frac{x}{2}$ et donc $dx = \\frac{2dt}{1+t^2}$. $$\\begin{aligned}"
+    }
+   ]
+  },
+  {
+   "a": "12.3",
+   "b": "12.5.1",
+   "type": "prerequis",
+   "source": "fiches",
+   "raison": "changement de variable",
+   "fiches": 5,
+   "sur": 7,
+   "preuves": [
+    {
+     "fiche": "b~1A~integrales~anc_s2_analyse_ds2_2012_version2_01~vclaude~s5",
+     "technique": "changement de variable",
+     "extrait": "ctible (forme canonique, $\\ln$ + $\\arctan$), intégration par parties, changement de variable $u=\\cos x$ et décomposition en éléments simples, puissances impaires"
+    },
+    {
+     "fiche": "b~1A~integrales~anc_s2_analyse_ds2_2013_2014_primitive_version1_01~vclaude~s6",
+     "technique": "changement de variable",
+     "extrait": "me $u'u^n$ ; forme canonique et $\\arctan$ ; intégration par parties ; changement de variable (règles de bioche) ; linéarisation ; parties successives pour $e^{ax}"
+    }
+   ]
+  },
+  {
+   "a": "12.3",
+   "b": "12.5.2",
+   "type": "prerequis",
+   "source": "fiches",
+   "raison": "changement de variable",
+   "fiches": 4,
+   "sur": 7,
+   "preuves": [
+    {
+     "fiche": "b~1A~integrales~anc_s2_analyse_ds2_2013_2014_primitive_version1_01~vclaude~s4",
+     "technique": "changement de variable",
+     "extrait": "me $u'u^n$ ; forme canonique et $\\arctan$ ; intégration par parties ; changement de variable (règles de bioche) ; linéarisation ; parties successives pour $e^{ax}"
+    },
+    {
+     "fiche": "b~1A~integrales~anc_s2_analyse_ds2_2013_2014_primitive_version1_01~s4",
+     "technique": "changement de variable",
+     "extrait": "\\textbf{méthode.} changement de variable, parties, bioche, linéarisation, intégrations par parties successives"
+    }
+   ]
+  },
+  {
+   "a": "12.3",
+   "b": "12.6",
+   "type": "prerequis",
+   "source": "fiches",
+   "raison": "changement de variable",
+   "fiches": 5,
+   "sur": 7,
+   "preuves": [
+    {
+     "fiche": "b~1A~integrales~anc_f211_tdprimitives_01",
+     "technique": "changement de variable",
+     "extrait": "e i=\\big[\\ln(3+x)\\big]_0^1=\\boxed{\\ln\\frac43}$. \\medskip \\textbf{h)} on pose $x=\\sin\\theta$, $\\theta\\in[-\\frac\\pi2,\\frac\\pi2]$, $dx=\\cos\\theta\\,d\\thet"
+    },
+    {
+     "fiche": "b~1A~integrales~s2integration_01",
+     "technique": "changement de variable",
+     "extrait": "\\int_{1/a}^a\\frac{\\ln x}{x^2+1}\\dd x$ (avec $a>0$). \\emph{méthode} : changement de variable $x=\\frac1t$, $\\dd x=-\\frac{\\dd t}{t^2}$. alors $\\ln x=-\\ln t$ et $x^2"
+    }
+   ]
+  },
+  {
+   "a": "12.3",
+   "b": "14.2",
+   "type": "prerequis",
+   "source": "fiches",
+   "raison": "changement de variable",
+   "fiches": 6,
+   "sur": 7,
+   "preuves": [
+    {
+     "fiche": "b~2A~fonctions_de_plusieurs_variables~1920s3ds1_02",
+     "technique": "changement de variable",
+     "extrait": "\\textit{cours : changement de variables $(x,y)=\\varphi(u,v)$, $f(x,y)=g(u,v)$ : dérivées partielles de $g$ p"
+    },
+    {
+     "fiche": "b~2A~fonctions_de_plusieurs_variables~s3fpv_05",
+     "technique": "changement de variable",
+     "extrait": "changement de variables affine - edp\\\\ on veut r\\'esoudre l'\\'equation $\\displaystyle 2\\frac"
+    }
+   ]
+  },
+  {
+   "a": "12.3",
+   "b": "15.2",
+   "type": "prerequis",
+   "source": "cours",
+   "raison": "changement de variable en polaires",
+   "fiches": 0,
+   "sur": 0,
+   "preuves": []
+  },
+  {
+   "a": "13.1",
+   "b": "07.4",
+   "type": "prerequis",
+   "source": "cours",
+   "raison": "systèmes différentiels : équations du 1er ordre",
+   "fiches": 0,
+   "sur": 0,
+   "preuves": []
+  },
+  {
+   "a": "13.1",
+   "b": "13.2",
+   "type": "prerequis",
+   "source": "cours+fiches",
+   "raison": "structure des solutions (homogène + particulière) (équation différentielle 1er ordre)",
+   "fiches": 7,
+   "sur": 7,
+   "preuves": [
+    {
+     "fiche": "b~1A~equations_differentielles~anc_formation_continue_mmp_ds_ratrappage_2011_01~s2",
+     "technique": "équation différentielle 1er ordre",
+     "extrait": ", $]0;1[$, $]1;+\\infty[$.} \\textbf{méthode.} ordre 1 : homogène puis variation de la constante. ordre 2 : équation caractéristique puis particulière polynomiale. \\"
+    },
+    {
+     "fiche": "b~1A~equations_differentielles~anc_s2_analyse_ds2_2012_version2_02",
+     "technique": "équation différentielle 1er ordre",
+     "extrait": "tiplicité de $m$ (ou $m+i\\beta$) comme racine. \\medskip \\textbf{1.} $y'+\\frac1xy=x^2+x+1$ sur $\\r^{+*}$ : $(xy)'=xy'+y=x^3+x^2+x$, donc $xy=\\f"
+    }
+   ]
+  },
+  {
+   "a": "13.1",
+   "b": "19.3",
+   "type": "application",
+   "source": "cours+fiches",
+   "raison": "équations différentielles résolues par Laplace (équation différentielle 1er ordre)",
+   "fiches": 3,
+   "sur": 7,
+   "preuves": [
+    {
+     "fiche": "b~2A~transformee_de_laplace~ds2_2022_02~vclaude2",
+     "technique": "équation différentielle 1er ordre",
+     "extrait": ")^2(p^2+1)}$$ \\item résoudre en utilisant la transformée de laplace l'équation différentielle $$y''+y=t\\,e^{3t}\\;\\;\\mbox{avec}\\;\\;y(0)=2,\\;\\;y'(0)=1$$ \\item résoud"
+    },
+    {
+     "fiche": "b~2A~transformee_de_laplace~fred_ds_complements_2022_1_02~vclaude4",
+     "technique": "équation différentielle 1er ordre",
+     "extrait": ")^2(p^2+4)}$$ \\item résoudre en utilisant la transformée de laplace l'équation différentielle $$y''+4y=t\\,e^{-t}\\;\\;\\mbox{avec}\\;\\;y(0)=1,\\;\\;y'(0)=0$$ \\item résou"
+    }
+   ]
+  },
+  {
+   "a": "13.2",
+   "b": "19.3",
+   "type": "application",
+   "source": "cours",
+   "raison": "équations du 2nd ordre par Laplace",
+   "fiches": 0,
+   "sur": 0,
+   "preuves": []
+  },
+  {
+   "a": "14.1",
+   "b": "14.2",
+   "type": "prerequis",
+   "source": "cours+fiches",
+   "raison": "règle de la chaîne (dérivées partielles)",
+   "fiches": 7,
+   "sur": 7,
+   "preuves": [
+    {
+     "fiche": "b~2A~fonctions_de_plusieurs_variables~1920s3ds1_02",
+     "technique": "dérivées partielles",
+     "extrait": "urs : changement de variables $(x,y)=\\varphi(u,v)$, $f(x,y)=g(u,v)$ : dérivées partielles de $g$ par la règle de la chaîne.} \\medskip on a $g(u,v)=f(3u-v,\\,v"
+    },
+    {
+     "fiche": "b~2A~equations_differentielles~ds1_2012_equa_dif_02",
+     "technique": "dérivées partielles",
+     "extrait": "entielle suivante:(on posera $u=xy$ et $v=\\dfrac{y}{x}$). $$x \\dfrac{\\partial f }{\\partial x} + y \\dfrac{\\partial f }{\\partial y}=2.$$"
+    }
+   ]
+  },
+  {
+   "a": "14.1",
+   "b": "14.3",
+   "type": "prerequis",
+   "source": "cours",
+   "raison": "points critiques : dérivées partielles nulles",
+   "fiches": 0,
+   "sur": 0,
+   "preuves": []
+  },
+  {
+   "a": "14.1",
+   "b": "14.4.1",
+   "type": "prerequis",
+   "source": "cours+fiches",
+   "raison": "forme exacte : dérivées croisées (dérivées partielles)",
+   "fiches": 6,
+   "sur": 7,
+   "preuves": [
+    {
+     "fiche": "b~2A~fonctions_de_plusieurs_variables~anc_f311_tdfpv_07",
+     "technique": "dérivées partielles",
+     "extrait": "\\textbf{méthode.} si $\\frac{\\partial p}{\\partial y}\\neq\\frac{\\partial q}{\\partial x}$, $\\omega$ n'est pas"
+    },
+    {
+     "fiche": "b~2A~fonctions_de_plusieurs_variables~s3tdfpv_08",
+     "technique": "dérivées partielles",
+     "extrait": "\\textit{cours : $\\omega$ est exacte sur un ouvert étoilé $\\iff\\partial_yp=\\partial_xq$ (en 3 variables : les trois égalités croisées) ; on c"
+    }
+   ]
+  },
+  {
+   "a": "14.1",
+   "b": "14.4.2",
+   "type": "prerequis",
+   "source": "fiches",
+   "raison": "dérivées partielles",
+   "fiches": 5,
+   "sur": 5,
+   "preuves": [
+    {
+     "fiche": "b~2A~fonctions_de_plusieurs_variables~claude_14_4_2_03",
+     "technique": "dérivées partielles",
+     "extrait": "sur une courbe fermée est non nulle : $\\vec v$ n'est pas un champ de gradients."
+    },
+    {
+     "fiche": "b~2A~fonctions_de_plusieurs_variables~anc_formation_continue_gi_ds_final_2008_sujet_a_01",
+     "technique": "dérivées partielles",
+     "extrait": "\\textbf{1.} $\\mathrm{div}(\\vec v)=\\dfrac{\\partial(xyz)}{\\partial x}+\\dfrac{\\partial(3x)}{\\partial y}+\\dfrac{\\partial(4y"
+    }
+   ]
+  },
+  {
+   "a": "14.1",
+   "b": "14.4.3",
+   "type": "prerequis",
+   "source": "fiches",
+   "raison": "dérivées partielles",
+   "fiches": 4,
+   "sur": 7,
+   "preuves": [
+    {
+     "fiche": "b~2A~fonctions_de_plusieurs_variables~anc_formation_continue_gi_ds2_03",
+     "technique": "dérivées partielles",
+     "extrait": "\\textbf{méthode.} champ de gradients $\\iff\\overrightarrow{\\mathrm{rot}}\\,\\vec v=\\vec0$ ; recherche de $f$"
+    },
+    {
+     "fiche": "b~2A~fonctions_de_plusieurs_variables~anc_formation_continue_gi_ds_final_2008_sujet_a_05",
+     "technique": "dérivées partielles",
+     "extrait": "posante ne dépend pas de $y$.} \\medskip $$\\mathrm{div}\\,\\vec e=\\frac{\\partial(3z)}{\\partial x}+\\frac{\\partial}{\\partial y}\\bigl(\\frac1{1+x^2}\\bigr)"
+    }
+   ]
+  },
+  {
+   "a": "14.4.1",
+   "b": "14.4.3",
+   "type": "outil",
+   "source": "fiches",
+   "raison": "forme différentielle",
+   "fiches": 2,
+   "sur": 7,
+   "preuves": [
+    {
+     "fiche": "b~2A~fonctions_de_plusieurs_variables~anc_formation_continue_gi_ds_final_2008_sujet_a_03~vclaude3",
+     "technique": "forme différentielle",
+     "extrait": "boxed{-2}$$ vérification : $\\partial_yp=2x=\\partial_xq$, la forme est exacte, de primitive $f=x^{2} y + x + y^{3}$, et $f(b)-f(a)=-1-(1)=-2$."
+    },
+    {
+     "fiche": "b~2A~fonctions_de_plusieurs_variables~2122s3ds1_01~vclaude6",
+     "technique": "forme différentielle",
+     "extrait": "\\textit{cours : domaine d'une forme différentielle, critère d'exactitude (égalité des dérivées croisées) sur un ouvert é"
+    }
+   ]
+  },
+  {
+   "a": "14.4.1",
+   "b": "15.1",
+   "type": "outil",
+   "source": "cours",
+   "raison": "formule de Green-Riemann",
+   "fiches": 0,
+   "sur": 0,
+   "preuves": []
+  },
+  {
+   "a": "15.1",
+   "b": "15.2",
+   "type": "prerequis",
+   "source": "cours+fiches",
+   "raison": "domaine puis passage en polaires (intégrale double)",
+   "fiches": 6,
+   "sur": 7,
+   "preuves": [
+    {
+     "fiche": "b~2A~integrales_multiples~anc_formation_continue_gi_ds1_2009_03~vclaude~s1",
+     "technique": "intégrale double",
+     "extrait": "le quadrant $x>0$, $y<0$ : $r\\in]0,3[$, $\\theta\\in]-\\frac\\pi2,0[$. $$\\iint_d(x^2+y^2)\\,dx\\,dy=\\int_{-\\pi/2}^{0}\\!\\!\\int_0^3r^2\\cdot r\\,dr\\,d\\the"
+    },
+    {
+     "fiche": "b~2A~integrales_multiples~1718s3ds2_01",
+     "technique": "intégrale double",
+     "extrait": "\\textit{cours : intégrale double sur un domaine $\\{x\\in[a;b],\\ y_1(x)\\le y\\le y_2(x)\\}$ (ou $y$ fixé),"
+    }
+   ]
+  },
+  {
+   "a": "15.1",
+   "b": "15.3",
+   "type": "prerequis",
+   "source": "cours+fiches",
+   "raison": "de deux à trois variables (intégrale double)",
+   "fiches": 2,
+   "sur": 7,
+   "preuves": [
+    {
+     "fiche": "b~2A~integrales_multiples~tdintdble_04",
+     "technique": "intégrale double",
+     "extrait": "triples suivantes : \\begin{enumerate} \\item $\\displaystyle i_5=\\dst\\iint_d\\frac{dxdy}{1+x^2\\tan^2y}\\;$ o\\`u $d=\\{0\\leq x\\leq 1,\\,0\\leq y\\leq \\"
+    },
+    {
+     "fiche": "b~2A~integrales_multiples~ds2b06_07_01",
+     "technique": "intégrale double",
+     "extrait": "\\begin{enumerate} \\item calculer $\\displaystyle i=\\iint_dxy\\,dxdy$ o\\`u $d=\\{0\\leq x\\leq 1,\\,x\\leq y\\leq 1\\}$. \\item calculer"
+    }
+   ]
+  },
+  {
+   "a": "15.2",
+   "b": "15.3",
+   "type": "prerequis",
+   "source": "cours",
+   "raison": "cylindriques = polaires + z",
+   "fiches": 0,
+   "sur": 0,
+   "preuves": []
+  },
+  {
+   "a": "15.3",
+   "b": "15.4",
+   "type": "prerequis",
+   "source": "cours+fiches",
+   "raison": "volumes par intégrales triples (intégrale triple / cylindrique / sphérique)",
+   "fiches": 6,
+   "sur": 7,
+   "preuves": [
+    {
+     "fiche": "b~2A~integrales_multiples~ds2_2022_08",
+     "technique": "intégrale triple / cylindrique / sphérique",
+     "extrait": "en cylindriques : $t$ est l'ensemble des points avec $0\\le\\theta\\le\\pi$ ($y\\ge0$), $"
+    },
+    {
+     "fiche": "b~2A~integrales_multiples~td_fred_s3s4_20",
+     "technique": "intégrale triple / cylindrique / sphérique",
+     "extrait": "rties symétriques ($z\\ge0$ et $z\\le0$). pour la partie supérieure, en sphériques : $0\\le r\\le1$, $0\\le\\varphi\\le\\frac\\pi4$, $0\\le\\theta\\le2\\pi$ : $$v"
+    }
+   ]
+  },
+  {
+   "a": "15.3",
+   "b": "15.5",
+   "type": "prerequis",
+   "source": "fiches",
+   "raison": "intégrale triple / cylindrique / sphérique",
+   "fiches": 7,
+   "sur": 7,
+   "preuves": [
+    {
+     "fiche": "b~2A~integrales_multiples~1920s3ds2_04",
+     "technique": "intégrale triple / cylindrique / sphérique",
+     "extrait": "\\textit{cours : coordonnées cylindriques $\\dd x\\,\\dd y\\,\\dd z=\\rho\\,\\dd\\rho\\,\\dd\\theta\\,\\dd z$ ; centre de gr"
+    },
+    {
+     "fiche": "b~2A~integrales_multiples~2016s3ds2_02",
+     "technique": "intégrale triple / cylindrique / sphérique",
+     "extrait": "\\textit{cours : coordonnées sphériques ($\\dd x\\,\\dd y\\,\\dd z=\\rho^2\\cos\\varphi\\,\\dd\\rho\\,\\dd\\theta\\,\\dd\\var"
+    }
+   ]
+  },
+  {
+   "a": "15.4",
+   "b": "15.5",
+   "type": "prerequis",
+   "source": "cours",
+   "raison": "aires, volumes, puis masses",
+   "fiches": 0,
+   "sur": 0,
+   "preuves": []
+  },
+  {
+   "a": "16",
+   "b": "17",
+   "type": "prerequis",
+   "source": "cours",
+   "raison": "tangente et branches infinies, même démarche qu'en paramétré",
+   "fiches": 0,
+   "sur": 0,
+   "preuves": []
+  },
+  {
+   "a": "19.1",
+   "b": "19.2",
+   "type": "prerequis",
+   "source": "cours+fiches",
+   "raison": "tables de transformées (transformée de Laplace)",
+   "fiches": 7,
+   "sur": 7,
+   "preuves": [
+    {
+     "fiche": "lap_10",
+     "technique": "transformée de Laplace",
+     "extrait": "calculer ou résoudre : $\\mathcal{l}^{-1}\\left[\\dfrac{p-1}{p^2+2p+5}\\right]$"
+    },
+    {
+     "fiche": "b~3A~transformee_de_laplace~fred_ds3a04_05_2026_02",
+     "technique": "transformée de Laplace",
+     "extrait": "\\textit{cours : forme canonique du dénominateur, $\\mathcal{l}(e^{-at}f)(p)=f(p+a)$, $\\mathcal{l}(\\cos\\omega t)=\\dfrac p{p^2+\\omega^"
+    }
+   ]
+  },
+  {
+   "a": "19.1",
+   "b": "19.3",
+   "type": "prerequis",
+   "source": "cours+fiches",
+   "raison": "transformer l'équation (transformée de Laplace)",
+   "fiches": 5,
+   "sur": 7,
+   "preuves": [
+    {
+     "fiche": "b~2A~transformee_de_laplace~ds2_2022_02",
+     "technique": "transformée de Laplace",
+     "extrait": "\\textbf{1.} par la table de laplace (avec l'échelon de heaviside $\\mathcal u$) : $$\\boxed{u(t)=\\mathrm e^"
+    },
+    {
+     "fiche": "b~2A~transformee_de_laplace~ds2_2022_02~vclaude2",
+     "technique": "transformée de Laplace",
+     "extrait": ",u(t)\\qquad v(t)=t\\,e^{3t}\\,u(t)}$$ \\medskip \\textbf{2.} on cherche $f(p)=\\dfrac{\\alpha}{(p-3)}+\\dfrac{\\beta}{(p-3)^2}+\\dfrac{\\gamma p+\\delta}{"
+    }
+   ]
+  },
+  {
+   "a": "19.1",
+   "b": "19.4",
+   "type": "prerequis",
+   "source": "fiches",
+   "raison": "transformée de Laplace",
+   "fiches": 1,
+   "sur": 1,
+   "preuves": [
+    {
+     "fiche": "b~3A~transformee_de_laplace~anc_formation_continue_ge_laplace_et_z_exercices_02",
+     "technique": "transformée de Laplace",
+     "extrait": "coquille, il faut lire $\\mathcal l(tf(t))=-f'(p)$.} par définition $f(p)=\\int_0^{+\\infty}f(t)e^{-pt}dt$. on dérive sous l'intégrale par rappor"
+    }
+   ]
+  },
+  {
+   "a": "19.2",
+   "b": "19.3",
+   "type": "prerequis",
+   "source": "cours",
+   "raison": "revenir au temps",
+   "fiches": 0,
+   "sur": 0,
+   "preuves": []
+  }
+ ]
+}

@@ -88,7 +88,7 @@ async function construire() {
   $('.cst-x').onclick = hide;
 
   let data, libs;
-  try { [data, libs] = await Promise.all([fetch('graphe.json?v=2').then((r) => r.json()), LIBS()]); }
+  try { [data, libs] = await Promise.all([fetch('graphe.json?v=3').then((r) => r.json()), LIBS()]); }
   catch (e) { $('.cst-load').textContent = 'Connexion nécessaire pour la vue 3D.'; return { show }; }
   const [{ default: ForceGraph3D }, THREE, { UnrealBloomPass }] = libs;
 
@@ -271,7 +271,7 @@ async function construire() {
     const n = sel, col = SEMC[n.sem] || '#7df9ff'; const nb = n.nb || {};
     const T = { semestre: 'Semestre', chapitre: 'Chapitre', notion: 'Notion' }[n.type];
     const cnt = n.type === 'semestre' ? [[nb.chap, 'chapitres'], [nb.notions, 'notions']] : [[nb.n1 ?? 0, 'questions N1'], [nb.n2 ?? 0, 'automatismes N2 · nombres variables'], [nb.n3 ?? 0, 'exercices N3']];
-    const rel = (arr, side, titre) => { const L = (arr || []).filter((l) => l.type !== 'hierarchie').sort((a, b) => (a.type === 'outil') - (b.type === 'outil')); if (!L.length) return ''; return `<h4>${titre}</h4>` + L.map((l) => { const o = byId.get(side === 's' ? (l.source.id ?? l.source) : (l.target.id ?? l.target)); return `<button data-go="${esc(o.id)}">${l.type === 'outil' ? '<span class="cst-o">outil</span> ' : ''}${esc(o.label)}<em>${esc(l.why || '')}${l.preuve ? ' · repéré dans ' + l.preuve + ' passages du site' : ''}</em></button>`; }).join(''); };
+    const rel = (arr, side, titre) => { const L = (arr || []).filter((l) => l.type !== 'hierarchie').sort((a, b) => (a.type === 'outil') - (b.type === 'outil')); if (!L.length) return ''; return `<h4>${titre}</h4>` + L.map((l) => { const o = byId.get(side === 's' ? (l.source.id ?? l.source) : (l.target.id ?? l.target)); return `<button data-go="${esc(o.id)}">${l.type === 'outil' ? '<span class="cst-o">outil</span> ' : ''}${esc(o.label)}<em>${esc(l.why || '')}${l.fiches ? ' · vu dans ' + l.fiches + ' corrigé' + (l.fiches > 1 ? 's' : '') + " de l'atelier" : l.preuve ? ' · repéré dans ' + l.preuve + ' passages du site' : ''}</em></button>`; }).join(''); };
     const kids = (out.get(n.id) || []).filter((l) => l.type === 'hierarchie' && l.niveau !== 'semestre').map((l) => byId.get(l.target.id ?? l.target));
     pn.innerHTML = `<button class="px" aria-label="Fermer le panneau">✕</button><span class="cst-badge" style="color:${col}">${esc(n.semLabel || n.sem)}</span><span class="cst-type">${T}</span>
       <h3>${esc(n.label)}</h3><div class="sub">${esc(n.type === 'notion' ? n.chapLabel : n.type === 'semestre' ? n.sub : (nb.notions || 0) + ' notions')}</div>

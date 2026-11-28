@@ -21,6 +21,25 @@ SEM = [('S1', '1re année · S1', '01', '06'), ('S2', '1re année · S2', '07', 
        ('S4', '2e année · S4', '15', '16'), ('S6', '3e année · S6', '17', '17')]
 
 P, O = 'prerequis', 'outil'
+# Sous-chapitres de l'atelier -> notions du site (numérotation du site : ch. 05 = Déterminants, 06 = Diagonalisation, ...)
+ATELIER_VERS_SITE = {
+    '01.1': 'c01t1', '01.2': 'c01t1', '01.5': 'c01t1', '01.7': 'c01t1', '01.3': 'c01t2', '01.4': 'c01t3', '01.6': 'c01t4',
+    '02.1': 'c02t1', '02.2': 'c02t1', '02.3': 'c02t2', '02.4': 'c02t3',
+    '03.1': 'c03t1', '03.2': 'c03t1', '03.3': 'c03t1', '03.4': 'c03t1', '03.5': 'c03t1', '03.6': 'c03t2',
+    '04.1': 'c04t1', '04.2': 'c04t2', '04.3': 'c04t2', '04.5': 'c04t2', '04.4': 'c06t1',
+    '06.1': 'c05t1', '06.2': 'c05t1', '06.3': 'c04t3', '06.4': 'c05t2', '06.5': 'c04t2', '06.7': 'c05t3', '06.8': 'c05t3',
+    '07.1': 'c06t2', '07.3': 'c06t2', '07.2': 'c06t3', '07.4': 'c06t3',
+    '08.3': 'c07t1', '08.1': 'c07t2', '08.2': 'c07t3', '09': 'c08t2',
+    '10.2': 'c09t1', '10.1': 'c09t2', '10.3': 'c09t3', '10.4': 'c09t3', '10.5': 'c09t3',
+    '11.1': 'c10t2', '11.2': 'c10t2', '11.3': 'c10t3',
+    '12.1': 'c11t1', '12.3': 'c11t1', '12.2': 'c11t2', '12.2.1': 'c11t2', '12.2.2': 'c11t2', '12.2.3': 'c11t2', '12.6': 'c11t2',
+    '12.4': 'c11t3', '12.5': 'c11t3', '12.5.1': 'c11t3', '12.5.2': 'c11t3',
+    '13.1': 'c12t1', '13.2': 'c12t3',
+    '14.1': 'c13t1', '14.7': 'c13t1', '14.2': 'c13t2', '14.4.1': 'c13t3', '14.4.2': 'c13t3', '14.4.3': 'c13t3', '14.3': 'c13t4',
+    '15.1': 'c14t1', '15.2': 'c14t2', '15.3': 'c14t3', '15.4': 'c14t4', '15.5': 'c14t4',
+    '16': 'c15t1', '17': 'c16t1',
+    '19.1': 'c17t1', '19.4': 'c17t2', '19.2': 'c17t3', '19.3': 'c17t4',
+}
 # (A, B, type, pourquoi, preuve = nb d'unités du site de B qui utilisent A ; 0 = lien de cours, sans compteur)
 LIENS = [
     # Complexes
@@ -144,12 +163,25 @@ def main():
         nodes.append({'id': cid, 'type': 'chapitre', 'label': c['n'] + ' · ' + c['t'], 'sem': sid, 'semLabel': slab, 'cours': '#%st1' % cid, 'exos': '#%st1n3' % cid,
                       'nb': dict(tot, notions=len(c['themes']))})
         ids.add(cid)
-    bad, seen = [], set()
+    bad, par = [], {}
     for a, b, typ, why, preuve in LIENS:
-        if a in ids and b in ids and (a, b) not in seen:
-            seen.add((a, b)); links.append({'source': a, 'target': b, 'type': typ, 'why': why, 'preuve': preuve})
+        if a in ids and b in ids: par[(a, b)] = {'source': a, 'target': b, 'type': typ, 'why': why, 'preuve': preuve, 'fiches': 0}
+        else: bad.append((a, b))
+    # Dépendances tirées des corrigés de l'atelier (codes atelier -> notions du site), cf. outils/dependances.json
+    D = json.load(open(os.path.join(ROOT, 'outils', 'dependances.json'), encoding='utf8'))['liens']
+    rang = {'prerequis': 2, 'application': 2, 'outil': 1}
+    for d in D:
+        a, b = ATELIER_VERS_SITE.get(d['a']), ATELIER_VERS_SITE.get(d['b'])
+        if not a or not b or a == b or a not in ids or b not in ids: continue
+        if (b, a) in par: continue  # garder le sens du cours
+        typ = 'prerequis' if d['type'] in ('prerequis', 'application') else 'outil'
+        o = par.get((a, b))
+        if o is None:
+            par[(a, b)] = {'source': a, 'target': b, 'type': typ, 'why': ('utilise : ' + d['raison']) if d['source'] == 'fiches' else d['raison'], 'preuve': 0, 'fiches': d['fiches']}
         else:
-            bad.append((a, b))
+            o['fiches'] = max(o['fiches'], d['fiches'])
+            if rang[typ] > rang.get(o['type'], 0): o['type'] = typ
+    for o in par.values(): links.append(o)
     json.dump({'version': 2, 'nodes': nodes, 'links': links}, open(OUT, 'w', encoding='utf8'), ensure_ascii=False, separators=(',', ':'))
     n = lambda t: sum(l['type'] == t for l in links)
     print('%d nœuds, %d liens (%d prérequis, %d outils) -> %s' % (len(nodes), len(links), n(P), n(O), OUT))
