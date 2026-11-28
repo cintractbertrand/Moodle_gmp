@@ -50,6 +50,7 @@ const CSS = `
 .cst-btn.b2{--c:#b18cff}
 .cst-rel{margin-top:14px;font-size:13px}.cst-rel h4{margin:10px 0 4px;font-size:11.5px;letter-spacing:.12em;text-transform:uppercase;opacity:.6}
 .cst-rel button{display:block;width:100%;text-align:left;background:none;border:0;color:#e6f1ff;padding:5px 6px;border-radius:8px;cursor:pointer;font:inherit}
+.cst-o{font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;color:#ffbe78;border:1px solid rgba(255,190,120,.5);border-radius:6px;padding:0 4px}
 .cst-rel button:hover{background:rgba(125,249,255,.1)}.cst-rel em{display:block;font-style:normal;opacity:.55;font-size:12px}
 .cst-pn .px{position:absolute;top:8px;right:10px;background:none;border:0;color:#e6f1ff;opacity:.6;font-size:18px;cursor:pointer}
 .scene-tooltip{font:13px system-ui,sans-serif!important;background:rgba(14,22,44,.8)!important;border:1px solid rgba(125,249,255,.3);border-radius:8px;padding:4px 8px!important;backdrop-filter:blur(6px)}
@@ -70,7 +71,7 @@ async function construire() {
   root.innerHTML = `<div class="cst-stage"></div>
   <div class="cst-load">Allumage des étoiles…</div>
   <div class="cst-top glass"><h2>✦ Constellation</h2><div class="cst-q"><input type="search" placeholder="Rechercher une notion, un chapitre…" aria-label="Rechercher" autocomplete="off"><ul class="cst-ac glass" role="listbox"></ul></div><button class="cst-x" title="Revenir au site (Échap)" aria-label="Fermer">✕</button></div>
-  <div class="cst-leg glass">${Object.entries(SEMC).map(([s, c]) => `<span style="color:${c}"><i></i><span style="color:#e6f1ff">${s}</span></span>`).join('')}<span><b></b>prérequis</span></div>
+  <div class="cst-leg glass">${Object.entries(SEMC).map(([s, c]) => `<span style="color:${c}"><i></i><span style="color:#e6f1ff">${s}</span></span>`).join('')}<span><b></b>prérequis</span><span><b style="background:#ffbe78;box-shadow:0 0 6px #ffbe78"></b>outil commun</span></div>
   <div class="cst-hint">Glisser : tourner · molette / pincer : zoom · clic : explorer</div>
   <aside class="cst-pn glass" aria-live="polite"></aside>`;
   document.body.appendChild(root);
@@ -82,7 +83,7 @@ async function construire() {
   $('.cst-x').onclick = hide;
 
   let data, libs;
-  try { [data, libs] = await Promise.all([fetch('graphe.json?v=1').then((r) => r.json()), LIBS()]); }
+  try { [data, libs] = await Promise.all([fetch('graphe.json?v=2').then((r) => r.json()), LIBS()]); }
   catch (e) { $('.cst-load').textContent = 'Connexion nécessaire pour la vue 3D.'; return { show }; }
   const [{ default: ForceGraph3D }, THREE, { UnrealBloomPass }, { default: SpriteText }] = libs;
 
@@ -90,8 +91,9 @@ async function construire() {
   const byId = new Map(data.nodes.map((n) => [n.id, n]));
   const out = new Map(), inc = new Map();
   for (const l of data.links) { (out.get(l.source) || out.set(l.source, []).get(l.source)).push(l); (inc.get(l.target) || inc.set(l.target, []).get(l.target)).push(l); }
-  const sems = data.nodes.filter((n) => n.type === 'semestre');
-  sems.forEach((n, i) => { const a = i / sems.length * Math.PI * 2 - Math.PI / 2; n.fx = Math.cos(a) * 175; n.fz = Math.sin(a) * 175; n.fy = (i % 2 ? 1 : -1) * 28; });
+  // chaque semestre = une constellation, à distance des autres (parcours en arc S1 -> S6)
+  const ANC = { S1: [-400, 30, 0], S2: [-150, -60, 130], S3: [110, 50, -70], S4: [330, -50, 110], S6: [480, 80, -60] };
+  const ancre = (k) => { let ns = []; const f = (al) => { for (const n of ns) { const a = ANC[n.sem]; if (!a) continue; const kk = (n.type === 'chapitre' ? k : k * .45) * al; n.vx += (a[0] - n.x) * kk; n.vy += (a[1] - n.y) * kk; n.vz += (a[2] - n.z) * kk; } }; f.initialize = (x) => { ns = x; }; return f; };
   const R = { semestre: 9, chapitre: 5.2, notion: 2.3 };
 
   // ---------- scène ----------
@@ -102,23 +104,24 @@ async function construire() {
     .nodeId('id').nodeVal((n) => R[n.type] ** 2 / 4)
     .nodeLabel((n) => `<b>${esc(n.label)}</b>${n.type === 'notion' ? '<br><span style="opacity:.7">' + esc(n.chapLabel) + '</span>' : n.type === 'semestre' ? '<br><span style="opacity:.7">' + esc(n.sub) + '</span>' : ''}`)
     .nodeThreeObject(nodeObj).nodeThreeObjectExtend(false)
-    .linkCurvature((l) => l.type === 'prerequis' ? .28 : 0).linkCurveRotation((l) => l.type === 'prerequis' ? (l.why || '').length % 6 : 0)
+    .linkCurvature((l) => l.type === 'hierarchie' ? 0 : .25).linkCurveRotation((l) => l.type === 'hierarchie' ? 0 : (l.why || '').length % 6)
     .linkOpacity(1).linkResolution(mob ? 4 : 6)
     .linkColor(linkColor).linkWidth(linkWidth)
-    .linkDirectionalParticles(partN).linkDirectionalParticleSpeed(partV).linkDirectionalParticleWidth(partW).linkDirectionalParticleColor(() => PRE).linkDirectionalParticleResolution(6)
+    .linkDirectionalParticles(partN).linkDirectionalParticleSpeed(partV).linkDirectionalParticleWidth(partW).linkDirectionalParticleColor((l) => l.type === 'outil' ? '#ffbe78' : PRE).linkDirectionalParticleResolution(6)
     .linkDirectionalArrowLength((l) => l.type === 'prerequis' ? 2.4 : 0).linkDirectionalArrowRelPos(.92).linkDirectionalArrowColor(() => 'rgba(125,249,255,.75)')
     .enableNodeDrag(false).warmupTicks(120).cooldownTicks(160)
     .onNodeHover((n) => { hov = n || null; $('.cst-stage').style.cursor = n ? 'pointer' : ''; majSurbrillance(); })
     .onNodeClick((n) => choisir(n, true))
     .onBackgroundClick(() => { if (sel) { sel = null; panneau(); majSurbrillance(); } });
   const ctr = () => G.controls();
-  G.d3Force('charge').strength((n) => n.type === 'notion' ? -28 : -90);
-  G.d3Force('link').distance((l) => l.type === 'prerequis' ? 95 : l.niveau === 'notion' ? 20 : l.niveau === 'chapitre' ? 58 : 200).strength((l) => l.type === 'prerequis' ? .025 : l.niveau === 'semestre' ? 0 : .85);
+  G.d3Force('charge').strength((n) => n.type === 'notion' ? -30 : -130);
+  G.d3Force('link').distance((l) => l.type === 'hierarchie' ? 18 : 120).strength((l) => l.type === 'hierarchie' ? .9 : l.type === 'prerequis' ? .012 : .006);
+  G.d3Force('ancre', ancre(.05));
   G.renderer().setPixelRatio(Math.min(devicePixelRatio || 1, mob ? 1.5 : 2));
   const bloom = new UnrealBloomPass(new THREE.Vector2(innerWidth, innerHeight), mob ? 1.35 : 1.65, .5, .42);
   G.postProcessingComposer().addPass(bloom);
   G.renderer().outputColorSpace = THREE.LinearSRGBColorSpace; // évite le double encodage sRGB du composer (fond gris)
-  const portrait = innerHeight > innerWidth; G.cameraPosition({ x: 0, y: portrait ? 260 : 140, z: Math.max(470, Math.min(1350, 300 / (.364 * innerWidth / innerHeight))) });
+  const portrait = innerHeight > innerWidth; G.cameraPosition({ x: 0, y: portrait ? 260 : 140, z: Math.max(640, Math.min(1500, 400 / (.364 * innerWidth / innerHeight))) });
   const c = ctr(); c.autoRotate = true; c.autoRotateSpeed = .55; c.enableDamping = true; c.dampingFactor = .08; c.minDistance = 25; c.maxDistance = 1400;
   c.addEventListener('start', () => { c.autoRotate = false; });
 
@@ -134,13 +137,12 @@ async function construire() {
     const col = new THREE.Color(SEMC[n.sem] || '#ffffff'); const g = new THREE.Group(); const r = R[n.type];
     const core = new THREE.Mesh(geo.s, new THREE.MeshBasicMaterial({ color: n.type === 'notion' ? col.clone().lerp(new THREE.Color('#ffffff'), .35) : col, transparent: true }));
     core.scale.setScalar(r); g.add(core); n.__mats = [core.material];
-    if (n.type === 'semestre') { // noyau atomique : orbites électroniques
-      for (let k = 0; k < 3; k++) { const ring = new THREE.Mesh(geo.r, new THREE.MeshBasicMaterial({ color: col, transparent: true, opacity: .55 })); ring.scale.setScalar(r * 2.4 + k * 3); ring.rotation.set(Math.PI / 2 + k * 1.05, k * .7, 0); g.add(ring); n.__mats.push(ring.material);
+    if (n.type === 'chapitre') { // noyau atomique : orbites électroniques
+      for (let k = 0; k < 2; k++) { const ring = new THREE.Mesh(geo.r, new THREE.MeshBasicMaterial({ color: col, transparent: true, opacity: .55 })); ring.scale.setScalar(r * 2.4 + k * 3); ring.rotation.set(Math.PI / 2 + k * 1.05, k * .7, 0); g.add(ring); n.__mats.push(ring.material);
         const el = new THREE.Mesh(geo.s, new THREE.MeshBasicMaterial({ color: '#ffffff' })); el.scale.setScalar(1.1); ring.add(el); el.position.set(1, 0, 0); el.scale.setScalar(1.1 / (r * 2.4 + k * 3)); rings.push({ ring, sp: .6 + k * .35 }); }
     }
     if (n.type === 'chapitre') {
-      const t = new SpriteText(n.label, 5.4, 'rgba(178,198,232,.9)'); t.fontWeight = '600'; t.fontFace = 'system-ui, Segoe UI, sans-serif'; t.material.depthWrite = false; t.position.y = r + 7; g.add(t); n.__mats.push(t.material);
-      const halo = new THREE.Mesh(geo.r, new THREE.MeshBasicMaterial({ color: col, transparent: true, opacity: .35 })); halo.scale.setScalar(r * 1.9); g.add(halo); n.__halo = halo; n.__mats.push(halo.material);
+      const t = new SpriteText(n.label, 7.5, 'rgba(178,198,232,.9)'); t.fontWeight = '600'; t.fontFace = 'system-ui, Segoe UI, sans-serif'; t.material.depthWrite = false; t.position.y = r + 12; g.add(t); n.__mats.push(t.material);
     }
     n.__base = n.__mats.map((m) => m.opacity ?? 1); return g;
   }
@@ -159,10 +161,11 @@ async function construire() {
   function voisinage(n) { hiN.clear(); hiL.clear(); if (!n) return; hiN.add(n);
     for (const l of data.links) { const s = l.source.id ?? l.source, t = l.target.id ?? l.target; if (s === n.id || t === n.id) { hiL.add(l); hiN.add(byId.get(s)); hiN.add(byId.get(t)); } } }
   function linkColor(l) { const on = hiL.has(l), any = hiN.size > 0;
-    if (l.type === 'prerequis') return on ? 'rgba(125,249,255,.95)' : any ? 'rgba(125,249,255,.06)' : 'rgba(125,249,255,.32)';
+    if (l.type === 'prerequis') return on ? 'rgba(125,249,255,.95)' : any ? 'rgba(125,249,255,.06)' : 'rgba(125,249,255,.3)';
+    if (l.type === 'outil') return on ? 'rgba(255,190,120,.9)' : any ? 'rgba(255,190,120,.05)' : 'rgba(255,190,120,.22)';
     const c = SEMC[(l.source.sem || byId.get(l.source)?.sem)] || '#8fa8ff'; if (l.niveau === 'semestre') return any ? 'rgba(255,255,255,.04)' : 'rgba(220,230,255,.16)'; return on ? c : any ? 'rgba(120,140,190,.05)' : hexA(c, .22); }
-  function linkWidth(l) { return hiL.has(l) ? (l.type === 'prerequis' ? 1.3 : .8) : (l.type === 'prerequis' ? .45 : l.niveau === 'semestre' ? .9 : .25); }
-  function partN(l) { return l.type !== 'prerequis' ? 0 : hiL.has(l) ? 7 : hiN.size ? 0 : 1; }
+  function linkWidth(l) { return hiL.has(l) ? (l.type === 'hierarchie' ? .8 : 1.3) : (l.type === 'prerequis' ? .45 : l.type === 'outil' ? .35 : .25); }
+  function partN(l) { return l.type === 'hierarchie' ? 0 : hiL.has(l) ? (l.type === 'prerequis' ? 7 : 4) : hiN.size ? 0 : (l.type === 'prerequis' ? 1 : 0); }
   function partV(l) { return hiL.has(l) ? .028 : .0045; }
   function partW(l) { return hiL.has(l) ? 2.1 : 1.1; }
   function hexA(h, a) { const c = new THREE.Color(h); return `rgba(${c.r * 255 | 0},${c.g * 255 | 0},${c.b * 255 | 0},${a})`; }
@@ -174,8 +177,9 @@ async function construire() {
 
   // ---------- caméra cinématique ----------
   function voler(n) {
-    const d = n.type === 'notion' ? 95 : n.type === 'chapitre' ? 160 : 250; const L = Math.hypot(n.x, n.y, n.z) || 1; const k = 1 + d / L;
-    const p = L < 5 ? { x: 0, y: d * .4, z: d } : { x: n.x * k, y: n.y * k + d * .25, z: n.z * k };
+    const d = n.type === 'notion' ? 170 : 240; const cp = G.camera().position; // garder l'angle de vue actuel
+    let dx = cp.x - n.x, dy = cp.y - n.y, dz = cp.z - n.z; const L = Math.hypot(dx, dy, dz) || 1; dx /= L; dy /= L; dz /= L;
+    const p = { x: n.x + dx * d, y: n.y + dy * d, z: n.z + dz * d };
     c.autoRotate = false; G.cameraPosition(p, { x: n.x, y: n.y, z: n.z }, 1700);
   }
   function choisir(n, fly) { if (!n) return; sel = n; panneau(); majSurbrillance(); if (fly) voler(n); }
@@ -186,13 +190,13 @@ async function construire() {
     const n = sel, col = SEMC[n.sem] || '#7df9ff'; const nb = n.nb || {};
     const T = { semestre: 'Semestre', chapitre: 'Chapitre', notion: 'Notion' }[n.type];
     const cnt = n.type === 'semestre' ? [[nb.chap, 'chapitres'], [nb.notions, 'notions']] : [[nb.n1 ?? 0, 'questions N1'], [nb.n2 ?? 0, 'automatismes N2 · nombres variables'], [nb.n3 ?? 0, 'exercices N3']];
-    const rel = (arr, side, titre) => { const L = (arr || []).filter((l) => l.type === 'prerequis'); if (!L.length) return ''; return `<h4>${titre}</h4>` + L.map((l) => { const o = byId.get(side === 's' ? (l.source.id ?? l.source) : (l.target.id ?? l.target)); return `<button data-go="${esc(o.id)}">${esc(o.label)}<em>${esc(l.why || '')}</em></button>`; }).join(''); };
+    const rel = (arr, side, titre) => { const L = (arr || []).filter((l) => l.type !== 'hierarchie').sort((a, b) => (a.type === 'outil') - (b.type === 'outil')); if (!L.length) return ''; return `<h4>${titre}</h4>` + L.map((l) => { const o = byId.get(side === 's' ? (l.source.id ?? l.source) : (l.target.id ?? l.target)); return `<button data-go="${esc(o.id)}">${l.type === 'outil' ? '<span class="cst-o">outil</span> ' : ''}${esc(o.label)}<em>${esc(l.why || '')}${l.preuve ? ' · repéré dans ' + l.preuve + ' passages du site' : ''}</em></button>`; }).join(''); };
     const kids = (out.get(n.id) || []).filter((l) => l.type === 'hierarchie' && l.niveau !== 'semestre').map((l) => byId.get(l.target.id ?? l.target));
-    pn.innerHTML = `<button class="px" aria-label="Fermer le panneau">✕</button><span class="cst-badge" style="color:${col}">${esc(n.sem)}</span><span class="cst-type">${T}</span>
+    pn.innerHTML = `<button class="px" aria-label="Fermer le panneau">✕</button><span class="cst-badge" style="color:${col}">${esc(n.semLabel || n.sem)}</span><span class="cst-type">${T}</span>
       <h3>${esc(n.label)}</h3><div class="sub">${esc(n.type === 'notion' ? n.chapLabel : n.type === 'semestre' ? n.sub : (nb.notions || 0) + ' notions')}</div>
       <div class="cst-cnt" style="grid-template-columns:repeat(${cnt.length},1fr)">${cnt.map(([v, t]) => `<div><b>${v ?? 0}</b><span>${t}</span></div>`).join('')}</div>
       <div class="cst-act"><button class="cst-btn" data-h="${esc(n.cours)}" style="--c:${col}">Ouvrir le cours</button><button class="cst-btn b2" data-h="${esc(n.exos)}">Lancer les exercices</button></div>
-      <div class="cst-rel">${rel(inc.get(n.id), 's', 'Prérequis')}${rel(out.get(n.id), 't', 'Débouche sur')}${kids.length ? '<h4>' + (n.type === 'semestre' ? 'Chapitres' : 'Notions') + '</h4>' + kids.map((o) => `<button data-go="${esc(o.id)}">${esc(o.label)}</button>`).join('') : ''}</div>`;
+      <div class="cst-rel">${rel(inc.get(n.id), 's', "S'appuie sur")}${rel(out.get(n.id), 't', 'Sert pour')}${kids.length ? '<h4>' + (n.type === 'semestre' ? 'Chapitres' : 'Notions') + '</h4>' + kids.map((o) => `<button data-go="${esc(o.id)}">${esc(o.label)}</button>`).join('') : ''}</div>`;
     pn.classList.add('on');
     pn.querySelector('.px').onclick = () => { sel = null; panneau(); majSurbrillance(); };
     pn.querySelectorAll('[data-go]').forEach((b) => b.onclick = () => choisir(byId.get(b.dataset.go), true));
